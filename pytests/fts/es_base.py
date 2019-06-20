@@ -348,7 +348,7 @@ class ElasticSearchBase(object):
         n = 1
         analyzer_map = {}
         while n <= num_custom_analyzers:
-            customAnalyzerName = fts_custom_analyzers_def.keys()[n-1]
+            customAnalyzerName = list(fts_custom_analyzers_def.keys())[n-1]
             fts_char_filters = fts_custom_analyzers_def[customAnalyzerName]["char_filters"]
             fts_tokenizer = fts_custom_analyzers_def[customAnalyzerName]["tokenizer"]
             fts_token_filters = fts_custom_analyzers_def[customAnalyzerName]["token_filters"]

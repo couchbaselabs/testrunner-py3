@@ -6,7 +6,7 @@ import requests
 from datetime import datetime
 import pytz
 import collections
-import constants
+from . import constants
 
 
 class ValueGenerator(object):
@@ -26,8 +26,8 @@ class ValueGenerator(object):
                 0o310,  # Octal
                 0x12c,  # Hex
                 3.14e8,  # Exponential
-                2147483648L,  # Long int
-                u"\u00dcnic\u00f6de",  # Unicode
+                2147483648,  # Long int
+                "\u00dcnic\u00f6de",  # Unicode
                 True + 5,  # Boolean
                 False - 5,
                 None,  # Special
@@ -45,8 +45,8 @@ class ValueGenerator(object):
 
     def array_mix(self):
         ret = []
-        for val in self.sub_doc().values():
-            ret.append(val.values())
+        for val in list(self.sub_doc().values()):
+            ret.append(list(val.values()))
         return ret
 
     def array_numbers(self, num_min=0, num_max=10):
@@ -133,14 +133,14 @@ class ValueGenerator(object):
             string.ascii_letters * 40 + \
             string.digits * 10 + \
             string.whitespace * 40 + \
-            string.punctuation * 10) for _ in xrange(random.randint(self.len_min, self.len_max)))
+            string.punctuation * 10) for _ in range(random.randint(self.len_min, self.len_max)))
 
     def string_num(self, len_min=1, len_max=10):
         self.len_min = int(len_min)
         self.len_max = int(len_max)
         return ''.join(random.choice(
             string.digits
-        ) for _ in xrange(random.randint(self.len_min, self.len_max)))
+        ) for _ in range(random.randint(self.len_min, self.len_max)))
 
     def rand_reserved(self):
         return random.choice(constants.niql_reserved_keywords)

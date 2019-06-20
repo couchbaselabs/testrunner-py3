@@ -1,5 +1,5 @@
 from couchbase_helper.document import View
-from hostnamemgmt_base import HostnameBaseTests
+from .hostnamemgmt_base import HostnameBaseTests
 from membase.api.rest_client import RestConnection, RestHelper
 from remote.remote_util import RemoteMachineShellConnection
 
@@ -30,7 +30,7 @@ class HostnameMgmtTests(HostnameBaseTests):
 
     def test_rename_twice(self):
         name = self.input.param('name', '')
-        for i in xrange(2):
+        for i in range(2):
             try:
                 hostnames = {}
                 if name:
@@ -38,7 +38,7 @@ class HostnameMgmtTests(HostnameBaseTests):
                         hostnames[server] = name
                 hostnames = self.rename_nodes(self.servers[:self.nodes_init], names=hostnames)
                 self.verify_referenced_by_names(self.servers[:self.nodes_init], hostnames)
-            except Exception, ex:
+            except Exception as ex:
                 if self.error:
                     self.assertTrue(str(ex).find(self.error) != -1,
                                     "Error expected: %s. Actual: %s" % (self.error, str(ex)))
@@ -56,7 +56,7 @@ class HostnameMgmtTests(HostnameBaseTests):
         self.sleep(5, 'wait for some progress in rebalance...')
         try:
             hostnames = self.rename_nodes(self.servers[:self.nodes_in + self.nodes_init])
-        except Exception, ex:
+        except Exception as ex:
             if self.error:
                 self.assertTrue(str(ex).find(self.error) != -1, "Unexpected error msg")
             else:
@@ -111,7 +111,7 @@ class HostnameMgmtTests(HostnameBaseTests):
         self.verify_referenced_by_names(self.servers[:2], hostnames)
         try:
             self.rename_nodes(self.servers[:1], names={self.servers[0]: hostnames[self.servers[1]]})
-        except Exception,  ex:
+        except Exception as  ex:
             if self.error:
                 self.assertTrue(str(ex).find(self.error) != -1, "Unexpected error msg")
             else:
@@ -120,7 +120,7 @@ class HostnameMgmtTests(HostnameBaseTests):
     def test_rename_negative_name_with_space(self):
         try:
             self.rename_nodes(self.servers[:1], names={self.servers[0]: ' '})
-        except Exception,  ex:
+        except Exception as  ex:
             if self.error:
                 self.assertTrue(str(ex).find(self.error) != -1, "Unexpected error msg")
             else:

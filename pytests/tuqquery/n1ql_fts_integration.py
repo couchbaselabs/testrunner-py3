@@ -1,4 +1,4 @@
-from tuq import QueryTests
+from .tuq import QueryTests
 from membase.api.exception import CBQError
 from lib.membase.api.rest_client import RestConnection
 from pytests.fts.fts_base import CouchbaseCluster
@@ -42,11 +42,11 @@ class N1qlFTSIntegrationTest(QueryTests):
 
 
     n1ql_syntax_tests = {
-        'select_term':{'fts_query':test_fts_query,
+        'select_term': {'fts_query':test_fts_query,
                        'fts_alias_query':test_fts_alias_query,
                        'n1ql_query':test_n1ql_query
                        },
-        'from_select_term':{'fts_query':"select primary_key from `test_bucket` where meta().id in "
+        'from_select_term': {'fts_query':"select primary_key from `test_bucket` where meta().id in "
                     "("
                         "from ("
                                 "SELECT result.hits FROM "
@@ -177,7 +177,7 @@ class N1qlFTSIntegrationTest(QueryTests):
     }
 
     prepareds_tests = {
-        'test_name':{
+        'test_name': {
             'prepared':"",
             'prepared_alias':"",
             'call_prepared':"",
@@ -304,13 +304,13 @@ class N1qlFTSIntegrationTest(QueryTests):
         services_map = self._get_services_map()
         master_result = self._validate_query_against_node(self.master, services_map, self.test_fts_query, self.test_n1ql_query, username=username, password=password)
         fts_node_result = self._validate_query_against_node(self.servers[1], services_map, self.test_fts_query, self.test_n1ql_query, username=username, password=password)
-        self.assertEquals(master_result, True, username+" query run failed on non-fts node")
-        self.assertEquals(fts_node_result, True, username+" query run failed on fts node")
+        self.assertEqual(master_result, True, username+" query run failed on non-fts node")
+        self.assertEqual(fts_node_result, True, username+" query run failed on fts node")
 
         master_result = self._validate_query_against_node(self.master, services_map, self.test_fts_alias_query, self.test_n1ql_query, username=username, password=password)
         fts_node_result = self._validate_query_against_node(self.servers[1], services_map, self.test_fts_alias_query, self.test_n1ql_query, username=username, password=password)
-        self.assertEquals(master_result, True, username+" alias query run failed on non-fts node")
-        self.assertEquals(fts_node_result, True, username+" alias query run failed on fts node")
+        self.assertEqual(master_result, True, username+" alias query run failed on non-fts node")
+        self.assertEqual(fts_node_result, True, username+" alias query run failed on fts node")
 
 
     ''' Test for user permissions - user is granted to run select queries and is not granted to run fts searches'''
@@ -323,13 +323,13 @@ class N1qlFTSIntegrationTest(QueryTests):
 
         master_result = self._validate_query_against_node(self.master, services_map, self.test_fts_query, self.test_n1ql_query, username=username, password=password)
         fts_node_result = self._validate_query_against_node(self.servers[1], services_map, self.test_fts_query, self.test_n1ql_query, username=username, password=password)
-        self.assertEquals(master_result, False, username+" query run failed on non-fts node")
-        self.assertEquals(fts_node_result, False, username+" query run failed on fts node")
+        self.assertEqual(master_result, False, username+" query run failed on non-fts node")
+        self.assertEqual(fts_node_result, False, username+" query run failed on fts node")
 
         alias_master_result = self._validate_query_against_node(self.master, services_map, self.test_fts_alias_query, self.test_n1ql_query, username=username, password=password)
         alias_fts_node_result = self._validate_query_against_node(self.servers[1], services_map, self.test_fts_alias_query, self.test_n1ql_query, username=username, password=password)
-        self.assertEquals(alias_master_result, False, username+" alias query run failed on non-fts node")
-        self.assertEquals(alias_fts_node_result, False, username+" alias query run failed on fts node")
+        self.assertEqual(alias_master_result, False, username+" alias query run failed on non-fts node")
+        self.assertEqual(alias_fts_node_result, False, username+" alias query run failed on fts node")
 
 
     ''' Test for user permissions - user is not granted to run select queries'''
@@ -341,28 +341,28 @@ class N1qlFTSIntegrationTest(QueryTests):
         errors_count = 0
         try:
             self._run_query_against_node(self.master, self.test_fts_query, username=username, password=password)
-        except CBQError, e:
+        except CBQError as e:
             if "User does not have credentials to run SELECT queries" in str(e):
                 errors_count = errors_count+1
         try:
             self._run_query_against_node(self.servers[1], self.test_fts_query, username=username, password=password)
-        except CBQError, e:
+        except CBQError as e:
             if "User does not have credentials to run SELECT queries" in str(e):
                 errors_count = errors_count+1
-        self.assertEquals(errors_count, 2, username+" query run failed.")
+        self.assertEqual(errors_count, 2, username+" query run failed.")
 
         errors_count = 0
         try:
             self._run_query_against_node(self.master, self.test_fts_alias_query, username=username, password=password)
-        except CBQError, e:
+        except CBQError as e:
             if "User does not have credentials to run SELECT queries" in str(e):
                 errors_count = errors_count+1
         try:
             self._run_query_against_node(self.servers[1], self.test_fts_alias_query, username=username, password=password)
-        except CBQError, e:
+        except CBQError as e:
             if "User does not have credentials to run SELECT queries" in str(e):
                 errors_count = errors_count+1
-        self.assertEquals(errors_count, 2, username+" alias query run failed.")
+        self.assertEqual(errors_count, 2, username+" alias query run failed.")
 
 
     ''' Test mixed cluster configuration specified below. 
@@ -373,11 +373,11 @@ class N1qlFTSIntegrationTest(QueryTests):
         services_map = self._get_services_map()
         for node in self.servers:
             test_result = self._validate_query_against_node(node, services_map, self.test_fts_query, self.test_n1ql_query)
-            self.assertEquals(test_result, True, "Node " + str(node) + " test is failed.")
+            self.assertEqual(test_result, True, "Node " + str(node) + " test is failed.")
 
             test_result = self._validate_query_against_node(node, services_map, self.test_fts_alias_query,
                                                        self.test_n1ql_query)
-            self.assertEquals(test_result, True, "Node " + str(node) + " alias test is failed.")
+            self.assertEqual(test_result, True, "Node " + str(node) + " alias test is failed.")
 
 
     ''' N1QL syntax check'''
@@ -390,16 +390,16 @@ class N1qlFTSIntegrationTest(QueryTests):
 
         for node in self.servers:
             test_result = self._validate_query_against_node(node, services_map, test_fts_query, test_n1ql_query)
-            self.assertEquals(test_result, True, "Node "+str(node)+" test "+test_name+" is failed.")
+            self.assertEqual(test_result, True, "Node "+str(node)+" test "+test_name+" is failed.")
 
             test_result = self._validate_query_against_node(node, services_map, test_fts_alias_query, test_n1ql_query)
-            self.assertEquals(test_result, True, "Node "+str(node)+" alias test "+test_name+" is failed.")
+            self.assertEqual(test_result, True, "Node "+str(node)+" alias test "+test_name+" is failed.")
 
 
     ''' N1QL syntax check - UNION/INTERSECT/EXCEPT '''
     def test_n1ql_syntax_union_intersect_except_correct_indexes(self):
         tests = {
-            "test_union":{
+            "test_union": {
                 "operator": "union",
                 "left_set_value": "test_string",
                 "right_set_value": "string data 1"
@@ -444,13 +444,13 @@ class N1qlFTSIntegrationTest(QueryTests):
 
                     for node in self.servers:
                         test_result = self._validate_query_against_node(node, services_map, fts_query, n1ql_query)
-                        self.assertEquals(test_result, True, "Node " + str(node) + " test is failed.")
+                        self.assertEqual(test_result, True, "Node " + str(node) + " test is failed.")
 
 
     ''' N1QL syntax check - UNION/INTERSECT/EXCEPT, invalid index for both subselects '''
     def test_n1ql_syntax_union_intersect_except_invalid_index(self):
         tests = {
-            "test_union":{
+            "test_union": {
                 "operator": "union",
                 "left_set_value": "test_string",
                 "right_set_value": "string data 1"
@@ -494,7 +494,7 @@ class N1qlFTSIntegrationTest(QueryTests):
                              "select * from ( select raw meta().id from test_bucket where string_field like '"+right_set_value+"%') q1) a order by q1"
                 for node in self.servers:
                     test_result = self._validate_query_against_node(node, services_map, fts_query, n1ql_query)
-                    self.assertEquals(test_result, False, "Node " + str(node) + " test is not failed.")
+                    self.assertEqual(test_result, False, "Node " + str(node) + " test is not failed.")
 
 
     ''' N1QL syntax check - ALL/DISTINCT RAW/ELEMENT/VALUE '''
@@ -515,7 +515,7 @@ class N1qlFTSIntegrationTest(QueryTests):
                     n1ql_query = "select " + a_d + r_e_v + " ht.id from (SELECT meta().id from test_bucket where string_field like 'test_string%') ht order by ht.id"
                     for node in self.servers:
                         test_result = self._validate_query_against_node(node, services_map, fts_query, n1ql_query)
-                        self.assertEquals(test_result, True, "Node " + str(node) + " test is failed.")
+                        self.assertEqual(test_result, True, "Node " + str(node) + " test is failed.")
 
 
     ''' Test idea: initially have 3-nodes cluster, containing 2 fts nodes.
@@ -534,18 +534,18 @@ class N1qlFTSIntegrationTest(QueryTests):
         services_string = self.input.param("services_init", '')
         services = services_string.split("-")
         for service in services:
-            service.replace(":",",")
+            service.replace(":", ",")
         idx_result_node1_before_failover = self._run_query_against_node(self.servers[0], self.test_fts_query)
 
 
         alias_result_node1_before_failover = self._run_query_against_node(self.servers[0], self.test_fts_alias_query)
-        self.assertEquals(idx_result_node1_before_failover == alias_result_node1_before_failover, True, "Results before failover are not the same.")
+        self.assertEqual(idx_result_node1_before_failover == alias_result_node1_before_failover, True, "Results before failover are not the same.")
 
         self.cluster.failover(servers=self.servers, failover_nodes=[self.servers[2]], graceful=False)
 
         idx_result_node1_after_failover = self._run_query_against_node(self.servers[0], self.test_fts_query)
         alias_result_node1_after_failover = self._run_query_against_node(self.servers[0], self.test_fts_alias_query)
-        self.assertEquals(idx_result_node1_before_failover == idx_result_node1_after_failover and
+        self.assertEqual(idx_result_node1_before_failover == idx_result_node1_after_failover and
                           idx_result_node1_before_failover == alias_result_node1_after_failover, True, "Results after failover are not the same.")
 
         self.cluster.rebalance(self.servers, [], [self.servers[2]])
@@ -554,7 +554,7 @@ class N1qlFTSIntegrationTest(QueryTests):
         idx_result_node1_after_rebalance = self._run_query_against_node(self.servers[0], self.test_fts_query)
         alias_result_node1_after_rebalance = self._run_query_against_node(self.servers[0], self.test_fts_alias_query)
 
-        self.assertEquals(idx_result_node1_before_failover == idx_result_node1_after_rebalance and
+        self.assertEqual(idx_result_node1_before_failover == idx_result_node1_after_rebalance and
                           idx_result_node1_before_failover == alias_result_node1_after_rebalance, True, "Results after rebalance are not the same.")
 
 
@@ -574,7 +574,7 @@ class N1qlFTSIntegrationTest(QueryTests):
         idx_result_node3_before_failover = self._run_query_against_node(self.servers[2], self.test_fts_query)
         alias_result_node3_before_failover = self._run_query_against_node(self.servers[2], self.test_fts_alias_query)
 
-        self.assertEquals(idx_result_node2_before_failover == alias_result_node2_before_failover and
+        self.assertEqual(idx_result_node2_before_failover == alias_result_node2_before_failover and
                           idx_result_node2_before_failover == idx_result_node3_before_failover and
                           idx_result_node2_before_failover == alias_result_node3_before_failover, True, "Results before failover are not the same.")
 
@@ -583,7 +583,7 @@ class N1qlFTSIntegrationTest(QueryTests):
         idx_result_node3_after_failover = self._run_query_against_node(self.servers[2], self.test_fts_query)
         alias_result_node3_after_failover = self._run_query_against_node(self.servers[2], self.test_fts_alias_query)
 
-        self.assertEquals(idx_result_node2_before_failover == idx_result_node3_after_failover and
+        self.assertEqual(idx_result_node2_before_failover == idx_result_node3_after_failover and
                           idx_result_node2_before_failover == alias_result_node3_after_failover, True, "Results after failover are not the same.")
 
         self.cluster.rebalance(self.servers, [], [self.servers[1], self.servers[3]], services=[])
@@ -613,14 +613,14 @@ class N1qlFTSIntegrationTest(QueryTests):
             # -------------- execute simple prepared -----------------------
             prepared_results = self.run_cbq_query_curl(query=call_prepared, server=server)['results']
             test_result = self._run_query_against_node(self.master, self.test_fts_query)
-            self.assertEquals(test_result==prepared_results, True, "Node " + str(self.master) + " test is failed.")
+            self.assertEqual(test_result==prepared_results, True, "Node " + str(self.master) + " test is failed.")
             # ------------------ create simple prepared using index alias -----------------------
             self.run_cbq_query_curl(query=prepared_statement_alias, server=server)
             self.sleep(5)
             # -------------- execute simple prepared using index alias -----------------------
             prepared_results = self.run_cbq_query_curl(query=call_prepared_alias, server=server)['results']
             test_result = self._run_query_against_node(self.master, self.test_fts_alias_query)
-            self.assertEquals(test_result==prepared_results, True)
+            self.assertEqual(test_result==prepared_results, True)
 
 
     ''' Test for parameterized query with named parameters. '''
@@ -633,11 +633,11 @@ class N1qlFTSIntegrationTest(QueryTests):
         for server in [self.master, self.servers[1]]:
             prepared_results = self.run_cbq_query_curl(query=statement, server=server)['results']
             test_result = self._run_query_against_node(server, self.test_fts_query)
-            self.assertEquals(test_result==prepared_results, True, "Node " + str(server) + " test is failed.")
+            self.assertEqual(test_result==prepared_results, True, "Node " + str(server) + " test is failed.")
 
             prepared_results = self.run_cbq_query_curl(query=statement_alias, server=server)['results']
             test_result = self._run_query_against_node(server, self.test_fts_alias_query)
-            self.assertEquals(test_result==prepared_results, True, "Node " + str(server) + " alias test is failed.")
+            self.assertEqual(test_result==prepared_results, True, "Node " + str(server) + " alias test is failed.")
 
 
     ''' Test how bleveMaxResultWindow variable change reflects count of search results for SEARCH_QUERY() query. '''
@@ -649,7 +649,7 @@ class N1qlFTSIntegrationTest(QueryTests):
         shell.execute_command(cmd)
         fts_result = self.run_cbq_query(query=self.test_fts_query_big_bucket, server=self.servers[1])['results'][0]['$1']
         n1ql_result = self.run_cbq_query("select count(*) from big_bucket where age>0")['results'][0]['$1']
-        self.assertEquals(fts_result, n1ql_result, "Test is failed.")
+        self.assertEqual(fts_result, n1ql_result, "Test is failed.")
 
     def test_facets_query(self):
         self.rest.load_sample("beer-sample")
@@ -671,7 +671,7 @@ class N1qlFTSIntegrationTest(QueryTests):
         total_hits, hits, took, status, fts_facets = \
             rest.run_fts_query_with_facets(index_name="idx_beer_sample_fts",
                                query_json = fts_request)
-        self.assertEquals(fts_facets['states']['terms'], n1ql_facets['states']['terms'], "Facets are not the same for n1ql and fts requests.")
+        self.assertEqual(fts_facets['states']['terms'], n1ql_facets['states']['terms'], "Facets are not the same for n1ql and fts requests.")
 
 
     # ================================= Utils =============================
@@ -683,7 +683,7 @@ class N1qlFTSIntegrationTest(QueryTests):
     def _validate_query_against_node(self, node=None, services_map=None, fts_query=None, n1ql_query=None, username=None, password=None):
         node_ip = node.ip
         node_port = node.port
-        if str(node_ip)+":"+str(node_port) in services_map.keys():
+        if str(node_ip)+":"+str(node_port) in list(services_map.keys()):
             node_services = services_map[str(node_ip)+":"+str(node_port)]
 
             # https://issues.couchbase.com/browse/MB-32999
@@ -754,7 +754,7 @@ class N1qlFTSIntegrationTest(QueryTests):
         while indexed_doc_count < doc_count:
             try:
                 indexed_doc_count = fts_index.get_indexed_doc_count()
-            except KeyError, k:
+            except KeyError as k:
                 continue
 
         return fts_index

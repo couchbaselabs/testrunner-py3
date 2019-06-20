@@ -97,7 +97,7 @@ class CliBaseTest(BaseTestCase):
         if "bin" not in bin_path:
             self.fail("Check if cb server install on %s" % self.master.ip)
         else:
-            self.cli_command_path = bin_path.replace('"','') + "/"
+            self.cli_command_path = bin_path.replace('"', '') + "/"
         self.root_path = LINUX_ROOT_PATH
         self.tmp_path = "/tmp/"
         self.tmp_path_raw = "/tmp/"
@@ -247,7 +247,7 @@ class CliBaseTest(BaseTestCase):
         expected_services = expected_services.split(",")
 
         nodes_services = rest.get_nodes_services()
-        for node, services in nodes_services.iteritems():
+        for node, services in nodes_services.items():
             if node.encode('ascii') == hostname:
                 if len(services) != len(expected_services):
                     log.info("Services on %s do not match expected services (%s vs. %s)",
@@ -686,7 +686,7 @@ class CliBaseTest(BaseTestCase):
                             alert_write_failed, alert_audit_dropped):
         rest = RestConnection(server)
         settings = rest.get_alerts_settings()
-        print settings
+        print(settings)
 
         if not enabled:
             if not settings["enabled"]:
@@ -822,7 +822,7 @@ class CliBaseTest(BaseTestCase):
                      str(ac["viewFragmentationThreshold"]["size"]))
             return False
 
-        print from_period, to_period
+        print(from_period, to_period)
         if from_period is not None:
             fromHour, fromMin = from_period.split(":", 1)
             if int(fromHour) != int(ac["allowedTimePeriod"]["fromHour"]):
@@ -917,9 +917,9 @@ class CliBaseTest(BaseTestCase):
     def verifyGroupExists(self, server, name):
         rest = RestConnection(server)
         groups = rest.get_zone_names()
-        print groups
+        print(groups)
 
-        for gname, _ in groups.iteritems():
+        for gname, _ in groups.items():
             if name == gname:
                 return True
 

@@ -10,9 +10,9 @@ from couchbase_helper.query_definitions import QueryDefinition
 from couchbase_helper.tuq_generators import TuqGenerators
 from membase.api.rest_client import RestConnection
 from membase.helper.bucket_helper import BucketOperationHelper
-from base_2i import BaseSecondaryIndexingTests
+from .base_2i import BaseSecondaryIndexingTests
 
-DATATYPES = [unicode, "scalar", int, dict, "missing", "empty", "null"]
+DATATYPES = [str, "scalar", int, dict, "missing", "empty", "null"]
 
 log = logging.getLogger()
 
@@ -219,11 +219,11 @@ class SecondaryIndexArrayIndexTests(BaseSecondaryIndexingTests):
         generators = []
         template = '{{"name":"{0}", "age":{1}, "bigValues":{2} }}'
         for i in range(10):
-            name = FIRST_NAMES[random.choice(range(len(FIRST_NAMES)))]
+            name = FIRST_NAMES[random.choice(list(range(len(FIRST_NAMES))))]
             id = "{0}-{1}".format(name, str(i))
-            age = random.choice(range(4, 19))
+            age = random.choice(list(range(4, 19)))
             bigValues = []
-            arrLen = random.choice(range(10, 15))
+            arrLen = random.choice(list(range(10, 15)))
             indiSize = (4096 * 4)
             for j in range(arrLen):
                 longStr = "".join(random.choice(lowercase) for k in range(indiSize))
@@ -251,7 +251,7 @@ class SecondaryIndexArrayIndexTests(BaseSecondaryIndexingTests):
             if "TO_ARRAY" in index_field:
                 index_field = index_field.split("TO_ARRAY(")[1].split(r")")[0]
             if index_field:
-                if type(self.full_docs_list[0][index_field]) is list:
+                if isinstance(self.full_docs_list[0][index_field], list):
                     return index_field, type(self.full_docs_list[0][index_field][0])
                 else:
                     return index_field, "scalar"
@@ -260,7 +260,7 @@ class SecondaryIndexArrayIndexTests(BaseSecondaryIndexingTests):
 
     def change_index_field_type(self, bucket_name, index_field,
                                 doc_list, data_type, query_definition):
-        if data_type is unicode:
+        if data_type is str:
             for doc in doc_list:
                 doc[index_field] = [random.choice(FIRST_NAMES) for i in range(10)]
                 self._update_document(bucket_name, doc["_id"], doc)
@@ -350,7 +350,7 @@ class SecondaryIndexArrayIndexTests(BaseSecondaryIndexingTests):
             doc_list = []
             list_param = False
             for field in index_fields:
-                if field not in doc.keys():
+                if field not in list(doc.keys()):
                     continue
                 if isinstance(doc[field], list):
                     list_param = True

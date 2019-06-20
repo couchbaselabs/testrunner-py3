@@ -2,7 +2,7 @@ import getopt
 import re
 from builds.build_query import BuildQuery
 import logger
-import ConfigParser
+import configparser
 import os
 import collections
 
@@ -129,7 +129,7 @@ class TestInputParser():
         ini_file = ''
         for option, argument in opts:
             if option == '-h':
-                print 'usage'
+                print('usage')
                 return
             if option == '-i':
                 has_ini = True
@@ -138,15 +138,15 @@ class TestInputParser():
                 # takes in a string of the form "p1=v1,v2,p2=v3,p3=v4,v5,v6"
                 # converts to a dictionary of the form {"p1":"v1,v2","p2":"v3","p3":"v4,v5,v6"}
                 argument_split = [a.strip() for a in re.split("[,]?([^,=]+)=", argument)[1:]]
-                pairs = dict(zip(argument_split[::2], argument_split[1::2]))
-                for pair in pairs.iteritems():
+                pairs = dict(list(zip(argument_split[::2], argument_split[1::2])))
+                for pair in pairs.items():
                     if pair[0] == "vbuckets":
                         # takes in a string of the form "1-100,140,150-160"
                         # converts to an array with all those values inclusive
                         vbuckets = set()
                         for v in pair[1].split(","):
                             r = v.split("-")
-                            vbuckets.update(range(int(r[0]), int(r[-1]) + 1))
+                            vbuckets.update(list(range(int(r[0]), int(r[-1]) + 1)))
                         params[pair[0]] = sorted(vbuckets)
                     else:
                         argument_list = [a.strip() for a in pair[1].split(",")]
@@ -167,9 +167,9 @@ class TestInputParser():
             input = TestInputParser.parse_from_command_line(argv)
         input.test_params = params
 
-        if "num_clients" not in input.test_params.keys() and input.clients:   # do not override the command line value
+        if "num_clients" not in list(input.test_params.keys()) and input.clients:   # do not override the command line value
             input.test_params["num_clients"] = len(input.clients)
-        if "num_nodes" not in input.test_params.keys() and input.servers:
+        if "num_nodes" not in list(input.test_params.keys()) and input.servers:
             input.test_params["num_nodes"] = len(input.servers)
 
         return input
@@ -179,7 +179,7 @@ class TestInputParser():
         servers = []
         ips = []
         input = TestInput()
-        config = ConfigParser.ConfigParser()
+        config = configparser.ConfigParser()
         config.read(file)
         sections = config.sections()
         global_properties = {}
@@ -234,7 +234,7 @@ class TestInputParser():
             input.tuq_client['client'] = TestInputParser.get_server_options([input.tuq_client['client'],],
                                                                             input.membase_settings,
                                                                             global_properties)[0]
-        for key, value in clusters.items():
+        for key, value in list(clusters.items()):
             end += value
             input.clusters[key] = servers[start:end]
             start += value
@@ -447,7 +447,7 @@ class TestInputParser():
             need_help = False
             for option, argument in opts:
                 if option == "-h":
-                    print 'usage...'
+                    print('usage...')
                     need_help = True
                     break
             if need_help:

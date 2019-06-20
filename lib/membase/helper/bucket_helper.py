@@ -1,5 +1,5 @@
 import copy
-import exceptions
+import builtins as exceptions
 import time
 import uuid
 import zlib
@@ -13,7 +13,7 @@ import memcacheConstants
 from memcached.helper.data_helper import MemcachedClientHelper, VBucketAwareMemcached
 from mc_bin_client import MemcachedClient
 from threading import Thread
-import Queue
+import queue
 from collections import defaultdict
 from couchbase_helper.stats_tools import StatsCommon
 from remote.remote_util import RemoteMachineShellConnection
@@ -212,7 +212,7 @@ class BucketOperationHelper():
 
         for serverInfo in servers:
             node = RestConnection(serverInfo).get_nodes_self()
-            paths = set([node.storage[0].path, node.storage[0].index_path])
+            paths = {node.storage[0].path, node.storage[0].index_path}
             for path in paths:
                 if "c:/Program Files" in path:
                     path = path.replace("c:/Program Files", "/cygdrive/c/Program Files")
@@ -365,11 +365,11 @@ class BucketOperationHelper():
                 client.vbucketId = vbucketId
                 flag, keyx, value = client.get(key=key, collection=collection)
                 if value_equal_to_key:
-                    test.assertEquals(value, key, msg='values dont match')
+                    test.assertEqual(value, key, msg='values dont match')
                 if verify_flags:
                     actual_flag = socket.ntohl(flag)
                     expected_flag = ctypes.c_uint32(zlib.adler32(value)).value
-                    test.assertEquals(actual_flag, expected_flag, msg='flags dont match')
+                    test.assertEqual(actual_flag, expected_flag, msg='flags dont match')
                 if debug:
                     log.info("verified key #{0} : {1}".format(index, key))
             except mc_bin_client.MemcachedError as error:
@@ -420,7 +420,7 @@ class BucketOperationHelper():
     def keys_exist_or_assert_in_parallel(keys, server, bucket_name, test, concurrency=2, collection=None):
         log = logger.Logger.get_logger()
         verification_threads = []
-        queue = Queue.Queue()
+        queue = queue.Queue()
         for i in range(concurrency):
             keys_chunk = BucketOperationHelper.chunks(keys, len(keys) / concurrency)
             t = Thread(target=BucketOperationHelper.keys_exist_or_assert,
@@ -516,7 +516,7 @@ class BucketOperationHelper():
             vbucketId = crc32.crc32_hash(key) & (vbucket_count - 1)
             client.vbucketId = vbucketId
             try:
-                client.set(key, 0, 0, key,collection=collection)
+                client.set(key, 0, 0, key, collection=collection)
                 inserted_keys.append(key)
             except mc_bin_client.MemcachedError as error:
                 log.error(error)

@@ -1,5 +1,5 @@
 import time
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import random
 import testconstants
 
@@ -109,7 +109,7 @@ class CWCBaseTest(BaseTestCase):
                         tmp_p = n.split(":")
                         if self.os_type == 'windows':
                             result["perNode"][tmp_ip]["path"] = \
-                                   ":".join((tmp_p[1].strip(),tmp_p[2].strip()))
+                                   ":".join((tmp_p[1].strip(), tmp_p[2].strip()))
                         elif self.os_type == 'unix':
                             result["perNode"][tmp_ip]["path"] = tmp_p[1].strip()
                         elif self.os_type == "mac":
@@ -181,7 +181,7 @@ class CWCBaseTest(BaseTestCase):
         for node in perNode:
             self.log.info("Verify log of node {0} uploaded to host: {1}" \
                           .format(node, self.uploadHost))
-            uploaded = urllib.urlopen(perNode[node]["url"]).getcode()
+            uploaded = urllib.request.urlopen(perNode[node]["url"]).getcode()
             if uploaded == 200 and self.uploadHost in perNode[node]["url"]:
                 self.log.info("Log of node {0} was uploaded to {1}" \
                               .format(node, perNode[node]["url"]))
@@ -237,7 +237,7 @@ class CWCBaseTest(BaseTestCase):
     def _cli_generate_random_collecting_node(self, rest):
         random_nodes = []
         nodes = rest.get_nodes()
-        for k in random.sample(range(int(self.nodes_init)), int(self.cli_collect_nodes)):
+        for k in random.sample(list(range(int(self.nodes_init))), int(self.cli_collect_nodes)):
             node_ip = nodes[k].id.replace("ns_1@", "")
             random_nodes.append(node_ip)
         random_nodes =";".join(random_nodes)

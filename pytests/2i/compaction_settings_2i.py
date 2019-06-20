@@ -1,6 +1,6 @@
 import logging
 from datetime import datetime
-from base_2i import BaseSecondaryIndexingTests
+from .base_2i import BaseSecondaryIndexingTests
 from couchbase_helper.query_definitions import QueryDefinition
 from membase.api.rest_client import RestConnection
 from remote.remote_util import RemoteMachineShellConnection
@@ -17,7 +17,7 @@ class SecondaryIndexingCompactionTests(BaseSecondaryIndexingTests):
         self.initial_index_number = self.input.param("initial_index_number", 2)
         query_template = QUERY_TEMPLATE
         self.query_template = query_template.format("job_title")
-        self.whereCondition= self.input.param("whereCondition"," job_title != \"Sales\" ")
+        self.whereCondition= self.input.param("whereCondition", " job_title != \"Sales\" ")
         self.query_template += " WHERE {0}".format(self.whereCondition)
         self.load_query_definitions = []
         for x in range(self.initial_index_number):
@@ -51,7 +51,7 @@ class SecondaryIndexingCompactionTests(BaseSecondaryIndexingTests):
             while not check and count < 10:
                 final_index_map = rest.get_index_stats()
                 for bucket in self.buckets:
-                    for index in final_index_map[bucket.name].keys():
+                    for index in list(final_index_map[bucket.name].keys()):
                         initial_compaction = initial_index_map[bucket.name][index]["num_compactions"]
                         final_compaction = final_index_map[bucket.name][index]["num_compactions"]
                         check = initial_compaction < final_compaction
@@ -286,7 +286,7 @@ class SecondaryIndexingCompactionTests(BaseSecondaryIndexingTests):
         if not buckets:
             buckets = self.buckets
         for bucket in buckets:
-            for index in final_map[bucket.name].keys():
+            for index in list(final_map[bucket.name].keys()):
                 initial_compaction = initial_map[bucket.name][index]["num_compactions"]
                 final_compaction = final_map[bucket.name][index]["num_compactions"]
                 self.assertTrue((initial_compaction<final_compaction),

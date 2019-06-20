@@ -6,7 +6,7 @@ import json
 import datetime
 from threading import Thread, Event
 from TestInput import TestInputSingleton
-from basetestcase import BaseTestCase
+from .basetestcase import BaseTestCase
 from membase.api.rest_client import RestConnection
 from membase.helper.bucket_helper import BucketOperationHelper
 from remote.remote_util import RemoteMachineShellConnection
@@ -35,7 +35,7 @@ class AutoCompactionTests(BaseTestCase):
     def insert_key(serverInfo, bucket_name, count, size):
         rest = RestConnection(serverInfo)
         smart = VBucketAwareMemcached(rest, bucket_name)
-        for i in xrange(count * 1000):
+        for i in range(count * 1000):
             key = "key_" + str(i)
             flag = random.randint(1, 999)
             value = {"value" : MemcachedClientHelper.create_value("*", size)}
@@ -57,7 +57,7 @@ class AutoCompactionTests(BaseTestCase):
             # update docs to create fragmentation
             try:
                 self._load_all_buckets(server, gen, "update", 0)
-            except Exception, ex:
+            except Exception as ex:
                 self.is_crashed.set()
                 self.log.error("Load cannot be performed: %s" % str(ex))
         monitor_fragm.result()
@@ -84,7 +84,7 @@ class AutoCompactionTests(BaseTestCase):
         if not output and (percent_threshold <= MIN_COMPACTION_THRESHOLD or percent_threshold >= MAX_COMPACTION_THRESHOLD):
             self.assertFalse(output, "it should be  impossible to set compaction value = {0}%".format(percent_threshold))
             import json
-            self.assertTrue(json.loads(rq_content).has_key("errors"), "Error is not present in response")
+            self.assertTrue("errors" in json.loads(rq_content), "Error is not present in response")
             self.assertTrue(str(json.loads(rq_content)["errors"]).find("Allowed range is 2 - 100") > -1, \
                             "Error 'Allowed range is 2 - 100' expected, but was '{0}'".format(str(json.loads(rq_content)["errors"])))
             self.log.info("Response contains error = '%(errors)s' as expected" % json.loads(rq_content))
@@ -95,7 +95,7 @@ class AutoCompactionTests(BaseTestCase):
             info = rest.get_nodes_self()
             available_ram = info.memoryQuota * (node_ram_ratio) / 2
             items = (int(available_ram * 1000) / 2) / item_size
-            print "ITEMS =============%s" % items
+            print("ITEMS =============%s" % items)
 
             rest.create_bucket(bucket=bucket_name, ramQuotaMB=int(available_ram), authType='sasl',
                                saslPassword='password', replicaNumber=1, proxyPort=11211)
@@ -136,7 +136,7 @@ class AutoCompactionTests(BaseTestCase):
                     self.fail("auto compaction does not run")
                 elif compact_run:
                     self.log.info("auto compaction run successfully")
-            except Exception, ex:
+            except Exception as ex:
                 self.log.info("exception in auto compaction")
                 if self.during_ops:
                      if self.during_ops == "change_password":
@@ -303,7 +303,7 @@ class AutoCompactionTests(BaseTestCase):
                                  allowedTimePeriodAbort="false")
         self._load_all_buckets(self.master, self.gen_load, "create", 0, 1)
         self._monitor_DB_fragmentation()
-        for i in xrange(10):
+        for i in range(10):
             active_tasks = self.cluster.async_monitor_active_task(self.master, "bucket_compaction", "bucket", wait_task=False)
             for active_task in active_tasks:
                 result = active_task.result()
@@ -334,7 +334,7 @@ class AutoCompactionTests(BaseTestCase):
                                  allowedTimePeriodAbort="false")
         self._load_all_buckets(self.master, self.gen_load, "create", 0, 1)
         self._monitor_DB_fragmentation()
-        for i in xrange(10):
+        for i in range(10):
             active_tasks = self.cluster.async_monitor_active_task(self.master, "bucket_compaction", "bucket", wait_task=False)
             for active_task in active_tasks:
                 result = active_task.result()
@@ -375,7 +375,7 @@ class AutoCompactionTests(BaseTestCase):
                     result = active_task.result()
                     self.assertTrue(result)
                     self.sleep(2)
-            except Exception, ex:
+            except Exception as ex:
                 self.log.error("Load cannot be performed: %s" % str(ex))
                 self.fail(ex)
         monitor_fragm.result()
@@ -464,7 +464,7 @@ class AutoCompactionTests(BaseTestCase):
             self.assertTrue(result)
             remote_client.wait_till_compaction_end(rest, self.default_bucket_name, self.wait_timeout)
             compaction_running = False
-        except Exception, ex:
+        except Exception as ex:
             self.is_crashed.set()
             self.log.error("Compaction cannot be cancelled: %s" % str(ex))
         remote_client.disconnect()
@@ -487,7 +487,7 @@ class AutoCompactionTests(BaseTestCase):
                     self.fail("Fragmentation level is not reached in %s sec" % self.wait_timeout * 30)
                 try:
                     self._load_all_buckets(self.servers[0], self.gen_update, "update", 0)
-                except Exception, ex:
+                except Exception as ex:
                     self.log.error("Load cannot be performed: %s" % str(ex))
                     self.fail(ex)
             monitor_fragm.result()
@@ -505,7 +505,7 @@ class AutoCompactionTests(BaseTestCase):
                 self.fail("Fragmentation level is not reached in %s sec" % self.wait_timeout * 30)
             try:
                 self._load_all_buckets(self.master, self.gen_update, "update", 0)
-            except Exception, ex:
+            except Exception as ex:
                 self.is_crashed.set()
                 self.log.error("Load cannot be performed: %s" % str(ex))
                 self.fail(ex)

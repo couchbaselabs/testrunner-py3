@@ -1,4 +1,4 @@
-import Queue
+import queue
 import copy
 from newupgradebasetest import NewUpgradeBaseTest
 from remote.remote_util import RemoteMachineShellConnection, RemoteUtilHelper
@@ -31,12 +31,12 @@ class EventingUpgrade(NewUpgradeBaseTest, BaseTestCase):
         super(EventingUpgrade, self).setUp()
         self.rest = RestConnection(self.master)
         self.server = self.master
-        self.queue = Queue.Queue()
+        self.queue = queue.Queue()
         self.src_bucket_name = self.input.param('src_bucket_name', 'src_bucket')
         self.eventing_log_level = self.input.param('eventing_log_level', 'INFO')
         self.dst_bucket_name = self.input.param('dst_bucket_name', 'dst_bucket')
         self.dst_bucket_name1 = self.input.param('dst_bucket_name1', 'dst_bucket1')
-        self.dst_bucket_curl = self.input.param('dst_bucket_curl','dst_bucket_curl')
+        self.dst_bucket_curl = self.input.param('dst_bucket_curl', 'dst_bucket_curl')
         self.source_bucket_mutation = self.input.param('source_bucket_mutation', 'source_bucket_mutation')
         self.metadata_bucket_name = self.input.param('metadata_bucket_name', 'metadata')
         self.gens_load = self.generate_docs(self.docs_per_day)
@@ -114,8 +114,8 @@ class EventingUpgrade(NewUpgradeBaseTest, BaseTestCase):
         # Validate the data for both the functions
         self.validate_eventing(self.dst_bucket_name, 0)
         self.validate_eventing(self.dst_bucket_name1, 0)
-        self.validate_eventing(self.source_bucket_mutation,0)
-        self.validate_eventing(self.dst_bucket_curl,0)
+        self.validate_eventing(self.source_bucket_mutation, 0)
+        self.validate_eventing(self.dst_bucket_curl, 0)
         # add data to source bucket
         self.load(self.gens_load, buckets=self.src_bucket, verify_data=False)
         # Validate the data for both the functions

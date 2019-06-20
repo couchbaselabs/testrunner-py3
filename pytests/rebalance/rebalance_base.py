@@ -96,7 +96,7 @@ class RebalanceBaseTest(BaseTestCase):
             # Shuffle the nodesS
             for i in range(1, self.zone):
                 node_in_zone = list(set(nodes_in_zone[zones[i]]) -
-                                    set([node for node in rest.get_nodes_in_zone(zones[i])]))
+                                    {node for node in rest.get_nodes_in_zone(zones[i])})
                 rest.shuffle_nodes_in_zones(node_in_zone, zones[0], zones[i])
         otpnodes = [node.id for node in rest.node_statuses()]
         nodes_to_remove = [node.id for node in rest.node_statuses()

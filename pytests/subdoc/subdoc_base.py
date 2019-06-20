@@ -131,7 +131,7 @@ class SubdocBaseTest(BaseTestCase):
 
     def generate_path(self, level, key):
         path = key
-        list = range(level)
+        list = list(range(level))
         list.reverse()
         for i in list:
             path = "level_"+str(i)+"."+path
@@ -189,9 +189,9 @@ class SubdocBaseTest(BaseTestCase):
                 host = self.master.ip
                 if self.master.ip == "127.0.0.1":
                     scheme = "http"
-                    host="{0}:{1}".format(self.master.ip,self.master.port)
-                return SDKClient(scheme=scheme,hosts = [host], bucket = bucket.name)
-            except Exception, ex:
+                    host="{0}:{1}".format(self.master.ip, self.master.port)
+                return SDKClient(scheme=scheme, hosts = [host], bucket = bucket.name)
+            except Exception as ex:
                 self.log.error("cannot load sdk client due to error {0}".format(str(ex)))
         # USE MC BIN CLIENT WHEN NOT USING SDK CLIENT
         return self.direct_mc_bin_client(server, bucket, timeout= timeout)

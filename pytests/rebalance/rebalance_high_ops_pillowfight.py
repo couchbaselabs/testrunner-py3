@@ -303,7 +303,7 @@ class RebalanceHighOpsWithPillowFight(BaseTestCase):
         while num_items > batch_end:
             batch_end = batch_start + batch_size
             keys = []
-            for i in xrange(batch_start, batch_end, 1):
+            for i in range(batch_start, batch_end, 1):
                 keys.append(str(i).rjust(20, '0'))
             try:
                 bkt.get_multi(keys)
@@ -1331,8 +1331,8 @@ class RebalanceHighOpsWithPillowFight(BaseTestCase):
 
     def view_queries(self, iterations):
         query = {"connectionTimeout": 60000}
-        for count in xrange(iterations):
-            for i in xrange(self.view_num):
+        for count in range(iterations):
+            for i in range(self.view_num):
                 self.cluster.query_view(self.master, self.ddocs[0].name,
                                         self.default_view_name + str(i), query,
                                         expected_rows=None, bucket="default",
@@ -1341,7 +1341,7 @@ class RebalanceHighOpsWithPillowFight(BaseTestCase):
     def create_ddocs_and_views(self):
         self.default_view = View(self.default_view_name, None, None)
         for bucket in self.buckets:
-            for i in xrange(int(self.ddocs_num)):
+            for i in range(int(self.ddocs_num)):
                 views = self.make_default_views(self.default_view_name,
                                                 self.view_num,
                                                 self.is_dev_ddoc,

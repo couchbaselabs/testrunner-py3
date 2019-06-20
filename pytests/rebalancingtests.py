@@ -294,7 +294,7 @@ class RebalanceDataGenerator(object):
 
     @staticmethod
     def do_verification(kv_store, rest, bucket):
-        keys = kv_store.keys()
+        keys = list(kv_store.keys())
         smart = VBucketAwareMemcached(rest, bucket)
         validation_failures = {}
         for k in keys:

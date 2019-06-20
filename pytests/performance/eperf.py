@@ -25,7 +25,7 @@ try:
     from seriesly import Seriesly
     import seriesly.exceptions
 except ImportError:
-    print "unable to import seriesly: see http://pypi.python.org/pypi/seriesly"
+    print("unable to import seriesly: see http://pypi.python.org/pypi/seriesly")
     Seriesly = None
 
 
@@ -53,7 +53,7 @@ def multi_buckets(test):
         prefix = self.parami("prefix", 0)
 
         procs = []
-        for bucket_id in reversed(range(num_buckets)):
+        for bucket_id in reversed(list(range(num_buckets))):
             self.set_param("bucket", buckets[bucket_id])
             new_prefix = prefix + bucket_id * num_clients
             self.set_param("prefix", str(new_prefix))
@@ -170,8 +170,8 @@ class EPerfMaster(perf.PerfBase):
         if input is None or not input:
             return output
 
-        for key, value in input.iteritems():
-            if key in output.keys():
+        for key, value in input.items():
+            if key in list(output.keys()):
                 output[key] += value
             else:
                 output[key] = value
@@ -214,7 +214,7 @@ class EPerfMaster(perf.PerfBase):
         # Merge (terrible time complexity)
         merged_ops = list()
         indexes = [0, 0]
-        for i in xrange(num_steps):
+        for i in range(num_steps):
             # Current time frame
             start_of_step = start_time + step * i
             end_of_step = start_of_step + step
@@ -257,7 +257,7 @@ class EPerfMaster(perf.PerfBase):
         final_json = json.loads(final_json)
         i += 1
         merge_keys = []
-        for latency in final_json.keys():
+        for latency in list(final_json.keys()):
             if latency.startswith('latency'):
                 merge_keys.append(str(latency))
 
@@ -280,7 +280,7 @@ class EPerfMaster(perf.PerfBase):
             dict = file.read()
             file.close()
             dict = json.loads(dict)
-            for key, value in dict.items():
+            for key, value in list(dict.items()):
                 if key in merge_keys:
                     if key.endswith("histogram"):
                         self.merge_dict(final_json[key], value)
@@ -664,7 +664,7 @@ class EPerfMaster(perf.PerfBase):
 
             bucket = self.param('bucket', 'default')
 
-            for ddoc_name, d in ddocs.items():
+            for ddoc_name, d in list(ddocs.items()):
                 d = copy.copy(d)
                 d["language"] = "javascript"
                 d_json = json.dumps(d)
@@ -674,8 +674,8 @@ class EPerfMaster(perf.PerfBase):
                                         headers=self.rest._create_capi_headers())
 
             # Initialize indexing
-            for ddoc_name, d in ddocs.items():
-                for view_name, x in d["views"].items():
+            for ddoc_name, d in list(ddocs.items()):
+                for view_name, x in list(d["views"].items()):
                     for attempt in range(10):
                         try:
                             self.rest.query_view(ddoc_name, view_name, bucket,
@@ -706,14 +706,14 @@ class EPerfMaster(perf.PerfBase):
         if ddocs:
             # Query with debug argument equals true
             bucket = self.param('bucket', 'default')
-            ddoc_name = ddocs.keys()[0]
-            view_name = ddocs[ddoc_name]['views'].keys()[0]
+            ddoc_name = list(ddocs.keys())[0]
+            view_name = list(ddocs[ddoc_name]['views'].keys())[0]
 
             response = self.rest.query_view(ddoc_name, view_name, bucket,
                                             {'debug': 'true'})
             debug_info = response['debug_info']
 
-            for subset, data in debug_info.iteritems():
+            for subset, data in debug_info.items():
                 self.log.info(subset)
                 self.log.info(data)
 
@@ -1058,7 +1058,7 @@ class EPerfMaster(perf.PerfBase):
                 queries=queries,
                 proto_prefix="couchbase",
                 host=host,
-                ddoc=view_gen.ddocs.next()
+                ddoc=next(view_gen.ddocs)
             )
 
         # Incremental index phase
@@ -1180,7 +1180,7 @@ class EPerfClient(EPerfMaster):
 
         try:
             dbs = self.seriesly.list_dbs()
-        except seriesly.exceptions.ConnectionError, e:
+        except seriesly.exceptions.ConnectionError as e:
             self.log.error("unable to connect to seriesly server {0}: {1}"
                            .format(host, e))
             return False

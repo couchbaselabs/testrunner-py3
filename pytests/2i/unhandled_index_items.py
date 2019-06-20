@@ -4,7 +4,7 @@ import random
 import pdb
 
 from string import lowercase
-from base_2i import BaseSecondaryIndexingTests
+from .base_2i import BaseSecondaryIndexingTests
 from couchbase.bucket import Bucket
 from couchbase_helper.documentgenerator import  DocumentGenerator
 from couchbase_helper.query_definitions import QueryDefinition
@@ -44,7 +44,7 @@ class GSIUnhandledIndexItems(BaseSecondaryIndexingTests):
             try:
                 self.change_max_item_size(val)
                 self.change_max_array_size(val)
-            except Exception, ex:
+            except Exception as ex:
                 msg = "Setting should be an integer greater than 0"
                 self.assertIn(msg, str(ex), "Exception {0} for value {1}".format(str(ex), val))
             else:
@@ -70,7 +70,7 @@ class GSIUnhandledIndexItems(BaseSecondaryIndexingTests):
             self._upload_documents(num_items=self.num_docs,
                                             item_size=self.max_item_size,
                                             array_size=self.max_array_size)
-        except Exception, ex:
+        except Exception as ex:
             msg_list = ["Too big", "Invalid"]
             for msg in msg_list:
                 if msg in str(ex):
@@ -497,7 +497,7 @@ class GSIUnhandledIndexItems(BaseSecondaryIndexingTests):
             index_id = "".join(random.choice(lowercase) for k in range(random.randint(1, 255)))
             encoded_array = []
             name = "".join(random.choice(lowercase) for k in range(random.randint(max_item_length)))
-            age = random.choice(range(4, 59))
+            age = random.choice(list(range(4, 59)))
             big_value_array = [name]
             for j in range(30):
                 element = "".join(random.choice(lowercase) for k in range(random.randint(max_array_element_size)))
@@ -507,7 +507,7 @@ class GSIUnhandledIndexItems(BaseSecondaryIndexingTests):
                 [big_value_array], start=0, end=1))
         index_id = "".join(random.choice(lowercase) for k in range(250))
         name = "".join(random.choice(lowercase) for k in range(random.randint(max_item_length)))
-        age = random.choice(range(4, 59))
+        age = random.choice(list(range(4, 59)))
         big_value_array = [name]
         encoded_array = []
         for j in range(30):
@@ -571,7 +571,7 @@ class GSIUnhandledIndexItems(BaseSecondaryIndexingTests):
                 index_id = "unhandled_items_" + str(random.random()*100000)
             encoded_array = []
             name = "".join(random.choice(lowercase) for k in range(item_length))
-            age = random.choice(range(4, 59))
+            age = random.choice(list(range(4, 59)))
             big_value_array = [name]
             for j in range(array_elements):
                 element = "".join(random.choice(lowercase) for k in range(array_element_size))

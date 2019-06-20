@@ -5,9 +5,9 @@ from couchbase_helper.documentgenerator import BlobGenerator
 from remote.remote_util import RemoteMachineShellConnection
 from membase.api.rest_client import RestConnection
 from memcached.helper.data_helper import LoadWithMcsoda
-from xdcrnewbasetests import XDCRNewBaseTest
-from xdcrnewbasetests import NodeHelper
-from xdcrnewbasetests import Utility, BUCKET_NAME, OPS
+from .xdcrnewbasetests import XDCRNewBaseTest
+from .xdcrnewbasetests import NodeHelper
+from .xdcrnewbasetests import Utility, BUCKET_NAME, OPS
 from scripts.install import InstallerJob
 from lib.memcached.helper.data_helper import MemcachedClientHelper
 
@@ -312,7 +312,7 @@ class unidirectional(XDCRNewBaseTest):
         self.setup_xdcr_and_load()
         self.verify_results()
         loop_count = self._input.param("loop_count", 20)
-        for i in xrange(loop_count):
+        for i in range(loop_count):
             self.log.info("Append iteration # %s" % i)
             gen_append = BlobGenerator('loadOne', 'loadOne', self._value_size, end=self._num_items)
             self.src_cluster.load_all_buckets_from_generator(gen_append, ops=OPS.APPEND, batch_size=1)
@@ -556,7 +556,7 @@ class unidirectional(XDCRNewBaseTest):
         """Tests with 2 buckets with customized optimisic replication thresholds
            one greater than value_size, other smaller
         """
-        from xdcrnewbasetests import REPL_PARAM
+        from .xdcrnewbasetests import REPL_PARAM
         self.setup_xdcr_and_load()
         self._wait_for_replication_to_catchup()
         for remote_cluster in self.src_cluster.get_remote_clusters():
@@ -617,7 +617,7 @@ class unidirectional(XDCRNewBaseTest):
                                                         self.src_master.rest_username,
                                                         self.src_master.rest_password)
                     output, _ = self.shell.execute_command(cmd)
-                self.assertNotEquals(len(output), 0, "Full disk warning not generated as expected in %s" % node.ip)
+                self.assertNotEqual(len(output), 0, "Full disk warning not generated as expected in %s" % node.ip)
                 self.log.info("Full disk warning generated as expected in %s" % node.ip)
 
                 self.shell.delete_files(zip_file)

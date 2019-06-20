@@ -2,7 +2,7 @@ from membase.api.rest_client import RestConnection
 from membase.helper.cluster_helper import ClusterOperationHelper
 from remote.remote_util import RemoteMachineShellConnection
 
-from subdoc_autotestgenerator import SubdocAutoTestGenerator
+from .subdoc_autotestgenerator import SubdocAutoTestGenerator
 
 
 class SubdocScenarioTests(SubdocAutoTestGenerator):

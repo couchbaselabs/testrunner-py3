@@ -3,7 +3,7 @@ import testconstants
 import gc
 import sys, json
 import traceback
-import Queue
+import queue
 from threading import Thread
 from basetestcase import BaseTestCase
 from mc_bin_client import MemcachedError
@@ -117,7 +117,7 @@ class NewUpgradeBaseTest(BaseTestCase):
         self.doc_ops = self.input.param("doc_ops", False)
         if self.doc_ops:
             self.ops_dist_map = self.calculate_data_change_distribution(
-                create_per=self.create_ops_per , update_per=self.update_ops_per ,
+                create_per=self.create_ops_per, update_per=self.update_ops_per,
                 delete_per=self.delete_ops_per, expiry_per=self.expiry_ops_per,
                 start=0, end=self.docs_per_day)
             self.log.info(self.ops_dist_map)
@@ -139,7 +139,7 @@ class NewUpgradeBaseTest(BaseTestCase):
             self.is_rpm = True
             if os_version.lower() == "centos 7":
                 self.is_centos7 = True
-        self.queue = Queue.Queue()
+        self.queue = queue.Queue()
         self.upgrade_servers = []
         self.index_replicas = self.input.param("index_replicas", None)
         self.partitions_per_pindex = \
@@ -178,9 +178,9 @@ class NewUpgradeBaseTest(BaseTestCase):
                     if server.ip in [node.ip for node in nodes]:
                         temp.append(server)
                 self.servers = temp
-            except Exception, e:
+            except Exception as e:
                 if e:
-                    print "Exception ", e
+                    print("Exception ", e)
                 self.cluster.shutdown(force=True)
                 self.fail(e)
             super(NewUpgradeBaseTest, self).tearDown()
@@ -288,7 +288,7 @@ class NewUpgradeBaseTest(BaseTestCase):
         gc.collect()
         if self.input.param('extra_verification', False):
             self.total_buckets += 2
-            print self.total_buckets
+            print(self.total_buckets)
         self.bucket_size = self._get_bucket_size(self.quota, self.total_buckets)
         if self.dgm_run:
             self.bucket_size = 256
@@ -381,8 +381,8 @@ class NewUpgradeBaseTest(BaseTestCase):
             remote.disconnect()
             self.sleep(10)
             return o, e
-        except Exception, e:
-            print traceback.extract_stack()
+        except Exception as e:
+            print(traceback.extract_stack())
             if queue is not None:
                 queue.put(False)
                 if not self.is_linux:
@@ -483,8 +483,8 @@ class NewUpgradeBaseTest(BaseTestCase):
                                                    wait_time=self.wait_timeout * 5,
                                                        expected_rows=expected_rows,
                                                                      retry_time=10)
-                except Exception, e:
-                    print e
+                except Exception as e:
+                    print(e)
                     if queue is not None:
                         queue.put(False)
                 if queue is not None:
@@ -543,7 +543,7 @@ class NewUpgradeBaseTest(BaseTestCase):
         self.default_view = View(self.default_view_name, None, None)
         for bucket in self.buckets:
             if int(self.ddocs_num) > 0:
-                for i in xrange(int(self.ddocs_num)):
+                for i in range(int(self.ddocs_num)):
                     views = self.make_default_views(self.default_view_name,
                             self.view_num, self.is_dev_ddoc, different_map=True)
                     ddoc = DesignDocument(self.default_view_name + str(i), views)
@@ -552,8 +552,8 @@ class NewUpgradeBaseTest(BaseTestCase):
                         try:
                             self.cluster.create_view(self.master, ddoc.name, view,
                                                                    bucket=bucket)
-                        except Exception, e:
-                            print e
+                        except Exception as e:
+                            print(e)
                             if queue is not None:
                                 queue.put(False)
                         if queue is not None:
@@ -582,8 +582,8 @@ class NewUpgradeBaseTest(BaseTestCase):
             for valid_key in valid_keys:
                 try:
                     _, flags, exp, seqno, cas = client.memcached(valid_key).getMeta(valid_key)
-                except MemcachedError, e:
-                    print e
+                except MemcachedError as e:
+                    print(e)
                     client.reset(RestConnection(self.master))
                     _, flags, exp, seqno, cas = client.memcached(valid_key).getMeta(valid_key)
                 self.assertTrue((comparator == '==' and seqno == seqno_expected) or
@@ -607,8 +607,8 @@ class NewUpgradeBaseTest(BaseTestCase):
                     self.wait_node_restarted(server, wait_time=testconstants.NS_SERVER_TIMEOUT * 4, wait_if_warmup=True)
                 else:
                     self.wait_node_restarted(server, wait_time=testconstants.NS_SERVER_TIMEOUT * 10, wait_if_warmup=True, check_service=True)
-            except Exception, e:
-                print traceback.extract_stack()
+            except Exception as e:
+                print(traceback.extract_stack())
                 if queue is not None:
                     queue.put(False)
                     if not self.is_linux:
@@ -623,10 +623,10 @@ class NewUpgradeBaseTest(BaseTestCase):
         in_servers = set(new_vbs) - set(old_vbs)
         self.assertEqual(len(out_servers), len(in_servers),
                         "Seems like it wasn't swap rebalance. Out %s, in %s" % (
-                                                len(out_servers),len(in_servers)))
+                                                len(out_servers), len(in_servers)))
         for vb_type in ["active_vb", "replica_vb"]:
             self.log.info("Checking %s on nodes that remain in cluster..." % vb_type)
-            for server, stats in old_vbs.iteritems():
+            for server, stats in old_vbs.items():
                 if server in new_vbs:
                     self.assertTrue(sorted(stats[vb_type]) == sorted(new_vbs[server][vb_type]),
                     "Server %s Seems like %s vbuckets were shuffled, old vbs is %s, new are %s" %(
@@ -634,10 +634,10 @@ class NewUpgradeBaseTest(BaseTestCase):
             self.log.info("%s vbuckets were not suffled" % vb_type)
             self.log.info("Checking in-out nodes...")
             vbs_servs_out = vbs_servs_in = []
-            for srv, stat in old_vbs.iteritems():
+            for srv, stat in old_vbs.items():
                 if srv in out_servers:
                     vbs_servs_out.extend(stat[vb_type])
-            for srv, stat in new_vbs.iteritems():
+            for srv, stat in new_vbs.items():
                 if srv in in_servers:
                     vbs_servs_in.extend(stat[vb_type])
             self.assertTrue(sorted(vbs_servs_out) == sorted(vbs_servs_in),
@@ -671,7 +671,7 @@ class NewUpgradeBaseTest(BaseTestCase):
                     else:
                         self.fail("Failed DCP rebalance upgrade")
                 elif any ("DCP upgrade completed successfully.\n" \
-                                    in d.values() for d in self.rest.get_logs(10)):
+                                    in list(d.values()) for d in self.rest.get_logs(10)):
                     self.log.info("DCP upgrade is completed")
                 else:
                     self.fail("DCP reabalance upgrade is not running")
@@ -707,7 +707,7 @@ class NewUpgradeBaseTest(BaseTestCase):
                 self.dcp_rebalance_in_offline_upgrade_from_version2()
             """ set install cb version to upgrade version after done upgrade """
             self.initial_version = self.upgrade_versions[0]
-        except Exception, ex:
+        except Exception as ex:
             self.log.info(ex)
             raise
 
@@ -732,7 +732,7 @@ class NewUpgradeBaseTest(BaseTestCase):
                 total_nodes -= 1
             if total_nodes == 0:
                 self.rest = RestConnection(upgrade_nodes[total_nodes])
-        except Exception, ex:
+        except Exception as ex:
             self.log.info(ex)
             raise
 
@@ -770,11 +770,11 @@ class NewUpgradeBaseTest(BaseTestCase):
             "not_tested_double_negative":-1.1,
             "not_tested_float":2.99792458e8,
             "not_tested_float_negative":-2.99792458e8,
-            "not_tested_array_numbers_integer" : [1,2,3,4,5],
-            "not_tested_array_numbers_double" : [1.1,2.2,3.3,4.4,5.5],
-            "not_tested_array_numbers_float" : [2.99792458e8,2.99792458e8,2.99792458e8],
-            "not_tested_array_numbers_mix" : [0,2.99792458e8,1.1],
-            "not_tested_array_array_mix" : [[2.99792458e8,2.99792458e8,2.99792458e8],[0,2.99792458e8,1.1],[],[0, 0, 0]],
+            "not_tested_array_numbers_integer" : [1, 2, 3, 4, 5],
+            "not_tested_array_numbers_double" : [1.1, 2.2, 3.3, 4.4, 5.5],
+            "not_tested_array_numbers_float" : [2.99792458e8, 2.99792458e8, 2.99792458e8],
+            "not_tested_array_numbers_mix" : [0, 2.99792458e8, 1.1],
+            "not_tested_array_array_mix" : [[2.99792458e8, 2.99792458e8, 2.99792458e8], [0, 2.99792458e8, 1.1], [], [0, 0, 0]],
             "not_tested_simple_string_lower_case":"abcdefghijklmnoprestuvxyz",
             "not_tested_simple_string_upper_case":"ABCDEFGHIJKLMNOPQRSTUVWXZYZ",
             "not_tested_simple_string_empty":"",
@@ -808,15 +808,15 @@ class NewUpgradeBaseTest(BaseTestCase):
 
     def generate_simple_data_numbers(self):
         json = {
-            "integer_zero":0,
-            "integer_big":1038383839293939383938393,
-            "double_zero":0.0,
-            "integer":1,
-            "integer_negative":-1,
-            "double":1.1,
-            "double_negative":-1.1,
-            "float":2.99792458e8,
-            "float_negative":-2.99792458e8,
+            "integer_zero": 0,
+            "integer_big": 1038383839293939383938393,
+            "double_zero": 0.0,
+            "integer": 1,
+            "integer_negative": -1,
+            "double": 1.1,
+            "double_negative": -1.1,
+            "float": 2.99792458e8,
+            "float_negative": -2.99792458e8,
         }
         return json
 
@@ -829,9 +829,9 @@ class NewUpgradeBaseTest(BaseTestCase):
                 host=self.master.ip
                 if self.master.ip == "127.0.0.1":
                     scheme = "http"
-                    host="{0}:{1}".format(self.master.ip,self.master.port)
-                return SDKClient(scheme=scheme,hosts = [host], bucket = bucket.name)
-            except Exception, ex:
+                    host="{0}:{1}".format(self.master.ip, self.master.port)
+                return SDKClient(scheme=scheme, hosts = [host], bucket = bucket.name)
+            except Exception as ex:
                 self.log.info("cannot load sdk client due to error {0}".format(str(ex)))
         # USE MC BIN CLIENT WHEN NOT USING SDK CLIENT
         return self.direct_mc_bin_client(server, bucket, timeout= timeout)
@@ -875,13 +875,13 @@ class NewUpgradeBaseTest(BaseTestCase):
                 return self.generate_ops(num_items, start, json_generator.generate_docs_bigdata)
             if self.dataset == "array":
                 return self.generate_ops(num_items, start, json_generator.generate_docs_array)
-        except Exception, ex:
+        except Exception as ex:
             self.log.info(ex)
             self.fail("There is no dataset %s, please enter a valid one" % self.dataset)
 
     def generate_ops(self, docs_per_day, start=0, method=None):
         gen_docs_map = {}
-        for key in self.ops_dist_map.keys():
+        for key in list(self.ops_dist_map.keys()):
             isShuffle = False
             if key == "update":
                 isShuffle = True
@@ -916,7 +916,7 @@ class NewUpgradeBaseTest(BaseTestCase):
             if self.dataset == "array":
                 return self.generate_docs_array(num_items, start)
             return getattr(self, 'generate_docs_' + self.dataset)(num_items, start)
-        except Exception, ex:
+        except Exception as ex:
             log.info(str(ex))
             self.fail("There is no dataset %s, please enter a valid one" % self.dataset)
 
@@ -983,7 +983,7 @@ class NewUpgradeBaseTest(BaseTestCase):
                                         bk_file_events_path)
         local_bk_def = open(bk_file_events_path)
         bk_file_fxn = json.loads(local_bk_def.read())
-        for k, v in bk_file_fxn[0]["settings"].iteritems():
+        for k, v in bk_file_fxn[0]["settings"].items():
             if v != bk_fxn[0]["settings"][k]:
                 self.log.info("key {0} has value not match".format(k))
                 self.log.info("{0} : {1}".format(v, bk_fxn[0]["settings"][k]))
@@ -1004,7 +1004,7 @@ class NewUpgradeBaseTest(BaseTestCase):
 
     def ordered(self, obj):
         if isinstance(obj, dict):
-            return sorted((k, ordered(v)) for k, v in obj.items())
+            return sorted((k, ordered(v)) for k, v in list(obj.items()))
         if isinstance(obj, list):
             return sorted(ordered(x) for x in obj)
         else:
@@ -1028,8 +1028,8 @@ class NewUpgradeBaseTest(BaseTestCase):
             for index in self.fts_obj.fts_indexes:
                 self.fts_obj.run_query_and_compare(index=index, num_queries=20)
             return self.fts_obj
-        except Exception, ex:
-            print ex
+        except Exception as ex:
+            print(ex)
             if queue is not None:
                 queue.put(False)
         if queue is not None:
@@ -1055,8 +1055,8 @@ class NewUpgradeBaseTest(BaseTestCase):
         try:
             self.log.info("Verify fts via queries again")
             self.update_delete_fts_data_run_queries(self.fts_obj)
-        except Exception, ex:
-            print ex
+        except Exception as ex:
+            print(ex)
             if queue is not None:
                 queue.put(False)
         if queue is not None:
@@ -1080,8 +1080,8 @@ class NewUpgradeBaseTest(BaseTestCase):
                                      pre_upgrade_index_type,
                                      index.get_index_type()))
             self.fts_obj.wait_for_indexing_complete()
-        except Exception, ex:
-            print ex
+        except Exception as ex:
+            print(ex)
             if queue is not None:
                 queue.put(False)
         if queue is not None:
@@ -1107,8 +1107,8 @@ class NewUpgradeBaseTest(BaseTestCase):
                               format(index.name,
                                      index.get_index_type()))
             self.fts_obj.wait_for_indexing_complete()
-        except Exception, ex:
-            print ex
+        except Exception as ex:
+            print(ex)
             if queue is not None:
                 queue.put(False)
         if queue is not None:
@@ -1130,8 +1130,8 @@ class NewUpgradeBaseTest(BaseTestCase):
                               format(index.name,
                                      index.get_index_type()))
             self.fts_obj.wait_for_indexing_complete()
-        except Exception, ex:
-            print ex
+        except Exception as ex:
+            print(ex)
             if queue is not None:
                 queue.put(False)
         if queue is not None:
@@ -1149,8 +1149,8 @@ class NewUpgradeBaseTest(BaseTestCase):
                               format(index.name,
                                      type,
                                      check_index_type))
-        except Exception, ex:
-            print ex
+        except Exception as ex:
+            print(ex)
             if queue is not None:
                 queue.put(False)
         if queue is not None:
@@ -1171,13 +1171,13 @@ class NewUpgradeBaseTest(BaseTestCase):
                 self.sleep(20)
                 num_actual = 0
                 if not servers:
-                    num_actual = self.get_item_count(self.master,bucketName)
+                    num_actual = self.get_item_count(self.master, bucketName)
                 else:
                     for server in servers:
-                        num_actual += self.get_item_count(server,bucketName)
+                        num_actual += self.get_item_count(server, bucketName)
                 if int(num_actual) == total_items:
                     self.log.info("{0} items are loaded in the {1} bucket"\
-                                           .format(num_actual ,bucketName))
+                                           .format(num_actual, bucketName))
                     break
                 self.log.info("{0} items are loaded in the {1} bucket"\
                                         .format(num_actual, bucketName))
@@ -1221,7 +1221,7 @@ class NewUpgradeBaseTest(BaseTestCase):
             return response["status"], response[
                 "metrics"], errors, results, handle
 
-        except Exception,e:
+        except Exception as e:
             raise Exception(str(e))
 
     def create_bucket_on_cbas(self, cbas_bucket_name, cb_bucket_name,

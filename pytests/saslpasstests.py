@@ -1,6 +1,6 @@
 import logger
 
-from basetestcase import BaseTestCase
+from .basetestcase import BaseTestCase
 from remote.remote_util import RemoteUtilHelper
 from couchbase_helper.document import View
 
@@ -22,7 +22,7 @@ class SaslPassTests(BaseTestCase):
             self._load_doc_data_all_buckets()
         if self.input.param("views", 0):
             views = []
-            for i in xrange(self.input.param("views", 0)):
+            for i in range(self.input.param("views", 0)):
                 views.append(View("view_sasl" + str(i),
                                   'function (doc, meta) {'
                                   'emit(meta.id, "emitted_value%s");}' % str(i),

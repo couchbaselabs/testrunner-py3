@@ -1,7 +1,7 @@
 import json
 from memcached.helper.data_helper import MemcachedClientHelper
 from membase.api.rest_client import RestConnection
-from basetestcase import BaseTestCase
+from .basetestcase import BaseTestCase
 from couchbase_helper.document import View
 from couchbase_helper.documentgenerator import BlobGenerator
 from remote.remote_util import RemoteMachineShellConnection
@@ -76,10 +76,10 @@ class CCCP(BaseTestCase):
         not_my_vbucket = False
         for bucket in self.buckets:
             while self.gen_load.has_next() and not not_my_vbucket:
-                key, _ = self.gen_load.next()
+                key, _ = next(self.gen_load)
                 try:
                     self.clients[bucket.name].get(key)
-                except Exception, ex:
+                except Exception as ex:
                     self.log.info("Config in exception is correct. Bucket %s, key %s"\
                                                                  % (bucket.name, key))
                     config = str(ex)[str(ex).find("Not my vbucket':") \

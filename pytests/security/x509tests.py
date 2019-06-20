@@ -2,7 +2,7 @@ from basetestcase import BaseTestCase
 from security.x509main import x509main
 from newupgradebasetest import NewUpgradeBaseTest
 from membase.api.rest_client import RestConnection, RestHelper
-import commands
+import subprocess
 import json
 import socket
 from couchbase.bucket import Bucket
@@ -34,8 +34,8 @@ class x509tests(BaseTestCase):
         self.prefixs = self.input.param('prefixs', 'www.cb-:us.:www.').split(":")
         self.delimeters = self.input.param('delimeter', '.:.:.') .split(":")
         self.setup_once = self.input.param("setup_once", False)
-        self.upload_json_mode = self.input.param("upload_json_mode",'rest')
-        self.sdk_version = self.input.param('sdk_version','pre-vulcan')
+        self.upload_json_mode = self.input.param("upload_json_mode", 'rest')
+        self.sdk_version = self.input.param('sdk_version', 'pre-vulcan')
         
         self.dns = self.input.param('dns', None)
         self.uri = self.input.param('uri', None)
@@ -111,9 +111,9 @@ class x509tests(BaseTestCase):
         s.connect(('couchbase.com', 0))
         return s.getsockname()[0]
         '''
-        status, ipAddress = commands.getstatusoutput("ifconfig en0 | grep 'inet addr:' | cut -d: -f2 |awk '{print $1}'")
+        status, ipAddress = subprocess.getstatusoutput("ifconfig en0 | grep 'inet addr:' | cut -d: -f2 |awk '{print $1}'")
         if '1' not in ipAddress:
-            status, ipAddress = commands.getstatusoutput("ifconfig eth0 | grep  -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | awk '{print $2}'")
+            status, ipAddress = subprocess.getstatusoutput("ifconfig eth0 | grep  -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | awk '{print $2}'")
         return ipAddress
     
     def createBulkDocuments(self, client):
@@ -165,7 +165,7 @@ class x509tests(BaseTestCase):
                 if cb is not None:
                     result = True
                     return result, cb
-            except Exception, ex:
+            except Exception as ex:
                 self.log.info("Expection is  -{0}".format(ex))
         elif self.sdk_version == 'vulcan':
             self.add_built_in_server_user([{'id': 'cbadminbucket', 'name': 'cbadminbucket', 'password': 'password'}], \
@@ -180,7 +180,7 @@ class x509tests(BaseTestCase):
                 if cb is not None:
                     result = True
                     return result, cb
-            except Exception, ex:
+            except Exception as ex:
                 self.log.info("Expection is  -{0}".format(ex))
         return result
 
@@ -260,7 +260,7 @@ class x509tests(BaseTestCase):
         x509main(self.master).setup_master()
         try:
             rest.add_node('Administrator', 'password', servs_inout.ip)
-        except Exception, ex:
+        except Exception as ex:
             ex = str(ex)
             # expected_result  = "Error adding node: " + servs_inout.ip + " to the cluster:" + self.master.ip + " - [\"Prepare join failed. Error applying node certificate. Unable to read certificate chain file\"]"
             expected_result = "Error adding node: " + servs_inout.ip + " to the cluster:" + self.master.ip
@@ -428,7 +428,7 @@ class x509tests(BaseTestCase):
             replication_id = restCluster1.start_replication('continuous', 'default', remote_cluster_name)
             if replication_id is not None:
                 self.assertTrue(True, "Replication was not created successfully")
-        except Exception, ex:
+        except Exception as ex:
             self.log.info("Exception is -{0}".format(ex))
         finally:
             restCluster2.delete_bucket()
@@ -723,7 +723,7 @@ class x509tests(BaseTestCase):
             cb = Bucket(connection_string, password='password')
             if cb is not None:
                 result = True
-        except Exception, ex:
+        except Exception as ex:
             self.log.info("Exception is -{0}".format(ex))
         self.assertTrue(result, "Cannot create a client connection with server")
 
@@ -974,7 +974,7 @@ class x509tests(BaseTestCase):
             self.assertTrue(True, "CA Cert works with mandatory")
                               
         status, output = x509main()._execute_command_clientcert(host.ip, url='/pools/default', port=8091, headers=" -u Administrator:password ", client_cert=False, curl=False, verb='GET', plain_curl=True)
-        self.assertEqual(status, 401 , "Invalid user gets authenticated successfully")
+        self.assertEqual(status, 401, "Invalid user gets authenticated successfully")
     
     def test_incorrect_user(self):
         host = self.master
@@ -982,7 +982,7 @@ class x509tests(BaseTestCase):
         rest.create_bucket(bucket='default', ramQuotaMB=100)
         
         status, output = x509main()._execute_command_clientcert(host.ip, url='/pools/default', port=18091, headers="", client_cert=True, curl=False)
-        self.assertEqual(status, 401 , "Invalid user gets authenticated successfully")
+        self.assertEqual(status, 401, "Invalid user gets authenticated successfully")
 
     def test_upload_json_tests(self):
         rest = RestConnection(self.master)
@@ -1095,7 +1095,7 @@ class x509_upgrade(NewUpgradeBaseTest):
                 if cb is not None:
                     result = True
                     return result, cb
-            except Exception, ex:
+            except Exception as ex:
                 self.log.info("Expection is  -{0}".format(ex))
         elif sdk_version == 'vulcan':
             self.add_built_in_server_user([{'id': 'cbadminbucket', 'name': 'cbadminbucket', 'password': 'password'}], \
@@ -1110,7 +1110,7 @@ class x509_upgrade(NewUpgradeBaseTest):
                 if cb is not None:
                     result = True
                     return result, cb
-            except Exception, ex:
+            except Exception as ex:
                 self.log.info("Expection is  -{0}".format(ex))
         return result
 

@@ -8,16 +8,16 @@ username = sys.argv[2]
 password = sys.argv[3]
 cb = Bucket('couchbase://172.23.105.177/QE-server-pool')
 query = 'select * from `QE-server-pool` where "%s" in poolId and state = "failedInstall";' % str(poolId)
-print('Running: %s' % query)
+print(('Running: %s' % query))
 row_iter = cb.n1ql_query(N1QLQuery(query))
 fixed_ips = []
 for row in row_iter: 
 	try:
 		print('********************************')
 		server = row['QE-server-pool']['ipaddr']
-		print('Server: %s' % server)
+		print(('Server: %s' % server))
 		cmds = 'rpm -e `rpm -qa | grep couchbase-server` && rm -rf /etc/systemd/system/multi-user.target.wants/couchbase-server.service && systemctl daemon-reload && systemctl list-units --type service --all'
-		print('cmds: %s' % cmds)
+		print(('cmds: %s' % cmds))
 		ssh = paramiko.SSHClient()
 		ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 		ssh.connect(server, username=username, password=password, timeout=10)
@@ -41,15 +41,15 @@ for row in row_iter:
 			#ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command('reboot')
 
 	except Exception as e:
-		print('Connection Failed: %s' % server)
+		print(('Connection Failed: %s' % server))
 		print(e)
 		pass
 	ssh.close()
 	print('********************************\n\n\n')
 
 for ip in fixed_ips:
-	query = "update `QE-server-pool` set state='available' where '%s' in poolId and state='failedInstall' and ipaddr='%s';" % (str(poolId),str(ip))
-	print('Running: %s' % query)
+	query = "update `QE-server-pool` set state='available' where '%s' in poolId and state='failedInstall' and ipaddr='%s';" % (str(poolId), str(ip))
+	print(('Running: %s' % query))
 	row_iter = cb.n1ql_query(N1QLQuery(query))
 	for row in row_iter:
 		print(row)

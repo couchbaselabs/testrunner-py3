@@ -54,7 +54,7 @@ class cbstatsTests(CliBaseTest):
                 vb_id = i - len(bucket_info.vbuckets) * int(i / len(bucket_info.vbuckets))
                 mc_conn.set("test_docs-%s" % i, 0, 0, json.dumps('{ "test" : "test"}').encode("ascii", "ignore"), vb_id)
                 keys_map["test_docs-%s" % i] = vb_id
-            for key, vb_id in keys_map.iteritems():
+            for key, vb_id in keys_map.items():
                 output, error = self.shell.execute_cbstats(self.buckets[0], self.command, key, vb_id)
                 self.verify_results(output, error)
 

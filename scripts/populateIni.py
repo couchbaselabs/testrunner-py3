@@ -1,7 +1,7 @@
 
 import sys
-import urllib2
-import urllib
+import urllib.request, urllib.error, urllib.parse
+import urllib.request, urllib.parse, urllib.error
 import httplib2
 import json
 import string
@@ -16,30 +16,30 @@ from optparse import OptionParser
 # need a timeout param
 
 def main():
-    print 'in main'
+    print('in main')
     usage = '%prog -i inifile -o outputfile -s servers'
     parser = OptionParser(usage)
-    parser.add_option('-s','--servers', dest='servers')
-    parser.add_option('-d','--addPoolServerId', dest='addPoolServerId', default=None)
-    parser.add_option('-a','--addPoolServers', dest='addPoolServers', default=None)
-    parser.add_option('-i','--inifile', dest='inifile')
-    parser.add_option('-o','--outputFile', dest='outputFile')
-    parser.add_option('-p','--os', dest='os')
+    parser.add_option('-s', '--servers', dest='servers')
+    parser.add_option('-d', '--addPoolServerId', dest='addPoolServerId', default=None)
+    parser.add_option('-a', '--addPoolServers', dest='addPoolServers', default=None)
+    parser.add_option('-i', '--inifile', dest='inifile')
+    parser.add_option('-o', '--outputFile', dest='outputFile')
+    parser.add_option('-p', '--os', dest='os')
     options, args = parser.parse_args()
 
 
-    print 'the ini file is', options.inifile
+    print('the ini file is', options.inifile)
 
     if not options.servers.startswith('['):
         options.servers='['+options.servers+']'
-    print 'the server info is', options.servers
+    print('the server info is', options.servers)
 
     addPoolServers = []
 
     if options.addPoolServers != None and options.addPoolServers != "None":
         if not options.addPoolServers.startswith('['):
             options.addPoolServers = '[' + options.addPoolServers + ']'
-        print 'the additional server pool info is', options.addPoolServers
+        print('the additional server pool info is', options.addPoolServers)
         addPoolServers = json.loads(options.addPoolServers)
 
     servers = json.loads(options.servers)
@@ -62,7 +62,7 @@ def main():
                   data[i] = string.replace(data[i], 'couchbase', 'Membase123')
 
     for d in data:
-          print d,
+          print(d, end=' ')
 
     f = open(options.outputFile, 'w')
     f.writelines(data)

@@ -5,7 +5,7 @@ from membase.api.rest_client import RestConnection
 import httplib2
 import base64
 import requests
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import random
 import os
 import copy
@@ -130,7 +130,7 @@ class x509main:
     
                 # print file contents for easy debugging
                 fout = open("./pytests/security/clientconf3.conf", "r")
-                print fout.read()
+                print(fout.read())
                 fout.close()
                 
                 output, error = shell.execute_command("openssl genrsa " + encryption + " -out " + x509main.CACERTFILEPATH + server.ip + ".key " + str(key_length))
@@ -173,7 +173,7 @@ class x509main:
 
             # print file contents for easy debugging
             fout = open("./pytests/security/clientconf2.conf", "r")
-            print fout.read()
+            print(fout.read())
             fout.close()
             
             # Generate Certificate for the client
@@ -251,9 +251,9 @@ class x509main:
         shell = RemoteMachineShellConnection(self.host)
         os_type = shell.extract_remote_info().distribution_type
         log.info ("OS type is {0}".format(os_type))
-        shell.delete_file(final_path , "root.crt")
-        shell.delete_file(final_path , "chain.pem")
-        shell.delete_file(final_path , "pkey.key")
+        shell.delete_file(final_path, "root.crt")
+        shell.delete_file(final_path, "chain.pem")
+        shell.delete_file(final_path, "pkey.key")
         if os_type == 'windows':
             final_path = '/cygdrive/c/Program\ Files/Couchbase/Server/var/lib/couchbase/inbox'
             shell.execute_command('rm -rf ' + final_path)
@@ -294,7 +294,7 @@ class x509main:
         url = "settings/clientCertAuth"
         api = rest.baseUrl + url
         status, content = self._rest_upload_file(api, x509main.CACERTFILEPATH + x509main.CLIENT_CERT_AUTH_JSON, "Administrator", 'password')
-        log.info (" --- Status from upload of client cert settings is {0} and Content is {1}".format(status,content))
+        log.info (" --- Status from upload of client cert settings is {0} and Content is {1}".format(status, content))
         return status, content
 
     '''
@@ -324,7 +324,7 @@ class x509main:
                     header = {'Content-type': 'Content-Type: application/json'}
                     r = requests.delete(final_url, verify=x509main.CERT_FILE, cert=(x509main.CLIENT_CERT_PEM, x509main.CLIENT_CERT_KEY), headers=header)
                 return r.status_code, r.text
-            except Exception, ex:
+            except Exception as ex:
                 log.info ("into exception form validate_ssl_login with client cert")
                 log.info (" Exception is {0}".format(ex))
                 return 'error'
@@ -333,10 +333,10 @@ class x509main:
                 r = requests.get("https://" + str(self.host.ip) + ":18091", verify=x509main.CERT_FILE)
                 if r.status_code == 200:
                     header = {'Content-type': 'application/x-www-form-urlencoded'}
-                    params = urllib.urlencode({'user':'{0}'.format(username), 'password':'{0}'.format(password)})               
+                    params = urllib.parse.urlencode({'user':'{0}'.format(username), 'password':'{0}'.format(password)})               
                     r = requests.post("https://" + str(self.host.ip) + ":18091/uilogin", data=params, headers=header, verify=x509main.CERT_FILE)
                     return r.status_code
-            except Exception, ex:
+            except Exception as ex:
                 log.info ("into exception form validate_ssl_login")
                 log.info (" Exception is {0}".format(ex))
                 return 'error'
@@ -454,4 +454,4 @@ class x509main:
         remote_client = RemoteMachineShellConnection(self.host)
         output, error = remote_client.execute_couchbase_cli(cli_command=cli_command, \
                     options=options, cluster_host="localhost", user=user, password=password)
-        log.info (" -- Output of command ssl-manage with --set-client-auth is {0} and erorr is {1}".format(output,error))
+        log.info (" -- Output of command ssl-manage with --set-client-auth is {0} and erorr is {1}".format(output, error))

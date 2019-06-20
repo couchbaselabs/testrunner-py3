@@ -1,4 +1,4 @@
-from tuq import QueryTests
+from .tuq import QueryTests
 from membase.api.exception import CBQError
 from lib.membase.api.rest_client import RestConnection
 from pytests.fts.fts_base import CouchbaseCluster
@@ -70,7 +70,7 @@ class N1qlFTSIntegrationPhase2Test(QueryTests):
                 fts_results = self.run_cbq_query(fts_query)['results']
                 n1ql_results = self.run_cbq_query(n1ql_query)['results']
 
-                self.assertEquals(fts_results, n1ql_results, "Incorrect query : "+str(fts_query))
+                self.assertEqual(fts_results, n1ql_results, "Incorrect query : "+str(fts_query))
 
         finally:
             self._remove_all_fts_indexes()
@@ -131,7 +131,7 @@ class N1qlFTSIntegrationPhase2Test(QueryTests):
         try:
             fts_results = self.run_cbq_query(fts_query)['results']
             n1ql_results = self.run_cbq_query(n1ql_query)['results']
-        except CBQError, err:
+        except CBQError as err:
             self._remove_all_fts_indexes()
             raise Exception("Query: "+fts_query+" is failed.")
 
@@ -140,7 +140,7 @@ class N1qlFTSIntegrationPhase2Test(QueryTests):
         self.drop_index_safe('beer-sample', 'idx_type')
         self.drop_index_safe('beer-sample', 'idx_code')
 
-        self.assertEquals(fts_results, n1ql_results, "Incorrect query : "+str(fts_query))
+        self.assertEqual(fts_results, n1ql_results, "Incorrect query : "+str(fts_query))
 
 
 
@@ -164,7 +164,7 @@ class N1qlFTSIntegrationPhase2Test(QueryTests):
                     "where t1.type='brewery' and t2.type='beer' and SEARCH("+search_alias+", 'state:California') order by t2.name"
         try:
             self.run_cbq_query(fts_query)
-        except CBQError, err:
+        except CBQError as err:
             self._remove_all_fts_indexes()
             self.assertTrue("Ambiguous reference to field" in str(err), "Unexpected error message is found - "+str(err))
 
@@ -186,7 +186,7 @@ class N1qlFTSIntegrationPhase2Test(QueryTests):
         fts_query = "select t.code, t.state from `beer-sample` t where t.type='brewery' and SEARCH("+search_alias+", 'France') order by t.code"
         try:
             self.run_cbq_query(fts_query)
-        except CBQError, ex:
+        except CBQError as ex:
             self._remove_all_fts_indexes()
             if test_name in ['star', 'object_values', 'array']:
                 self.assertTrue("SEARCH() function operands are invalid." in str(ex),
@@ -237,11 +237,11 @@ class N1qlFTSIntegrationPhase2Test(QueryTests):
                 more_suitable_index.update()
         if test_cases[test_name]["expected_result"] == "fail":
             result = self.run_cbq_query(fts_query)
-            self.assertEquals(result['status'], "errors", "Running SEARCH() query without fts index is successful. Should be failed.")
+            self.assertEqual(result['status'], "errors", "Running SEARCH() query without fts index is successful. Should be failed.")
         elif test_cases[test_name]["expected_result"] == "success":
             result = self.run_cbq_query("explain " + fts_query)
             self._remove_all_fts_indexes()
-            self.assertEquals(result['results'][0]['plan']['~children'][0]['index'], test_cases[test_name]["index_in_explain"])
+            self.assertEqual(result['results'][0]['plan']['~children'][0]['index'], test_cases[test_name]["index_in_explain"])
 
         self._remove_all_fts_indexes()
 
@@ -285,7 +285,7 @@ class N1qlFTSIntegrationPhase2Test(QueryTests):
                                    query_json=fts_request)
             self._remove_all_fts_indexes()
             comparison_result = self._compare_n1ql_results_against_fts(n1ql_results, hits)
-            self.assertEquals(comparison_result, "OK", comparison_result)
+            self.assertEqual(comparison_result, "OK", comparison_result)
 
 
     def test_use_index_hint(self):
@@ -296,32 +296,32 @@ class N1qlFTSIntegrationPhase2Test(QueryTests):
         self.cbcluster = CouchbaseCluster(name='cluster', nodes=self.servers, log=self.log)
 
         test_cases = {
-            "fts_index_exists" : {
+            "fts_index_exists": {
                 "hint_content" : "idx_beer_sample_fts USING FTS",
                 "expected_result" : "positive",
                 "options_content": ""
             },
-            "fts_index_does_not_exist" : {
+            "fts_index_does_not_exist": {
                 "hint_content" : "idx_beer_sample_fts_fake USING FTS",
                 "expected_result" : "negative",
                 "options_content": ""
             },
-            "fts_index_busy" : {
+            "fts_index_busy": {
                 "hint_content" : "idx_beer_sample_fts USING FTS",
                 "expected_result" : "positive",
                 "options_content": ""
             },
-            "fts_gsi_indexes_use" : {
+            "fts_gsi_indexes_use": {
                 "hint_content" : "idx_beer_sample_fts USING FTS, beer_primary using GSI",
                 "expected_result" : "positive",
                 "options_content": ""
             },
-            "same_hint_options" : {
+            "same_hint_options": {
                 "hint_content" : "idx_beer_sample_fts USING FTS",
                 "expected_result" : "positive",
                 "options_content" : ", {\"index\":\"idx_beer_sample_fts\"}"
             },
-            "not_same_hint_options" : {
+            "not_same_hint_options": {
                 "hint_content" : "idx_beer_sample_fts USING FTS",
                 "expected_result" : "positive",
                 "options_content" : ", {\"index\":\"idx_beer_sample_fts_1\"}"
@@ -368,8 +368,8 @@ class N1qlFTSIntegrationPhase2Test(QueryTests):
                 if test_name == "not_same_hint_options":
                     self.assertTrue(result['results'][0]['plan']['~children'][0]['index'] in ["idx_beer_sample_fts", "idx_beer_sample_fts_1"])
                 else:
-                    self.assertEquals(result['results'][0]['plan']['~children'][0]['index'], "idx_beer_sample_fts")
-            except CBQError, e:
+                    self.assertEqual(result['results'][0]['plan']['~children'][0]['index'], "idx_beer_sample_fts")
+            except CBQError as e:
                 negatives_found = 1
                 test_passed = False
 
@@ -381,7 +381,7 @@ class N1qlFTSIntegrationPhase2Test(QueryTests):
         finally:
             self._remove_all_fts_indexes()
 
-        self.assertEquals(negatives_found, negatives_expected, "Some test case results differ from expected.")
+        self.assertEqual(negatives_found, negatives_expected, "Some test case results differ from expected.")
 
 
     def test_index_selection(self):
@@ -448,9 +448,9 @@ class N1qlFTSIntegrationPhase2Test(QueryTests):
         n1ql_query = test_cases[test_name]["query"]
         result = self.run_cbq_query(n1ql_query)
         if test_name in["primary_gsi", "shortest_gsi"] :
-            self.assertEquals(result['results'][0]['plan']['~children'][0]['#operator'], "PrimaryScan3")
+            self.assertEqual(result['results'][0]['plan']['~children'][0]['#operator'], "PrimaryScan3")
         else:
-            self.assertEquals(result['results'][0]['plan']['~children'][0]['index'], test_cases[test_name]["index"])
+            self.assertEqual(result['results'][0]['plan']['~children'][0]['index'], test_cases[test_name]["index"])
 
         self._remove_all_fts_indexes()
         self.drop_index_safe('beer-sample', 'idx_state')
@@ -476,20 +476,20 @@ class N1qlFTSIntegrationPhase2Test(QueryTests):
                 rest.run_fts_query(index_name="idx_beer_sample_fts",
                                    query_json=fts_request)
             comparison_results = self._compare_n1ql_results_against_fts(n1ql_results, hits)
-            self.assertEquals(comparison_results, "OK", comparison_results)
+            self.assertEqual(comparison_results, "OK", comparison_results)
 
         n1ql_query = "select meta().id from `beer-sample` where not(not(search(`beer-sample`, {\"field\": \"state\", \"match\":\"California\"}))) "
         n1ql_results = self.run_cbq_query(n1ql_query)['results']
 
         total_hits, hits, took, status = rest.run_fts_query(index_name="idx_beer_sample_fts", query_json=fts_request)
         comparison_results = self._compare_n1ql_results_against_fts(n1ql_results, hits)
-        self.assertEquals(comparison_results, "OK", comparison_results)
+        self.assertEqual(comparison_results, "OK", comparison_results)
 
         self._remove_all_fts_indexes()
 
     def test_logical_predicates_negative(self):
         test_cases = {
-            "case_1":{
+            "case_1": {
                 "predicate": " = false ",
                 "verification_query": "select meta().id from `beer-sample` where state is missing or state!='California'"
             },
@@ -536,10 +536,10 @@ class N1qlFTSIntegrationPhase2Test(QueryTests):
         for result in verification_results:
             verification_doc_ids.append(result['id'])
 
-        self.assertEquals(len(search_doc_ids), len(verification_doc_ids),
+        self.assertEqual(len(search_doc_ids), len(verification_doc_ids),
                             "Results count does not match for test . SEARCH() - " + str(
                                 len(search_doc_ids)) + ", Verification - " + str(len(verification_doc_ids)))
-        self.assertEquals(sorted(search_doc_ids), sorted(verification_doc_ids),
+        self.assertEqual(sorted(search_doc_ids), sorted(verification_doc_ids),
                             "Found mismatch in results for test .")
 
 
@@ -557,7 +557,7 @@ class N1qlFTSIntegrationPhase2Test(QueryTests):
         total_hits, hits, took, status = rest.run_fts_query(index_name="idx_beer_sample_fts",
                                                             query_json=fts_request)
         comparison_results = self._compare_n1ql_results_against_fts(n1ql_results, hits)
-        self.assertEquals(comparison_results, "OK", comparison_results)
+        self.assertEqual(comparison_results, "OK", comparison_results)
 
         self._remove_all_fts_indexes()
 
@@ -576,7 +576,7 @@ class N1qlFTSIntegrationPhase2Test(QueryTests):
                      "inner join `beer-sample` t2 on `beer-sample`.state=t2.state and `beer-sample`.city=t2.city " \
                      "where SEARCH(`beer-sample`, 'state:California')"
         n1ql_results = self.run_cbq_query(n1ql_query)
-        self.assertEquals(n1ql_results['status'], 'success')
+        self.assertEqual(n1ql_results['status'], 'success')
 
         self._remove_all_fts_indexes()
         self.drop_index_safe('beer-sample', 'idx_state')
@@ -595,7 +595,7 @@ class N1qlFTSIntegrationPhase2Test(QueryTests):
                      "inner join `beer-sample` t2 on `beer-sample`.state=t2.state and `beer-sample`.city=t2.city " \
                      "where SEARCH(t2, 'state:California') and SEARCH(`beer-sample`, 'state:California')"
         n1ql_results = self.run_cbq_query(n1ql_query)
-        self.assertEquals(n1ql_results['status'], 'success')
+        self.assertEqual(n1ql_results['status'], 'success')
 
         self._remove_all_fts_indexes()
         self.drop_index_safe('beer-sample', 'idx_state')
@@ -613,7 +613,7 @@ class N1qlFTSIntegrationPhase2Test(QueryTests):
         total_hits, hits, took, status = rest.run_fts_query(index_name="idx_beer_sample_fts",
                                                             query_json=fts_request)
         comparison_results = self._compare_n1ql_results_against_fts(n1ql_results, hits)
-        self.assertEquals(comparison_results, "OK", comparison_results)
+        self.assertEqual(comparison_results, "OK", comparison_results)
 
         self._remove_all_fts_indexes()
 
@@ -668,10 +668,10 @@ class N1qlFTSIntegrationPhase2Test(QueryTests):
                     if r not in right_results:
                         left_right_results.append(r)
 
-            self.assertEquals(len(full_results), len(left_right_results),
+            self.assertEqual(len(full_results), len(left_right_results),
                         "Results count does not match for test "+test_name+", operation - "+uie+". Full query - " + str(
                             len(full_results)) + ", sum of 2 queries - " + str(len(left_right_results)))
-            self.assertEquals(sorted(full_results), sorted(left_right_results),
+            self.assertEqual(sorted(full_results), sorted(left_right_results),
                         "Found mismatch in results for test "+test_name+", operation - "+uie+".")
 
         self._remove_all_fts_indexes()
@@ -751,8 +751,8 @@ class N1qlFTSIntegrationPhase2Test(QueryTests):
         if test_cases[test_name]["expected_result"] == "cannot_prepare":
             try:
                 self.run_cbq_query(create_prepared)
-            except CBQError, err:
-                self.assertEquals(True, True)
+            except CBQError as err:
+                self.assertEqual(True, True)
                 return
         else:
             self.run_cbq_query(create_prepared)
@@ -775,10 +775,10 @@ class N1qlFTSIntegrationPhase2Test(QueryTests):
         for result in n1ql_results:
             n1ql_doc_ids.append(result['id'])
 
-        self.assertEquals(len(n1ql_doc_ids), len(prepared_doc_ids),
+        self.assertEqual(len(n1ql_doc_ids), len(prepared_doc_ids),
                             "Results count does not match for test . N1QL - " + str(
                                 len(n1ql_doc_ids)) + ", Prepareds - " + str(len(prepared_doc_ids)))
-        self.assertEquals(sorted(prepared_doc_ids), sorted(n1ql_doc_ids),
+        self.assertEqual(sorted(prepared_doc_ids), sorted(n1ql_doc_ids),
                             "Found mismatch in results for test .")
 
         self._remove_all_fts_indexes()
@@ -854,10 +854,10 @@ class N1qlFTSIntegrationPhase2Test(QueryTests):
             for result in n1ql_results:
                 n1ql_doc_ids.append(result['id'])
 
-            self.assertEquals(len(n1ql_doc_ids), len(prepared_doc_ids),
+            self.assertEqual(len(n1ql_doc_ids), len(prepared_doc_ids),
                                 "Results count does not match for test . N1QL - " + str(
                                     len(n1ql_doc_ids)) + ", Prepareds - " + str(len(prepared_doc_ids)))
-            self.assertEquals(sorted(prepared_doc_ids), sorted(n1ql_doc_ids),
+            self.assertEqual(sorted(prepared_doc_ids), sorted(n1ql_doc_ids),
                               "Found mismatch in results for test .")
 
         self._remove_all_fts_indexes()
@@ -876,7 +876,7 @@ class N1qlFTSIntegrationPhase2Test(QueryTests):
         query = "select meta().id from `beer-sample` where search(`beer-sample`, \"state:California\")"
 
         master_result = self.run_cbq_query(query=query, server=self.master, username=username, password=password)
-        self.assertEquals(master_result['status'], 'success', username+" query run failed on non-fts node")
+        self.assertEqual(master_result['status'], 'success', username+" query run failed on non-fts node")
 
         self._remove_all_fts_indexes()
 
@@ -932,7 +932,7 @@ class N1qlFTSIntegrationPhase2Test(QueryTests):
                                         index_name="idx_beer_sample_fts",
                                         query_json=fts_request)
                                     comparison_results = self._compare_n1ql_results_against_fts(search_results, hits)
-                                    self.assertEquals(comparison_results, "OK", comparison_results)
+                                    self.assertEqual(comparison_results, "OK", comparison_results)
                                 else:
                                     n1ql_query = "select meta().id from `beer-sample` where search(`beer-sample`, {\"query\": {\"field\": \"state\", \"match\": \"California\"}}) "+outer_sort_expression
                                     n1ql_results = self.run_cbq_query(n1ql_query)['results']
@@ -945,9 +945,9 @@ class N1qlFTSIntegrationPhase2Test(QueryTests):
                                     for result in n1ql_results:
                                         n1ql_doc_ids.append(result['id'])
 
-                                    self.assertEquals(len(n1ql_doc_ids), len(search_doc_ids),
+                                    self.assertEqual(len(n1ql_doc_ids), len(search_doc_ids),
                                                       "SEARCH QUERY - " + search_query + "\nN1QL QUERY - " + n1ql_query)
-                                    self.assertEquals(sorted(search_doc_ids), sorted(n1ql_doc_ids), "SEARCH QUERY - "+search_query+"\nN1QL QUERY - "+n1ql_query)
+                                    self.assertEqual(sorted(search_doc_ids), sorted(n1ql_doc_ids), "SEARCH QUERY - "+search_query+"\nN1QL QUERY - "+n1ql_query)
 
 
         self._remove_all_fts_indexes()
@@ -989,7 +989,7 @@ class N1qlFTSIntegrationPhase2Test(QueryTests):
             self.run_cbq_query("create index beer_sample_city_idx on `beer-sample` (`beer-sample`.city)")
 
         threads = []
-        t = threading.Thread(target=self._select_parallel, args=(select_query,213,))
+        t = threading.Thread(target=self._select_parallel, args=(select_query, 213,))
         t.daemon = True
         threads.append(t)
         t.start()
@@ -1006,67 +1006,67 @@ class N1qlFTSIntegrationPhase2Test(QueryTests):
 
     def test_joins(self):
         tests = {
-            "inner_l":{
+            "inner_l": {
                 "query": "select * from `beer-sample` l join `beer-sample` r on l.city=r.city where search(l, \"city:San Francisco\")",
                 "expected_result": "positive"
             },
-            "inner_r":{
+            "inner_r": {
                 "query": "select * from `beer-sample` l join `beer-sample` r on l.city=r.city where search(r, \"city:San Francisco\")",
                 "expected_result": "negative"
             },
-            "left_l":{
+            "left_l": {
                 "query": "select * from `beer-sample` l left join `beer-sample` r on l.city=r.city  where search(l, \"city:San Francisco\")",
                 "expected_result": "positive"
             },
-            "left_r":{
+            "left_r": {
                 "query": "select * from `beer-sample` l left join `beer-sample` r on l.city=r.city  where search(r, \"city:San Francisco\")",
                 "expected_result": "negative"
             },
-            "left_outer_l":{
+            "left_outer_l": {
                 "query": "select * from `beer-sample` l left outer join `beer-sample` r on l.city=r.city  where search(l, \"city:San Francisco\")",
                 "expected_result": "positive"
             },
-            "left_outer_r":{
+            "left_outer_r": {
                 "query": "select * from `beer-sample` l left outer join `beer-sample` r on l.city=r.city  where search(r, \"city:San Francisco\")",
                 "expected_result": "negative"
             },
-            "right_l":{
+            "right_l": {
                 "query": "select * from `beer-sample` l right join `beer-sample` r on l.city=r.city  where search(l, \"city:San Francisco\")",
                 "expected_result": "negative"
             },
-            "right_r":{
+            "right_r": {
                 "query": "select * from `beer-sample` l right join `beer-sample` r on l.city=r.city  where search(r, \"city:San Francisco\")",
                 "expected_result": "positive"
             },
-            "right_outer_l":{
+            "right_outer_l": {
                 "query": "select * from `beer-sample` l right outer join `beer-sample` r on l.city=r.city  where search(l, \"city:San Francisco\")",
                 "expected_result": "negative"
             },
-            "right_outer_r":{
+            "right_outer_r": {
                 "query": "select * from `beer-sample` l right outer join `beer-sample` r on l.city=r.city  where search(r, \"city:San Francisco\")",
                 "expected_result": "positive"
             },
-            "use_hash_build_l":{
+            "use_hash_build_l": {
                 "query": "select * from `beer-sample` l join `beer-sample` r use hash(build) on l.city=r.city where search(l, \"city:San Francisco\")",
                 "expected_result": "positive"
             },
-            "use_hash_build_r":{
+            "use_hash_build_r": {
                 "query": "select * from `beer-sample` l join `beer-sample` r use hash(build) on l.city=r.city  where search(r, \"city:San Francisco\")",
                 "expected_result": "positive"
             },
-            "use_hash_probe_l":{
+            "use_hash_probe_l": {
                 "query": "select * from `beer-sample` l join `beer-sample` r use hash(probe) on l.city=r.city where search(l, \"city:San Francisco\")",
                 "expected_result": "positive"
             },
-            "use_hash_probe_r":{
+            "use_hash_probe_r": {
                 "query": "select * from `beer-sample` l join `beer-sample` r use hash(probe) on l.city=r.city  where search(r, \"city:San Francisco\")",
                 "expected_result": "positive"
             },
-            "use_nl_l":{
+            "use_nl_l": {
                 "query": "select * from `beer-sample` l join `beer-sample` r use nl on l.city=r.city where search(l, \"city:San Francisco\")",
                 "expected_result": "positive"
             },
-            "use_nl_r":{
+            "use_nl_r": {
                 "query": "select * from `beer-sample` l join `beer-sample` r use nl on l.city=r.city  where search(r, \"city:San Francisco\")",
                 "expected_result": "negative"
             },
@@ -1144,7 +1144,7 @@ class N1qlFTSIntegrationPhase2Test(QueryTests):
         try:
             n1ql_query = tests[test_name]['query']
             result = self.run_cbq_query(n1ql_query)
-            self.assertEquals(result['status'], 'success', "The following query is incorrect - "+n1ql_query)
+            self.assertEqual(result['status'], 'success', "The following query is incorrect - "+n1ql_query)
 
             explain_result = self.run_cbq_query("explain "+n1ql_query)
             if tests[test_name]['expected_result'] == "positive":
@@ -1152,7 +1152,7 @@ class N1qlFTSIntegrationPhase2Test(QueryTests):
             if tests[test_name]['expected_result'] == "negative":
                 self.assertTrue("idx_beer_sample_fts" not in str(explain_result),
                                 "FTS index is used for query: " + n1ql_query)
-        except CBQError, err:
+        except CBQError as err:
             self.log.info("Incorrect query ::"+n1ql_query+"::")
 
         finally:
@@ -1210,23 +1210,23 @@ class N1qlFTSIntegrationPhase2Test(QueryTests):
     def _check_scan_parallel(self, query, expected_count, scan_type):
         try:
             search_results = self.run_cbq_query(query)['metrics']['resultCount']
-            self.assertEquals(expected_count - int(search_results) > 0, True, "Query result is incorrect for "+scan_type+": \n"
+            self.assertEqual(expected_count - int(search_results) > 0, True, "Query result is incorrect for "+scan_type+": \n"
                                 "Results before update - "+str(expected_count)+", count during update - "+str(search_results))
-        except CBQError, e:
-            self.assertEquals('True', 'False', 'Wrong query - '+str(query))
+        except CBQError as e:
+            self.assertEqual('True', 'False', 'Wrong query - '+str(query))
 
     def _update_parallel(self, query, operation, expected_count, scan_type):
         try:
             self.run_cbq_query(query)
-        except CBQError, e:
-            self.assertEquals('True', 'False', 'Wrong query - '+str(query))
+        except CBQError as e:
+            self.assertEqual('True', 'False', 'Wrong query - '+str(query))
 
     def _select_parallel(self, query, expected_count):
         try:
             search_results = self.run_cbq_query(query)['metrics']['resultCount']
-            self.assertEquals(expected_count, search_results, "Query result is incorrect")
-        except CBQError, e:
-            self.assertEquals('True', 'False', 'Wrong query - '+str(query))
+            self.assertEqual(expected_count, search_results, "Query result is incorrect")
+        except CBQError as e:
+            self.assertEqual('True', 'False', 'Wrong query - '+str(query))
 
     def _load_test_buckets(self):
         if self.get_bucket_from_name("beer-sample") is None:
@@ -1252,7 +1252,7 @@ class N1qlFTSIntegrationPhase2Test(QueryTests):
         while indexed_doc_count < doc_count:
             try:
                 indexed_doc_count = fts_index.get_indexed_doc_count()
-            except KeyError, k:
+            except KeyError as k:
                 continue
 
         return fts_index
@@ -1318,7 +1318,7 @@ class N1qlFTSIntegrationPhase2Test(QueryTests):
         for index in indexes:
             rest.delete_fts_index(index.name)
 
-    def get_rest_client(self, user , password):
+    def get_rest_client(self, user, password):
         rest = RestConnection(self.cbcluster.get_random_fts_node())
         rest.username = user
         rest.password = password

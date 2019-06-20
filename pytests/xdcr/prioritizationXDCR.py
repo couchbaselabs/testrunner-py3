@@ -4,7 +4,7 @@ import time
 from membase.api.rest_client import RestConnection
 from remote.remote_util import RemoteMachineShellConnection
 
-from xdcrnewbasetests import XDCRNewBaseTest
+from .xdcrnewbasetests import XDCRNewBaseTest
 
 
 class XDCRPrioritization(XDCRNewBaseTest):
@@ -40,7 +40,7 @@ class XDCRPrioritization(XDCRNewBaseTest):
             repl = rest.get_replication_for_buckets(bucket.name, bucket.name)
             # Taking 10 samples of DCP priority ~5 seconds apart.
             # cbstats takes ~4 secs + 2 seconds sleep
-            for sample in xrange(10):
+            for sample in range(10):
                 output, error = shell.execute_cbstats(bucket, "dcp", print_results=False)
                 for stat in output:
                     if re.search("eq_dcpq:xdcr:dcp_" + repl['id'] + ".*==:priority:", stat):

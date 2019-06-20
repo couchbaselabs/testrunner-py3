@@ -1,4 +1,4 @@
-from tuq import QueryTests
+from .tuq import QueryTests
 from membase.api.rest_client import RestHelper
 from couchbase.cluster import Cluster
 from couchbase.cluster import PasswordAuthenticator
@@ -60,7 +60,7 @@ class QueryXattrTests(QueryTests):
         compare_2 = self.run_xattrs_query("SELECT meta().xattrs._system3.field1 FROM default", "", "_system3", "", "default", compare_fields=["field1"], xattr_data=self.system_xattr_data, primary_compare=False)
 
         # nested partial path query
-        compare_3 = self.run_xattrs_query("SELECT meta().xattrs._system3.field1.sub_field1a FROM default", "", "_system3", "", "default", compare_fields=["field1", "sub_field1a"], xattr_data=self.system_xattr_data,primary_compare=False)
+        compare_3 = self.run_xattrs_query("SELECT meta().xattrs._system3.field1.sub_field1a FROM default", "", "_system3", "", "default", compare_fields=["field1", "sub_field1a"], xattr_data=self.system_xattr_data, primary_compare=False)
 
         # multiple paths single xattr query
         query_response = self.run_cbq_query("SELECT meta().xattrs._system3, meta().xattrs._system3.field1, meta().xattrs._system3.field1.sub_field1a FROM default")
@@ -531,7 +531,7 @@ class QueryXattrTests(QueryTests):
         index_statement = "CREATE INDEX idx1 ON default(meta().xattrs._system1, meta().xattrs._system2, meta().xattrs._system3) USING " + self.index_type
         try:
             query_response = self.run_cbq_query(index_statement)
-        except Exception, ex:
+        except Exception as ex:
             pass
         else:
             self.fail()
@@ -541,7 +541,7 @@ class QueryXattrTests(QueryTests):
         query = "SELECT meta().xattrs._system1, meta().xattrs._system2, meta().xattrs._system3 FROM default"
         try:
             query_response = self.run_cbq_query(query)
-        except Exception, ex:
+        except Exception as ex:
             pass
         else:
             self.fail()
@@ -1291,7 +1291,7 @@ class QueryXattrTests(QueryTests):
         index_statement = "CREATE INDEX idx1 ON default(meta().xattrs.user1, meta().xattrs.user2, meta().xattrs.user3) USING " + self.index_type
         try:
             query_response = self.run_cbq_query(index_statement)
-        except Exception, ex:
+        except Exception as ex:
             pass
         else:
             self.fail()
@@ -1300,7 +1300,7 @@ class QueryXattrTests(QueryTests):
         query = "SELECT meta().xattrs.user1, meta().xattrs.user2, meta().xattrs.user3 FROM default"
         try:
             query_response = self.run_cbq_query(query)
-        except Exception, ex:
+        except Exception as ex:
             pass
         else:
             self.fail()
@@ -1389,7 +1389,7 @@ class QueryXattrTests(QueryTests):
         try:
             index = "create index sdqidxs21112 on default(meta().xattrs.`$document`)"
             self.run_cbq_query(query=index)
-        except Exception, ex:
+        except Exception as ex:
             self.assertTrue('GSI CreateIndex() - cause: Fails to create index.  Cannot index on Virtual Extended Attributes.'
                             in str(ex), "Error message is not what was expected, here is the error outputed %s" % ex)
 
@@ -1653,21 +1653,21 @@ class QueryXattrTests(QueryTests):
         try:
             query = "SELECT meta().id, meta().xattrs.user1, meta().xattrs._system1 from default"
             self.run_cbq_query(query=query)
-        except Exception, ex:
+        except Exception as ex:
             self.assertTrue('Plan error: Can only retrieve virtual xattr and user xattr or virtual xattr and system xattr'
                             in str(ex), "Error message is not what was expected, here is the error outputed %s" % ex)
 
         try:
             index = "create index idx on default(meta().xattrs.`_system1`, meta().xattrs.user1)"
             self.run_cbq_query(query=index)
-        except Exception, ex:
+        except Exception as ex:
             self.assertTrue('Plan error: Only a single user or system xattribute can be indexed.'
                             in str(ex), "Error message is not what was expected, here is the error outputed %s" % ex)
 
         try:
             index = " create index qidxs21112 on default(meta().xattrs.`_system1`) where meta().xattrs.`$document` > 5"
             self.run_cbq_query(query=index)
-        except Exception, ex:
+        except Exception as ex:
             self.assertTrue('GSI CreateIndex() - cause: Fails to create index.  Cannot index on Virtual Extended Attributes.'
                             in str(ex), "Error message is not what was expected, here is the error outputed %s" % ex)
 

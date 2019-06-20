@@ -138,14 +138,14 @@ class TuqTutorialTests(BaseTestCase):
                         status, content, header = self._http_request(api, 'POST', params)
                         json_parsed = json.loads(content)
                         if status:
-                            if "errors" in json_parsed.keys():
+                            if "errors" in list(json_parsed.keys()):
                                 """ check if error still thow even status ok """
                                 errors[key] = json_parsed["errors"]
-                            if "status" in json_parsed.keys() and \
+                            if "status" in list(json_parsed.keys()) and \
                                 json_parsed["status"] != "success":
                                 queries_failed[key] = queries[key]
                         else:
-                            if "status" in json_parsed.keys() and \
+                            if "status" in list(json_parsed.keys()) and \
                                          json_parsed["status"] == "fatal":
                                 queries_failed[key] = queries[key]
             else:
@@ -155,13 +155,13 @@ class TuqTutorialTests(BaseTestCase):
                 json_parsed = json.loads(content)
                 if status:
                     self.log.info("OK")
-                    if "errors" in json_parsed.keys():
+                    if "errors" in list(json_parsed.keys()):
                         errors[key] = json_parsed["errors"]
-                    if "status" in json_parsed.keys() and \
+                    if "status" in list(json_parsed.keys()) and \
                                  json_parsed["status"] != "success":
                         queries_failed[key] = queries[key]
                 else:
-                    if "status" in json_parsed.keys() and \
+                    if "status" in list(json_parsed.keys()) and \
                                  json_parsed["status"] == "fatal":
                         queries_failed[key] = queries[key]
         if queries_failed:

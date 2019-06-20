@@ -84,7 +84,7 @@ COUCHBASE_VERSION_2 = ["2.0.0", "2.0.1", "2.0.2", "2.1.0", "2.1.1", "2.2.0", "2.
 COUCHBASE_VERSION_2_WITH_REL = ["2.5.0", "2.5.1"]
 COUCHBASE_VERSION_3 = ["3.0.0", "3.0.1", "3.0.2", "3.0.3", "3.1.0", "3.1.1", "3.1.2",
                        "3.1.3", "3.1.4", "3.1.5", "3.1.6", "3.5.0"]
-WIN_CB_VERSION_3 = ["3.0.0", "3.0.1", "3.0.2", "3.0.3", "3.1.0", "3.1.1","3.1.2",
+WIN_CB_VERSION_3 = ["3.0.0", "3.0.1", "3.0.2", "3.0.3", "3.1.0", "3.1.1", "3.1.2",
                     "3.1.3", "3.1.4", "3.1.5", "3.1.6"]
 SHERLOCK_VERSION = ["4.0.0", "4.0.1", "4.0", "4.1.0", "4.1", "4.1.1", "4.1.2"]
 WATSON_VERSION = ["4.5.0", "4.5.1", "4.6.0", "4.6.1", "4.6.2", "4.6.3", "4.6.4", "4.6.5"]
@@ -205,7 +205,7 @@ MAC_COUCHBASE_SAMPLE_PATH = "/Applications/Couchbase\ Server.app/Contents/Resour
 MAC_CB_PATH = "/Applications/Couchbase\ Server.app/Contents/Resources/couchbase-core/"
 LINUX_COUCHBASE_LOGS_PATH = '/opt/couchbase/var/lib/couchbase/logs'
 WIN_COUCHBASE_LOGS_PATH = '/cygdrive/c/Program\ Files/Couchbase/Server/var/lib/couchbase/logs/'
-MISSING_UBUNTU_LIB = ["libcurl3","python-httplib2"]
+MISSING_UBUNTU_LIB = ["libcurl3", "python-httplib2"]
 LINUX_GOPATH = '/root/tuq/gocode'
 WINDOWS_GOPATH = '/cygdrive/c/tuq/gocode'
 LINUX_GOROOT = '/root/tuq/go'

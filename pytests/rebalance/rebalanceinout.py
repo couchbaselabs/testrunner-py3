@@ -118,7 +118,7 @@ class RebalanceInOutTests(RebalanceBaseTest):
         self.sleep(30)
         try:
             self.shuffle_nodes_between_zones_and_rebalance(servs_out)
-        except Exception, e:
+        except Exception as e:
             if "deltaRecoveryNotPossible" not in e.__str__():
                 self.fail("Rebalance did not fail. Rebalance has to fail since no delta recovery should be possible"
                           " while adding nodes too")
@@ -223,7 +223,7 @@ class RebalanceInOutTests(RebalanceBaseTest):
         # Validate seq_no snap_start/stop values after doc_loading
         self.check_snap_start_corruption()
 
-        for i in reversed(range(self.num_servers)[self.num_servers / 2:]):
+        for i in reversed(list(range(self.num_servers))[self.num_servers / 2:]):
             tasks = self._async_load_all_buckets(self.master, gen, "update", 0, batch_size=50)
             self.cluster.rebalance(
                 self.servers[:i], [], self.servers[i:self.num_servers],
@@ -319,7 +319,7 @@ class RebalanceInOutTests(RebalanceBaseTest):
         self.check_snap_start_corruption()
 
         batch_size = 50
-        for i in reversed(range(self.num_servers)[self.num_servers / 2:]):
+        for i in reversed(list(range(self.num_servers))[self.num_servers / 2:]):
             tasks = self._async_load_all_buckets(
                 self.master, gen, "update", 0,
                 batch_size=batch_size, timeout_secs=60)
@@ -370,7 +370,7 @@ class RebalanceInOutTests(RebalanceBaseTest):
             self.servers[1:self.num_servers], [])
         self._load_all_buckets(self.master, gen, "create", 0)
         batch_size = 50
-        for i in reversed(range(self.num_servers)[self.num_servers / 2:]):
+        for i in reversed(list(range(self.num_servers))[self.num_servers / 2:]):
             tasks = self._async_load_all_buckets(
                 self.master, gen, "update", 0,
                 batch_size=batch_size, timeout_secs=60)
@@ -484,7 +484,7 @@ class RebalanceInOutTests(RebalanceBaseTest):
         gen_delete = BlobGenerator('mike', 'mike-', self.value_size,
                                    start=self.num_items / 2 + 2000,
                                    end=self.num_items)
-        for i in reversed(range(self.num_servers)[self.num_servers / 2:]):
+        for i in reversed(list(range(self.num_servers))[self.num_servers / 2:]):
             tasks = self._async_load_all_buckets(
                 self.master, self.gen_update, "update", 0,
                 pause_secs=5, batch_size=1, timeout_secs=60)
@@ -531,7 +531,7 @@ class RebalanceInOutTests(RebalanceBaseTest):
         gen_expire = BlobGenerator('mike', 'mike-', self.value_size,
                                    start=self.num_items / 2,
                                    end=self.num_items)
-        for i in reversed(range(self.num_servers)[self.num_servers / 2:]):
+        for i in reversed(list(range(self.num_servers))[self.num_servers / 2:]):
             self.log.info("iteration #{0}".format(i))
             tasks = self._async_load_all_buckets(
                 self.master, self.gen_update, "update", 0, batch_size=1)
@@ -678,9 +678,9 @@ class RebalanceInOutTests(RebalanceBaseTest):
         num_ddocs = self.input.param("num_ddocs", 1)
         num_views = self.input.param("num_views", 1)
         is_dev_ddoc = self.input.param("is_dev_ddoc", False)
-        ddoc_names = ['ddoc' + str(i) for i in xrange(num_ddocs)]
+        ddoc_names = ['ddoc' + str(i) for i in range(num_ddocs)]
         map_func = """function (doc, meta) {{\n  emit(meta.id, "emitted_value_{0}");\n}}"""
-        views = [View("view" + str(i), map_func.format(i), None, is_dev_ddoc, False) for i in xrange(num_views)]
+        views = [View("view" + str(i), map_func.format(i), None, is_dev_ddoc, False) for i in range(num_views)]
         # views = self.make_default_views(self.default_view_name, num_views, is_dev_ddoc)
 
         prefix = ("", "dev_")[is_dev_ddoc]
@@ -702,7 +702,7 @@ class RebalanceInOutTests(RebalanceBaseTest):
         servs_init = self.servers[:self.nodes_init]
         servs_in = [self.servers[i + self.nodes_init] for i in range(self.nodes_in)]
         servs_out = [self.servers[self.nodes_init - i - 1] for i in range(self.nodes_out)]
-        for i in xrange(num_ddocs * num_views * len(self.buckets)):
+        for i in range(num_ddocs * num_views * len(self.buckets)):
             # wait until all initial_build indexer processes are completed
             active_tasks = self.cluster.async_monitor_active_task(servs_init, "indexer", "True", wait_task=False)
             for active_task in active_tasks:
@@ -732,7 +732,7 @@ class RebalanceInOutTests(RebalanceBaseTest):
         tasks = dict()
         for bucket in self.buckets:
             for ddoc_name in ddoc_names:
-                for i in xrange(num_views):
+                for i in range(num_views):
                     tasks["{0}/_design/{1}/_view/{2}".format(bucket, ddoc_name, "view" + str(i))] = \
                         self.cluster.async_query_view(self.master,
                                                       prefix + ddoc_name, "view" + str(i), query, expected_rows, bucket)

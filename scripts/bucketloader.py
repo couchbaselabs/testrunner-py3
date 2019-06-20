@@ -34,7 +34,7 @@ def create_buckets(server, count, prefix, quota):
                                saslPassword="password",
                                authType="sasl",
                                proxyPort=info.memcached)
-            print "created bucket {0}".format(name)
+            print("created bucket {0}".format(name))
 
 
 def load_buckets(server, name, get, threads, moxi):
@@ -58,7 +58,7 @@ if __name__ == "__main__":
 
         if "count" in params:
             count = int(params["count"])
-            print count
+            print(count)
         if "load" in params:
             if params["load"].lower() == "true":
                 run_load = True
@@ -94,7 +94,7 @@ if __name__ == "__main__":
             for t in threads:
                 t.join()
     except Exception as ex:
-        print ex
+        print(ex)
 
 
 

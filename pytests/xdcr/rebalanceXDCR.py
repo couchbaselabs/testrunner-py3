@@ -1,5 +1,5 @@
-from xdcrnewbasetests import XDCRNewBaseTest
-from xdcrnewbasetests import Utility, BUCKET_NAME, OPS
+from .xdcrnewbasetests import XDCRNewBaseTest
+from .xdcrnewbasetests import Utility, BUCKET_NAME, OPS
 """Testing Rebalance on Unidirectional and Bidirectional XDCR replication setup"""
 
 
@@ -12,7 +12,7 @@ class Rebalance(XDCRNewBaseTest):
         self.dest_cluster = self.get_cb_cluster_by_name('C2')
         self.dest_master = self.dest_cluster.get_master_node()
         self.__rebalance = self._input.param("rebalance", "").split('-')
-        self.__failover = self._input.param("failover","").split('-')
+        self.__failover = self._input.param("failover", "").split('-')
         self.__num_rebalance = self._input.param("num_rebalance", 1)
         self.__num_failover = self._input.param("num_failover", 1)
 

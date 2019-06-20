@@ -1,15 +1,15 @@
-import Queue
+import queue
 import copy, json
-from newupgradebasetest import NewUpgradeBaseTest
+from .newupgradebasetest import NewUpgradeBaseTest
 from remote.remote_util import RemoteMachineShellConnection, RemoteUtilHelper
 from couchbase_helper.documentgenerator import BlobGenerator
 from membase.api.rest_client import RestConnection, RestHelper
 from membase.api.exception import RebalanceFailedException
 from membase.helper.cluster_helper import ClusterOperationHelper
 from memcached.helper.kvstore import KVStore
-from fts.stable_topology_fts import StableTopFTS
+from .fts.stable_topology_fts import StableTopFTS
 from pytests.fts.fts_callable import FTSCallable
-from cbas.cbas_functional_tests import CBASFunctionalTests
+from .cbas.cbas_functional_tests import CBASFunctionalTests
 # from 2i.indexscans_2i import SecondaryIndexingScanTests
 from testconstants import COUCHBASE_VERSION_2
 from testconstants import COUCHBASE_VERSION_3, COUCHBASE_FROM_VERSION_3
@@ -17,15 +17,15 @@ from testconstants import SHERLOCK_VERSION, COUCHBASE_FROM_SHERLOCK,\
                           COUCHBASE_FROM_SPOCK, COUCHBASE_FROM_WATSON,\
                           COUCHBASE_FROM_VULCAN
 from couchbase.cluster import Cluster, PasswordAuthenticator
-from couchbase.exceptions import CouchbaseError,CouchbaseNetworkError,CouchbaseTransientError
-from security.rbac_base import RbacBase
+from couchbase.exceptions import CouchbaseError, CouchbaseNetworkError, CouchbaseTransientError
+from .security.rbac_base import RbacBase
 from threading import Thread
 
 
 class SingleNodeUpgradeTests(NewUpgradeBaseTest):
     def setUp(self):
         super(SingleNodeUpgradeTests, self).setUp()
-        self.queue = Queue.Queue()
+        self.queue = queue.Queue()
 
     def tearDown(self):
         super(SingleNodeUpgradeTests, self).tearDown()
@@ -84,7 +84,7 @@ class SingleNodeUpgradeTests(NewUpgradeBaseTest):
                 output, error = self._upgrade(upgrade_version, self.master, info=info)
                 if str(output).find(error) != -1 or str(error).find(error) != -1:
                     raise Exception(error)
-        except Exception, ex:
+        except Exception as ex:
             self.log.info("Exception %s appeared as expected" % ex)
             self.log.info("Check that old version is working fine")
             self.verification([self.master])
@@ -97,10 +97,10 @@ class Upgrade_Utils(NewUpgradeBaseTest):
     def setUp(self):
         super(Upgrade_Utils, self).setUp()
         self.nodes_init = self.input.param('nodes_init', 2)
-        self.queue = Queue.Queue()
+        self.queue = queue.Queue()
 
     def tearDown(self):
-        print "teardown done"
+        print("teardown done")
 
     def add_and_rebalance(self):
         self._install(self.servers[:self.nodes_init])
@@ -116,14 +116,14 @@ class MultiNodesUpgradeTests(NewUpgradeBaseTest):
     def setUp(self):
         super(MultiNodesUpgradeTests, self).setUp()
         self.nodes_init = self.input.param('nodes_init', 2)
-        self.queue = Queue.Queue()
+        self.queue = queue.Queue()
         self.rate_limit = self.input.param("rate_limit", 100000)
         self.batch_size = self.input.param("batch_size", 1000)
         self.doc_size = self.input.param("doc_size", 100)
         self.loader = self.input.param("loader", "high_doc_ops")
         self.instances = self.input.param("instances", 4)
         self.threads = self.input.param("threads", 5)
-        self.use_replica_to = self.input.param("use_replica_to",False)
+        self.use_replica_to = self.input.param("use_replica_to", False)
         self.index_name_prefix = None
 
     def tearDown(self):
@@ -290,7 +290,7 @@ class MultiNodesUpgradeTests(NewUpgradeBaseTest):
                 server.index_path = index_path
                 shell = RemoteMachineShellConnection(server)
                 # shell.remove_folders([data_path, index_path])
-                for path in set([data_path, index_path]):
+                for path in {data_path, index_path}:
                     shell.create_directory(path)
                 shell.disconnect()
             self._install(self.servers[:self.nodes_init])
@@ -325,7 +325,7 @@ class MultiNodesUpgradeTests(NewUpgradeBaseTest):
                 for server in servers_with_not_default:
                     rest = RestConnection(server)
                     node = rest.get_nodes_self()
-                    print node.storage[0]
+                    print(node.storage[0])
                     self.assertEqual(node.storage[0].path.lower(), data_path.lower(),
                                      "Server %s. Data path expected:%s, actual %s." % (
                                          server.ip, data_path, node.storage[0].path))
@@ -1082,7 +1082,7 @@ class MultiNodesUpgradeTests(NewUpgradeBaseTest):
         try:
             self.operations(self.servers[self.nodes_init:self.num_servers], services="kv,kv,index,n1ql")
             self.sleep(timeout=300)
-        except Exception, ex:
+        except Exception as ex:
             # do nothing, the bucket is created
             self.log.info("bucket is created")
 
@@ -2274,7 +2274,7 @@ class MultiNodesUpgradeTests(NewUpgradeBaseTest):
                 self.servers[:self.nodes_init + 1], [], to_remove_nodes)
             index_server = self.get_nodes_from_services_map(
                 service_type="index", get_all_nodes=False)
-            for i in xrange(20):
+            for i in range(20):
                 output = self.rest.list_indexer_rebalance_tokens(
                     server=index_server)
                 if "rebalancetoken" in output:
@@ -2963,18 +2963,18 @@ class MultiNodesUpgradeTests(NewUpgradeBaseTest):
                              args=(self.master, self.num_items))
         self.log.info('starting the load thread...')
         load_thread.start()
-        for i in xrange(2):
+        for i in range(2):
             status, json_parsed1 = rest.get_bucket_stats_json()
             array1.extend(json_parsed1["op"]["samples"]["ep_ops_create"])
             array2.extend(json_parsed1["op"]["samples"]["ep_ops_update"])
             self.sleep(60)
         import numpy as np
-        filter(lambda a: a != 0, array1)
-        filter(lambda a: a != 0, array2)
+        [a for a in array1 if a != 0]
+        [a for a in array2 if a != 0]
         self.log.info("array")
         self.log.info(array1)
         self.log.info(array2)
-        for i in xrange(80, 100, 1):
+        for i in range(80, 100, 1):
             percentile_ep_ops_create = np.percentile(array1, i)
             percentile_ep_ops_update = np.percentile(array2, i)
             self.log.info(
@@ -3030,7 +3030,7 @@ class MultiNodesUpgradeTests(NewUpgradeBaseTest):
         while num_items > batch_end:
             batch_end = batch_start + batch_size
             keys = []
-            for i in xrange(batch_start, batch_end, 1):
+            for i in range(batch_start, batch_end, 1):
                 keys.append(str(i).rjust(20, '0'))
             try:
                 bkt.get_multi(keys)
@@ -3116,7 +3116,7 @@ class MultiNodesUpgradeTests(NewUpgradeBaseTest):
             else:
                 self.cluster.rebalance(servers, servers_in, [], timeout=2400)
                 self.cluster.rebalance(servers, [], servers_out, timeout=2400)
-        except Exception, ex:
+        except Exception as ex:
             rebalance_fail = True
         finally:
             self.sleep(self.sleep_time)
@@ -3139,14 +3139,14 @@ class MultiNodesUpgradeTests(NewUpgradeBaseTest):
             if errors:
                 self.log.info("Printing missing keys : ")
             for error in errors:
-                print error
+                print(error)
             if errors:
                 self.check_dataloss_with_cbc_hash(load_host, bucket, missing_keys)
             if self.loader == "pillowfight":
                 if errors_replica:
                     self.log.info("Printing missing keys in replica : ")
                 for error in errors_replica:
-                    print error
+                    print(error)
                 if errors_replica:
                     self.check_dataloss_with_cbc_hash(load_host, bucket, missing_keys_replica)
             if num_items != rest.get_active_key_count(bucket):
@@ -3173,8 +3173,8 @@ class MultiNodesUpgradeTests(NewUpgradeBaseTest):
 
     def view_queries(self, iterations):
         query = {"connectionTimeout": 60000}
-        for count in xrange(iterations):
-            for i in xrange(self.view_num):
+        for count in range(iterations):
+            for i in range(self.view_num):
                 self.cluster.query_view(self.master, self.ddocs[0].name,
                                         self.default_view_name + str(i), query,
                                         expected_rows=None, bucket="default", retry_time=2)

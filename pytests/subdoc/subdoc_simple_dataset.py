@@ -1,6 +1,6 @@
 from lib.mc_bin_client import MemcachedClient, MemcachedError
 from lib.memcacheConstants import *
-from subdoc_base import SubdocBaseTest
+from .subdoc_base import SubdocBaseTest
 from membase.api.rest_client import RestConnection
 from memcached.helper.data_helper import VBucketAwareMemcached
 import copy, json
@@ -47,7 +47,7 @@ class SubdocSimpleDataset(SubdocBaseTest):
 
 
     def generate_random_json_doc(self, value_size = 10240):
-        age = range(1, 100)
+        age = list(range(1, 100))
         name = ['a' * value_size,]
         template =  { "age": age, "name": name }
         json_string = json.dumps(template)
@@ -97,7 +97,7 @@ class SubdocSimpleDataset(SubdocBaseTest):
         time.sleep(5)
         client1.generic_request(client1.memcached(self.key).append, self.key, 'appended data')
         get_meta_resp_after = client1.generic_request(client1.memcached(self.key).getMeta, self.key)
-        self.assertEquals(get_meta_resp_before[2], get_meta_resp_after[2]) # 3rd value is expiry value
+        self.assertEqual(get_meta_resp_before[2], get_meta_resp_after[2]) # 3rd value is expiry value
 
 #SD_COUNTER
     def test_counter(self):
@@ -105,20 +105,20 @@ class SubdocSimpleDataset(SubdocBaseTest):
         dict = {}
         self.key = "test_counter"
         array = {
-                    "add_integer":0,
-                    "sub_integer":1,
-                    "add_double":0.0,
-                    "sub_double":0.0,
-                    "array_add_integer":[0,1],
-                    "array_sub_integer":[0,1],
+                    "add_integer": 0,
+                    "sub_integer": 1,
+                    "add_double": 0.0,
+                    "sub_double": 0.0,
+                    "array_add_integer": [0, 1],
+                    "array_sub_integer": [0, 1],
                 }
         expected_array = {
-                    "add_integer":1,
-                    "sub_integer":0,
-                    "add_double":1.0,
-                    "sub_double":0.0,
-                    "array_add_integer":[1,1],
-                    "array_sub_integer":[0,0],
+                    "add_integer": 1,
+                    "sub_integer": 0,
+                    "add_double": 1.0,
+                    "sub_double": 0.0,
+                    "array_add_integer": [1, 1],
+                    "array_sub_integer": [0, 0],
                 }
         jsonDump = json.dumps(array)
         self.client.set(self.key, 0, 0, jsonDump)
@@ -129,7 +129,7 @@ class SubdocSimpleDataset(SubdocBaseTest):
         self.counter(self.client, key = "test_counter", path = 'array_add_integer[0]', value = "-1.0")
         self.counter(self.client, key = "test_counter", path = 'array_add_integer[1]', value = "-1.0")
         self.json  = expected_array
-        for key in expected_array.keys():
+        for key in list(expected_array.keys()):
             value = expected_array[key]
             logic, data_return  =  self.get_string_and_verify_return( self.client, key = self.key, path = key)
             if not logic:
@@ -191,7 +191,7 @@ class SubdocSimpleDataset(SubdocBaseTest):
                 }
         expected_array = {
                     "empty":["1"],
-                    "single_dimension_array":["0","1"],
+                    "single_dimension_array":["0", "1"],
                     "two_dimension_array":[["0", "1"]],
                     "three_dimension_array":[[["0", "1"]]]
                 }
@@ -202,7 +202,7 @@ class SubdocSimpleDataset(SubdocBaseTest):
         self.array_add_last(self.client, key = "test_add_last_array", path = 'two_dimension_array[0]', value =  json.dumps("1"))
         self.array_add_last(self.client, key = "test_add_last_array", path = 'three_dimension_array[0][0]', value =  json.dumps("1"))
         self.json  = expected_array
-        for key in expected_array.keys():
+        for key in list(expected_array.keys()):
             value = expected_array[key]
             logic, data_return  =  self.get_string_and_verify_return( self.client, key = self.key, path = key)
             if not logic:
@@ -222,7 +222,7 @@ class SubdocSimpleDataset(SubdocBaseTest):
                 }
         expected_array = {
                     "empty":["0"],
-                    "single_dimension_array":["0","1"],
+                    "single_dimension_array":["0", "1"],
                     "two_dimension_array":[["0", "1"]],
                     "three_dimension_array":[[["0", "1"]]]
                 }
@@ -233,7 +233,7 @@ class SubdocSimpleDataset(SubdocBaseTest):
         self.array_add_first(self.client, key = "test_add_first_array", path = 'two_dimension_array[0]', value =  json.dumps("0"))
         self.array_add_first(self.client, key = "test_add_first_array", path = 'three_dimension_array[0][0]', value =  json.dumps("0"))
         self.json  = expected_array
-        for key in expected_array.keys():
+        for key in list(expected_array.keys()):
             value = expected_array[key]
             logic, data_return  =  self.get_string_and_verify_return( self.client, key = self.key, path = key)
             if not logic:
@@ -247,15 +247,15 @@ class SubdocSimpleDataset(SubdocBaseTest):
         self.key = "test_add_unique_array"
         array = {
                     "empty":[],
-                    "single_dimension_array":["0",2],
-                    "two_dimension_array":[["0",2]],
+                    "single_dimension_array":["0", 2],
+                    "two_dimension_array":[["0", 2]],
                     "three_dimension_array":[[["0", 2]]]
                 }
         expected_array = {
                     "empty":["1"],
-                    "single_dimension_array":["0",2, "1"],
-                    "two_dimension_array":[["0",2, "1"]],
-                    "three_dimension_array":[[["0",2,"1"]]]
+                    "single_dimension_array":["0", 2, "1"],
+                    "two_dimension_array":[["0", 2, "1"]],
+                    "three_dimension_array":[[["0", 2, "1"]]]
                 }
         jsonDump = json.dumps(array)
         self.client.set(self.key, 0, 0, jsonDump)
@@ -264,7 +264,7 @@ class SubdocSimpleDataset(SubdocBaseTest):
         self.array_add_unique(self.client, key = "test_add_unique_array", path = 'two_dimension_array[0]', value =  json.dumps("1"))
         self.array_add_unique(self.client, key = "test_add_unique_array", path = 'three_dimension_array[0][0]', value =  json.dumps("1"))
         self.json  = expected_array
-        for key in expected_array.keys():
+        for key in list(expected_array.keys()):
             value = expected_array[key]
             logic, data_return  =  self.get_string_and_verify_return( self.client, key = self.key, path = key)
             if not logic:
@@ -282,29 +282,29 @@ class SubdocSimpleDataset(SubdocBaseTest):
                     "three_dimension_array_no_element":[[[]]]
                 }
         expected_array = {
-                    "single_dimension_array_no_element":[0, 1 , 2, 3],
-                    "two_dimension_array_no_element":[[0, 1, 2, 3],[0, 1, 2, 3]],
-                    "three_dimension_array_no_element":[[[0, 1, 2, 3],[0, 1, 2, 3]],[0, 1, 2, 3]],
+                    "single_dimension_array_no_element": [0, 1, 2, 3],
+                    "two_dimension_array_no_element": [[0, 1, 2, 3], [0, 1, 2, 3]],
+                    "three_dimension_array_no_element": [[[0, 1, 2, 3], [0, 1, 2, 3]], [0, 1, 2, 3]],
                 }
         jsonDump = json.dumps(array)
         self.client.set(self.key, 0, 0, jsonDump)
-        self.array_add_insert(self.client, key  = "test_add_insert_array" , path = "single_dimension_array_no_element[0]", value = json.dumps(1))
-        self.array_add_insert(self.client, key  = "test_add_insert_array" , path = "single_dimension_array_no_element[0]", value = json.dumps(0))
-        self.array_add_insert(self.client, key  = "test_add_insert_array" , path = "single_dimension_array_no_element[2]", value = json.dumps(3))
-        self.array_add_insert(self.client, key  = "test_add_insert_array" , path = "single_dimension_array_no_element[2]", value = json.dumps(2))
-        self.array_add_insert(self.client, key  = "test_add_insert_array" , path = "two_dimension_array_no_element[0][0]", value = json.dumps(1))
-        self.array_add_insert(self.client, key  = "test_add_insert_array" , path = "two_dimension_array_no_element[0][0]", value = json.dumps(0))
-        self.array_add_insert(self.client, key  = "test_add_insert_array" , path = "two_dimension_array_no_element[0][2]", value = json.dumps(3))
-        self.array_add_insert(self.client, key  = "test_add_insert_array" , path = "two_dimension_array_no_element[0][2]", value = json.dumps(2))
-        self.array_add_insert(self.client, key  = "test_add_insert_array" , path = "two_dimension_array_no_element[1]", value = json.dumps([0, 1, 2, 3]))
-        self.array_add_insert(self.client, key  = "test_add_insert_array" , path = "three_dimension_array_no_element[0][0][0]", value = json.dumps(1))
-        self.array_add_insert(self.client, key  = "test_add_insert_array" , path = "three_dimension_array_no_element[0][0][0]", value = json.dumps(0))
-        self.array_add_insert(self.client, key  = "test_add_insert_array" , path = "three_dimension_array_no_element[0][0][2]", value = json.dumps(3))
-        self.array_add_insert(self.client, key  = "test_add_insert_array" , path = "three_dimension_array_no_element[0][0][2]", value = json.dumps(2))
-        self.array_add_insert(self.client, key  = "test_add_insert_array" , path = "three_dimension_array_no_element[0][1]", value = json.dumps([0, 1, 2, 3]))
-        self.array_add_insert(self.client, key  = "test_add_insert_array" , path = "three_dimension_array_no_element[1]", value = json.dumps([0, 1, 2, 3]))
+        self.array_add_insert(self.client, key  = "test_add_insert_array", path = "single_dimension_array_no_element[0]", value = json.dumps(1))
+        self.array_add_insert(self.client, key  = "test_add_insert_array", path = "single_dimension_array_no_element[0]", value = json.dumps(0))
+        self.array_add_insert(self.client, key  = "test_add_insert_array", path = "single_dimension_array_no_element[2]", value = json.dumps(3))
+        self.array_add_insert(self.client, key  = "test_add_insert_array", path = "single_dimension_array_no_element[2]", value = json.dumps(2))
+        self.array_add_insert(self.client, key  = "test_add_insert_array", path = "two_dimension_array_no_element[0][0]", value = json.dumps(1))
+        self.array_add_insert(self.client, key  = "test_add_insert_array", path = "two_dimension_array_no_element[0][0]", value = json.dumps(0))
+        self.array_add_insert(self.client, key  = "test_add_insert_array", path = "two_dimension_array_no_element[0][2]", value = json.dumps(3))
+        self.array_add_insert(self.client, key  = "test_add_insert_array", path = "two_dimension_array_no_element[0][2]", value = json.dumps(2))
+        self.array_add_insert(self.client, key  = "test_add_insert_array", path = "two_dimension_array_no_element[1]", value = json.dumps([0, 1, 2, 3]))
+        self.array_add_insert(self.client, key  = "test_add_insert_array", path = "three_dimension_array_no_element[0][0][0]", value = json.dumps(1))
+        self.array_add_insert(self.client, key  = "test_add_insert_array", path = "three_dimension_array_no_element[0][0][0]", value = json.dumps(0))
+        self.array_add_insert(self.client, key  = "test_add_insert_array", path = "three_dimension_array_no_element[0][0][2]", value = json.dumps(3))
+        self.array_add_insert(self.client, key  = "test_add_insert_array", path = "three_dimension_array_no_element[0][0][2]", value = json.dumps(2))
+        self.array_add_insert(self.client, key  = "test_add_insert_array", path = "three_dimension_array_no_element[0][1]", value = json.dumps([0, 1, 2, 3]))
+        self.array_add_insert(self.client, key  = "test_add_insert_array", path = "three_dimension_array_no_element[1]", value = json.dumps([0, 1, 2, 3]))
         self.json  = expected_array
-        for key in expected_array.keys():
+        for key in list(expected_array.keys()):
             value = expected_array[key]
             logic, data_return  =  self.get_string_and_verify_return( self.client, key = self.key, path = key)
             if not logic:
@@ -439,11 +439,11 @@ class SubdocSimpleDataset(SubdocBaseTest):
         nested_json = self.generate_nested(base_json, array, self.nesting_level)
         jsonDump = json.dumps(nested_json)
         stats = mc.stats()
-        self.assertEquals(stats['ep_compression_mode'], 'active')
+        self.assertEqual(stats['ep_compression_mode'], 'active')
 
         scheme = "http"
-        host="{0}:{1}".format(self.master.ip,self.master.port)
-        self.sdk_client=SDKClient(scheme=scheme,hosts = [host], bucket = "default")
+        host="{0}:{1}".format(self.master.ip, self.master.port)
+        self.sdk_client=SDKClient(scheme=scheme, hosts = [host], bucket = "default")
 
         self.sdk_client.set(self.key, value=jsonDump, ttl=60)
         rv = self.sdk_client.cb.mutate_in(self.key, SD.upsert('my.attr', "value",
@@ -464,11 +464,11 @@ class SubdocSimpleDataset(SubdocBaseTest):
             self.client.get(self.key)
             self.fail("the key should get expired")
         except mc_bin_client.MemcachedError as error:
-            self.assertEquals(error.status, 1)
+            self.assertEqual(error.status, 1)
 
         stats = mc.stats()
-        self.assertEquals(int(stats['curr_items']), 0)
-        self.assertEquals(int(stats['curr_temp_items']), 0)
+        self.assertEqual(int(stats['curr_items']), 0)
+        self.assertEqual(int(stats['curr_temp_items']), 0)
 
 # SD_REPLACE - Replace Operations
 
@@ -514,13 +514,13 @@ class SubdocSimpleDataset(SubdocBaseTest):
         result = True
         self.key = "test_delete_array"
         array = {
-                    "numbers":[1,2,3],
+                    "numbers":[1, 2, 3],
                     "strings":["absde", "dddl", "dkdkd"],
-                    "two_dimension_array":[["0","1"]],
-                    "three_dimension_array":[[["0","1"]]]
+                    "two_dimension_array":[["0", "1"]],
+                    "three_dimension_array":[[["0", "1"]]]
                 }
         expected_array = {
-                    "numbers":[2,3],
+                    "numbers":[2, 3],
                     "strings":["absde", "dddl"],
                     "two_dimension_array":[["1"]],
                     "three_dimension_array":[[["1"]]]
@@ -532,7 +532,7 @@ class SubdocSimpleDataset(SubdocBaseTest):
         self.delete(self.client, key = "test_delete_array", path = 'two_dimension_array[0][0]')
         self.delete(self.client, key = "test_delete_array", path = 'three_dimension_array[0][0][0]')
         self.json  = expected_array
-        for key in expected_array.keys():
+        for key in list(expected_array.keys()):
             value = expected_array[key]
             logic, data_return  =  self.get_string_and_verify_return( self.client, key = self.key, path = key)
             if not logic:
@@ -549,7 +549,7 @@ class SubdocSimpleDataset(SubdocBaseTest):
         self.json =  dataset
         jsonDump = json.dumps(self.json)
         self.client.set(self.key, 0, 0, jsonDump)
-        for key in self.json.keys():
+        for key in list(self.json.keys()):
             value = self.json[key]
             logic, data_return  =  self.get_string_and_verify_return( self.client, key = self.key, path = key)
             if not logic:
@@ -566,11 +566,11 @@ class SubdocSimpleDataset(SubdocBaseTest):
         self.json =  dataset
         jsonDump = json.dumps(dict)
         self.client.set(self.key, 0, 0, jsonDump)
-        for key in self.json.keys():
+        for key in list(self.json.keys()):
             value = self.json[key]
             value = json.dumps(value)
             self.dict_add(self.client, self.key, key, value)
-        for key in self.json.keys():
+        for key in list(self.json.keys()):
             value = self.json[key]
             logic, data_return  =  self.get_string_and_verify_return( self.client, key = self.key, path = key)
             if not logic:
@@ -586,11 +586,11 @@ class SubdocSimpleDataset(SubdocBaseTest):
         self.json =  dataset
         jsonDump = json.dumps(dict)
         self.client.set(self.key, 0, 0, jsonDump)
-        for key in self.json.keys():
+        for key in list(self.json.keys()):
             value = self.json[key]
             value = json.dumps(value)
             self.dict_upsert(self.client, self.key, key, value)
-        for key in self.json.keys():
+        for key in list(self.json.keys()):
             value = self.json[key]
             logic, data_return  =  self.get_string_and_verify_return( self.client, key = self.key, path = key)
             if not logic:
@@ -607,12 +607,12 @@ class SubdocSimpleDataset(SubdocBaseTest):
         jsonDump = json.dumps(self.json)
         new_json = self.shuffle_json(self.json)
         self.client.set(self.key, 0, 0, jsonDump)
-        for key in self.json.keys():
+        for key in list(self.json.keys()):
             value = new_json[key]
             value = json.dumps(value)
             self.dict_upsert(self.client, self.key, key, value, create=create, expiry=expiry)
         self.json =  new_json
-        for key in new_json.keys():
+        for key in list(new_json.keys()):
             value = new_json[key]
             logic, data_return  =  self.get_string_and_verify_return( self.client, key = self.key, path = key)
             if not logic:
@@ -626,7 +626,7 @@ class SubdocSimpleDataset(SubdocBaseTest):
                 self.client.get(self.key)
                 self.fail("Document is not expired")
             except mc_bin_client.MemcachedError as error:
-                    self.assertEquals(error.status, 1)
+                    self.assertEqual(error.status, 1)
 
 
     def dict_replace_verify(self, dataset, data_key = "default"):
@@ -638,12 +638,12 @@ class SubdocSimpleDataset(SubdocBaseTest):
         jsonDump = json.dumps(self.json)
         new_json = self.shuffle_json(self.json)
         self.client.set(self.key, 0, 0, jsonDump)
-        for key in self.json.keys():
+        for key in list(self.json.keys()):
             value = new_json[key]
             value = json.dumps(value)
             self.dict_replace(self.client, self.key, key, value)
         self.json =  new_json
-        for key in new_json.keys():
+        for key in list(new_json.keys()):
             value = new_json[key]
             logic, data_return  =  self.get_string_and_verify_return( self.client, key = self.key, path = key)
             if not logic:
@@ -659,10 +659,10 @@ class SubdocSimpleDataset(SubdocBaseTest):
         self.json =  dataset
         jsonDump = json.dumps(self.json)
         self.client.set(self.key, 0, 0, jsonDump)
-        for key in self.json.keys():
+        for key in list(self.json.keys()):
             self.delete(self.client, self.key, key)
             self.json.pop(key)
-            for key in self.json.keys():
+            for key in list(self.json.keys()):
                 value = self.json[key]
                 logic, data_return  =  self.get_string_and_verify_return( self.client, key = self.key, path = key)
                 if not logic:
@@ -765,9 +765,9 @@ class SubdocSimpleDataset(SubdocBaseTest):
 
     def shuffle_json(self, json_value):
         dict = {}
-        keys = json_value.keys()
+        keys = list(json_value.keys())
         for key in keys:
-            index = random.randint(0,len(keys)-1)
+            index = random.randint(0, len(keys)-1)
             dict[key] =json_value[keys[index]]
         return dict
 

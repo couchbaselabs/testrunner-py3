@@ -417,7 +417,7 @@ class GenericLoadingTask(Thread, Task):
             except Exception:
                 retry_count += 1
                 self.client.reset_vbuckets(self.rest,
-                                           set([self.client._get_vBucket_id(key)]))
+                                           {self.client._get_vBucket_id(key)})
         return value
 
 

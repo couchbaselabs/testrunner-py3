@@ -76,9 +76,9 @@ class basic_collections(BaseTestCase):
 
         try:
 
-            mc.set("key",0,0,"value",collection=collection)
-            flag, keyx, value = mc.get(key="key",collection=collection)
-            print "flag:{} keyx:{} value:{}".format(flag, keyx, value)
+            mc.set("key", 0, 0, "value", collection=collection)
+            flag, keyx, value = mc.get(key="key", collection=collection)
+            print("flag:{} keyx:{} value:{}".format(flag, keyx, value))
 
         except MemcachedError as exp:
             self.fail("Exception with setting and getting the key in collections {0}".format(exp) )

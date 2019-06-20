@@ -63,7 +63,7 @@ class OptionsTests(QueryTests):
             self.query = "SELECT count(name) FROM %s" % (bucket.name)
             try:
                 actual_result = self.run_cbq_query()
-            except Exception, ex:
+            except Exception as ex:
                 self.assertTrue(str(ex).find('timeout') != -1, 'Server timeout did not work')
                 self.log.info('Timeout is on')
             else:
@@ -304,24 +304,24 @@ class OptionsRestTests(QueryTests):
             self.assertTrue("success" in str(output))
 
             #subqueries
-            statement = 'EXPLAIN SELECT * FROM %s t1 WHERE job_title = "Engineer" and name IN (SELECT name FROM %s where job_title=$type and name=$name)&$type="Support"&$name="employee-4"'% (bucket.name,bucket.name)
+            statement = 'EXPLAIN SELECT * FROM %s t1 WHERE job_title = "Engineer" and name IN (SELECT name FROM %s where job_title=$type and name=$name)&$type="Support"&$name="employee-4"'% (bucket.name, bucket.name)
             output = self.curl_helper(statement)
             self.assertTrue(output['results'][0]['plan']['~children'][0]['index'] == 'def_name')
             self.query = "CREATE INDEX `def_name2` ON %s(`name`) WHERE  job_title = 'Support'"% (bucket.name)
             self.run_cbq_query()
-            statement = 'SELECT * FROM %s t1 WHERE job_title = "Engineer" and name IN (SELECT name FROM %s where job_title=$type and name=$name)&$type="Support"&$name="employee-4"'% (bucket.name,bucket.name)
+            statement = 'SELECT * FROM %s t1 WHERE job_title = "Engineer" and name IN (SELECT name FROM %s where job_title=$type and name=$name)&$type="Support"&$name="employee-4"'% (bucket.name, bucket.name)
             actual_result = self.curl_helper(statement)
-            statement = 'SELECT * FROM %s t1 use index(`#primary`) WHERE job_title = "Engineer" and name IN (SELECT name FROM %s where job_title=$type and name=$name)&$type="Support"&$name="employee-4"'% (bucket.name,bucket.name)
+            statement = 'SELECT * FROM %s t1 use index(`#primary`) WHERE job_title = "Engineer" and name IN (SELECT name FROM %s where job_title=$type and name=$name)&$type="Support"&$name="employee-4"'% (bucket.name, bucket.name)
             expected_result = self.curl_helper(statement)
             self.assertTrue(sorted(actual_result['results'])==sorted(expected_result['results']))
 
-            statement='EXPLAIN SELECT * FROM %s t1 WHERE job_title = "Engineer" and name in (SELECT name FROM %s where _type=$1 and name=$2)&args=["Support","employee-4"]'% (bucket.name,bucket.name)
+            statement='EXPLAIN SELECT * FROM %s t1 WHERE job_title = "Engineer" and name in (SELECT name FROM %s where _type=$1 and name=$2)&args=["Support","employee-4"]'% (bucket.name, bucket.name)
             output = self.curl_helper(statement)
             self.assertTrue(output['results'][0]['plan']['~children'][0]['index'] == 'def_name')
 
-            statement='SELECT * FROM %s t1 WHERE job_title = "Engineer" and name in (SELECT name FROM %s where _type=$1 and name=$2)&args=["Support","employee-4"]'% (bucket.name,bucket.name)
+            statement='SELECT * FROM %s t1 WHERE job_title = "Engineer" and name in (SELECT name FROM %s where _type=$1 and name=$2)&args=["Support","employee-4"]'% (bucket.name, bucket.name)
             actual_result = self.curl_helper(statement)
-            statement='SELECT * FROM %s t1 use index(`#primary`) WHERE job_title = "Engineer" and name in (SELECT name FROM %s where _type=$1 and name=$2)&args=["Support","employee-4"]'% (bucket.name,bucket.name)
+            statement='SELECT * FROM %s t1 use index(`#primary`) WHERE job_title = "Engineer" and name in (SELECT name FROM %s where _type=$1 and name=$2)&args=["Support","employee-4"]'% (bucket.name, bucket.name)
             expected_result = self.curl_helper(statement)
             self.assertTrue(sorted(actual_result['results'])==sorted(expected_result['results']))
 
@@ -344,15 +344,15 @@ class OptionsRestTests(QueryTests):
     # Test for MB-25664:panic when right side of LIKE is depends on field
     def test_like_field_in_document(self):
         for bucket in self.buckets:
-            self.query = "CREATE INDEX %s ON %s(name)" % ("ix",bucket.name)
+            self.query = "CREATE INDEX %s ON %s(name)" % ("ix", bucket.name)
             self.run_cbq_query()
             self.query = 'EXPLAIN SELECT meta().id from %s where name like job_title'% (bucket.name)
             actual_result = self.run_cbq_query()
             plan = self.ExplainPlanHelper(actual_result)
-            self.assertEqual(plan['~children'][0]['index'],'ix')
+            self.assertEqual(plan['~children'][0]['index'], 'ix')
             self.query = 'SELECT meta().id from %s where name like job_title'% (bucket.name)
             actual_result = self.run_cbq_query()
-            self.assertEqual(actual_result['metrics']['resultCount'],0)
+            self.assertEqual(actual_result['metrics']['resultCount'], 0)
 
     # Test for MB-25737:group by on empty table should not give any results
     def test_groupby_empty_bucket(self):
@@ -361,35 +361,35 @@ class OptionsRestTests(QueryTests):
             self.run_cbq_query()
             self.query = "select job_title from %s group by job_title"%(bucket.name)
             actual_result = self.run_cbq_query()
-            self.assertEqual(actual_result['metrics']['resultCount'],0)
-            self.query = 'select job_title from %s where meta().id like "%s" group by job_title'%(bucket.name,"query-test%")
+            self.assertEqual(actual_result['metrics']['resultCount'], 0)
+            self.query = 'select job_title from %s where meta().id like "%s" group by job_title'%(bucket.name, "query-test%")
             actual_result = self.run_cbq_query()
-            self.assertEqual(actual_result['metrics']['resultCount'],0)
+            self.assertEqual(actual_result['metrics']['resultCount'], 0)
             self.query = "select job_title,sum(job_title) from %s group by job_title"%(bucket.name)
             actual_result = self.run_cbq_query()
-            self.assertEqual(actual_result['metrics']['resultCount'],0)
+            self.assertEqual(actual_result['metrics']['resultCount'], 0)
 
     # Test for MB-25762-ARRAY KEY predicate is not pushed to indexer it should not cover without whole array in the index
     def test_array_key(self):
         for bucket in self.buckets:
-            self.query = 'INSERT into %s (key , value) VALUES ("%s", %s)' % (bucket.name, "k01",{"k0":"XYZ","ka":["def"]} )
+            self.query = 'INSERT into %s (key , value) VALUES ("%s", %s)' % (bucket.name, "k01", {"k0":"XYZ","ka":["def"]} )
             self.run_cbq_query()
-            self.query = 'CREATE INDEX %s ON %s(k0,k1,DISTINCT ARRAY v FOR v IN ka END)' %("ix11",bucket.name)
+            self.query = 'CREATE INDEX %s ON %s(k0,k1,DISTINCT ARRAY v FOR v IN ka END)' %("ix11", bucket.name)
             self.run_cbq_query()
-            self.query = 'explain SELECT META().id FROM %s WHERE k0 = "XYZ" AND ANY v IN ka SATISFIES v LIKE "%s" END' %(bucket.name,"def%")
+            self.query = 'explain SELECT META().id FROM %s WHERE k0 = "XYZ" AND ANY v IN ka SATISFIES v LIKE "%s" END' %(bucket.name, "def%")
             actual_result = self.run_cbq_query()
             plan = self.ExplainPlanHelper(actual_result)
             self.assertTrue("cover" not in plan)
-            self.query = 'SELECT META().id FROM %s WHERE k0 = "XYZ" AND ANY v IN ka SATISFIES v LIKE "%s" END' %(bucket.name,"def%")
+            self.query = 'SELECT META().id FROM %s WHERE k0 = "XYZ" AND ANY v IN ka SATISFIES v LIKE "%s" END' %(bucket.name, "def%")
             actual_result = self.run_cbq_query()
-            self.assertEqual(actual_result['metrics']['resultCount'],1)
-            self.query = 'CREATE INDEX %s ON %s(k0,k1,ka,DISTINCT ARRAY v FOR v IN ka END)' %("ix12",bucket.name)
+            self.assertEqual(actual_result['metrics']['resultCount'], 1)
+            self.query = 'CREATE INDEX %s ON %s(k0,k1,ka,DISTINCT ARRAY v FOR v IN ka END)' %("ix12", bucket.name)
             self.run_cbq_query()
-            self.query = 'explain SELECT META().id FROM %s WHERE k0 = "XYZ" AND ANY v IN ka SATISFIES v LIKE "%s" END' %(bucket.name,"def%")
+            self.query = 'explain SELECT META().id FROM %s WHERE k0 = "XYZ" AND ANY v IN ka SATISFIES v LIKE "%s" END' %(bucket.name, "def%")
             actual_result = self.run_cbq_query()
             plan = self.ExplainPlanHelper(actual_result)
             self.assertTrue("cover" in str(plan))
-            self.query = 'SELECT META().id FROM %s WHERE k0 = "XYZ" AND ANY v IN ka SATISFIES v LIKE "%s" END' %(bucket.name,"def%")
+            self.query = 'SELECT META().id FROM %s WHERE k0 = "XYZ" AND ANY v IN ka SATISFIES v LIKE "%s" END' %(bucket.name, "def%")
             actual_result = self.run_cbq_query()
-            self.assertEqual(actual_result['metrics']['resultCount'],1)
+            self.assertEqual(actual_result['metrics']['resultCount'], 1)
 

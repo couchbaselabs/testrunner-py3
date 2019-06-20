@@ -15,14 +15,14 @@ import socket
 import struct
 import sys
 import time
-import logger
+from . import logger
 
-from memcacheConstants import REQ_MAGIC_BYTE, RES_MAGIC_BYTE
-from memcacheConstants import REQ_PKT_FMT, RES_PKT_FMT, MIN_RECV_PACKET
-from memcacheConstants import SET_PKT_FMT, DEL_PKT_FMT, INCRDECR_RES_FMT
-from memcacheConstants import TOUCH_PKT_FMT, GAT_PKT_FMT, GETL_PKT_FMT
-from memcacheConstants import COMPACT_DB_PKT_FMT
-import memcacheConstants
+from .memcacheConstants import REQ_MAGIC_BYTE, RES_MAGIC_BYTE
+from .memcacheConstants import REQ_PKT_FMT, RES_PKT_FMT, MIN_RECV_PACKET
+from .memcacheConstants import SET_PKT_FMT, DEL_PKT_FMT, INCRDECR_RES_FMT
+from .memcacheConstants import TOUCH_PKT_FMT, GAT_PKT_FMT, GETL_PKT_FMT
+from .memcacheConstants import COMPACT_DB_PKT_FMT
+from . import memcacheConstants
 
 def parse_address(addr):
     """Parse a host string with optional port number into a
@@ -87,10 +87,8 @@ class MemcachedErrorMetaclass(type):
         return (super(MemcachedErrorMetaclass, cls)
                 .__call__(*args, **kwargs))
 
-class MemcachedError(exceptions.Exception):
+class MemcachedError(exceptions.Exception, metaclass=MemcachedErrorMetaclass):
     """Error raised when a command fails."""
-
-    __metaclass__ = MemcachedErrorMetaclass
 
     def __init__(self, status, msg):
         supermsg='Memcached error #' + repr(status)
@@ -408,7 +406,7 @@ class MemcachedClient(object):
         """Start a plan auth session."""
         try:
             self.sasl_auth_start('CRAM-MD5', '')
-        except MemcachedError, e:
+        except MemcachedError as e:
             if e.status != memcacheConstants.ERR_AUTH_CONTINUE:
                 raise
             challenge = e.msg
@@ -424,7 +422,7 @@ class MemcachedClient(object):
         return self._doCmd(memcacheConstants.CMD_START_PERSISTENCE, '', '')
 
     def set_param(self, vbucket, key, val, type):
-        print "setting param:", key, val
+        print("setting param:", key, val)
         self.vbucketId = vbucket
         type = struct.pack(memcacheConstants.SET_PARAM_FMT, type)
         return self._doCmd(memcacheConstants.CMD_SET_PARAM, key, val, type)
@@ -439,8 +437,8 @@ class MemcachedClient(object):
 
     def compact_db(self, vbucket, purgeBeforeTs, purgeBeforeSeq, dropDeletes):
         assert isinstance(vbucket, int)
-        assert isinstance(purgeBeforeTs, long)
-        assert isinstance(purgeBeforeSeq, long)
+        assert isinstance(purgeBeforeTs, int)
+        assert isinstance(purgeBeforeSeq, int)
         assert isinstance(dropDeletes, int)
         self.vbucketId = vbucket
         compact = struct.pack(memcacheConstants.COMPACT_DB_PKT_FMT,
@@ -467,7 +465,7 @@ class MemcachedClient(object):
         opaqued=dict(enumerate(keys))
         terminal=len(opaqued)+10
         # Send all of the keys in quiet
-        for k,v in opaqued.iteritems():
+        for k, v in opaqued.items():
             self._sendCmd(memcacheConstants.CMD_GETQ, v, '', k, collection=collection)
 
         self._sendCmd(memcacheConstants.CMD_NOOP, '', '', terminal)
@@ -490,14 +488,14 @@ class MemcachedClient(object):
 
         # If this is a dict, convert it to a pair generator
         if hasattr(items, 'iteritems'):
-            items = items.iteritems()
+            items = iter(items.items())
 
         opaqued=dict(enumerate(items))
         terminal=len(opaqued)+10
         extra=struct.pack(SET_PKT_FMT, flags, exp)
 
         # Send all of the keys in quiet
-        for opaque,kv in opaqued.iteritems():
+        for opaque, kv in opaqued.items():
             self._sendCmd(memcacheConstants.CMD_SETQ, kv[0], kv[1], opaque, extra, collection=collection)
 
         self._sendCmd(memcacheConstants.CMD_NOOP, '', '', terminal)
@@ -509,7 +507,7 @@ class MemcachedClient(object):
             try:
                 opaque, cas, data = self._handleSingleResponse(None)
                 done = opaque == terminal
-            except MemcachedError, e:
+            except MemcachedError as e:
                 failed.append(e)
 
         return failed
@@ -523,7 +521,7 @@ class MemcachedClient(object):
         extra = ''
 
         # Send all of the keys in quiet
-        for opaque, k in opaqued.iteritems():
+        for opaque, k in opaqued.items():
             self._sendCmd(memcacheConstants.CMD_DELETEQ, k, '', opaque, extra, collection=collection)
 
         self._sendCmd(memcacheConstants.CMD_NOOP, '', '', terminal)
@@ -535,7 +533,7 @@ class MemcachedClient(object):
             try:
                 opaque, cas, data = self._handleSingleResponse(None)
                 done = opaque == terminal
-            except MemcachedError, e:
+            except MemcachedError as e:
                 failed.append(e)
 
         return failed
@@ -593,7 +591,7 @@ class MemcachedClient(object):
 
         d = {}
 
-        for k,v in errmap['errors'].iteritems():
+        for k, v in errmap['errors'].items():
             d[int(k, 16)] = v
 
         errmap['errors'] = d
@@ -635,11 +633,11 @@ class MemcachedClient(object):
         if not self.is_collections_supported():
                 raise exceptions.RuntimeError("Collections are not enabled")
 
-        if type(collection) == str:
+        if isinstance(collection, str):
             # expect scope.collection for name API
             try:
                 collection = self.collection_map[collection]
-            except KeyError, e:
+            except KeyError as e:
                 self.log.info("Error: cannot map collection \"{}\" to an ID".format(collection))
                 self.log.info("name API expects \"scope.collection\" as the key")
                 raise e
@@ -664,5 +662,5 @@ class MemcachedClient(object):
         parsed = json.loads(manifest)
         for scope in parsed['scopes']:
             for collection in scope['collections']:
-                key = scope[u'name'] + "." + collection[u'name']
-                self.collection_map[key] = int(collection[u'uid'],16)
+                key = scope['name'] + "." + collection['name']
+                self.collection_map[key] = int(collection['uid'], 16)

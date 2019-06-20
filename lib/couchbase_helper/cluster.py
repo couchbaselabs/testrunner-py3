@@ -354,13 +354,13 @@ class Cluster(object):
                                 server.rest_password,
                                 items, batch, threads, start_document,
                                 cb_version, instances, ttl)
-        print "Running {}".format(cmd)
+        print("Running {}".format(cmd))
         result = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE,
                                   stderr=subprocess.PIPE)
         output = result.stdout.read()
         error = result.stderr.read()
         if error:
-            print error
+            print(error)
             raise Exception("Failed to run the loadgen.")
         if output:
             loaded = output.split('\n')[:-1]
@@ -393,7 +393,7 @@ class Cluster(object):
         cmd = cmd_format.format(server.ip, bucket.name, server.rest_username,
                                 server.rest_password,
                                 int(items), batch, threads, start_document, cb_version)
-        print "Running {}".format(cmd)
+        print("Running {}".format(cmd))
         result = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE,
                                   stderr=subprocess.PIPE)
         output = result.stdout.read()
@@ -403,7 +403,7 @@ class Cluster(object):
         VBucketAware = VBucketAwareMemcached(rest, bucket.name)
         _, _, _ = VBucketAware.request_map(rest, bucket.name)
         if error:
-            print error
+            print(error)
             raise Exception("Failed to run the loadgen validator.")
         if output:
             loaded = output.split('\n')[:-1]
@@ -471,7 +471,7 @@ class Cluster(object):
     def shutdown(self, force=False):
         self.task_manager.shutdown(force)
         if force:
-            print "Cluster instance shutdown with force"
+            print("Cluster instance shutdown with force")
 
     def async_create_view(self, server, design_doc_name, view, bucket="default", with_query=True,
                           check_replication=False, ddoc_options=None):
@@ -609,7 +609,7 @@ class Cluster(object):
         Returns:
             list of MonitorActiveTask - A task future that is a handle to the scheduled task."""
         _tasks = []
-        if type(servers) != types.ListType:
+        if type(servers) != list:
             servers = [servers, ]
         for server in servers:
             _task = MonitorActiveTask(server, type_task, target_value, wait_progress, num_iteration, wait_task)

@@ -17,9 +17,9 @@ from testconstants import WIN_COUCHBASE_BIN_PATH_RAW
 from testconstants import MAC_COUCHBASE_BIN_PATH
 from random import randint
 from datetime import datetime
-import commands
+import subprocess
 import logger
-import urllib
+import urllib.request, urllib.parse, urllib.error
 from security.auditmain import audit
 from security.ldaptest import ldaptest
 import socket
@@ -33,7 +33,7 @@ class auditTest(BaseTestCase):
         super(auditTest, self).setUp()
         try:
             self.ipAddress = self.getLocalIPAddress()
-        except Exception, ex:
+        except Exception as ex:
             self.ipAddress = '127.0.0.1'
         self.eventID = self.input.param('id', None)
         auditTemp = audit(host=self.master)
@@ -60,15 +60,15 @@ class auditTest(BaseTestCase):
         return ipAddress
         '''
 
-    def setupLDAPSettings (self,rest):
+    def setupLDAPSettings (self, rest):
         api = rest.baseUrl + 'settings/saslauthdAuth'
-        params = urllib.urlencode({"enabled":'true',"admins":[],"roAdmins":[]})
+        params = urllib.parse.urlencode({"enabled":'true',"admins":[],"roAdmins":[]})
         status, content, header = rest._http_request(api, 'POST', params)
         return status, content, header
 
     def set_user_role(self,rest,username,user_role='admin'):
         payload = "name=" + username + "&roles=" + user_role
-        content =  rest.set_user_roles(user_id=username,payload=payload)
+        content =  rest.set_user_roles(user_id=username, payload=payload)
 
     #Wrapper around auditmain
     def checkConfig(self, eventID, host, expectedResults, n1ql_audit=False):
@@ -106,7 +106,7 @@ class auditTest(BaseTestCase):
                                'auth_type':'sasl', "autocompaction":'false', "purge_interval":"undefined", "flush_enabled":'true', "num_threads":3, "source":source, \
                                "user":user, "ip":self.ipAddress, "port":57457 , 'sessionid':'','storage_mode':'couchstore', 'max_ttl':400}
             rest.create_bucket(expectedResults['bucket_name'], expectedResults['ram_quota'] / 1048576, expectedResults['auth_type'], 'password', expectedResults['num_replicas'], '11211', 'membase', \
-                               0, expectedResults['num_threads'], 0 , 'valueOnly', maxTTL=expectedResults['max_ttl'])
+                               0, expectedResults['num_threads'], 0, 'valueOnly', maxTTL=expectedResults['max_ttl'])
             expectedResults = {'bucket_name':'TestBucket', 'ram_quota':104857600, 'num_replicas':1, 'replica_index':True, 'eviction_policy':'value_only', 'type':'membase', \
                                'auth_type':'sasl', "autocompaction":'false', "purge_interval":"undefined", "flush_enabled":True, "num_threads":3, "source":source, \
                                "user":user, "ip":self.ipAddress, "port":57457,'storage_mode':'couchstore', 'max_ttl':200}
@@ -118,7 +118,7 @@ class auditTest(BaseTestCase):
                                'auth_type':'sasl', "autocompaction":'false', "purge_interval":"undefined", "flush_enabled":False, "num_threads":3, "source":source, \
                                "user":user, "ip":self.ipAddress, "port":57457}
             rest.create_bucket(expectedResults['bucket_name'], expectedResults['ram_quota'] / 1048576, expectedResults['auth_type'], 'password', expectedResults['num_replicas'], \
-                               '11211', 'membase', 1, expectedResults['num_threads'], 0 , 'valueOnly')
+                               '11211', 'membase', 1, expectedResults['num_threads'], 0, 'valueOnly')
             rest.delete_bucket(expectedResults['bucket_name'])
 
         elif (ops in ['flush']):
@@ -157,8 +157,8 @@ class auditTest(BaseTestCase):
 
         if (ops in ['addNodeKV']):
             self.cluster.rebalance(self.servers, servs_inout, [])
-            print servs_inout
-            print servs_inout[0].ip
+            print(servs_inout)
+            print(servs_inout[0].ip)
             expectedResults = {"services":['kv'], 'port':8091, 'hostname':servs_inout[0].ip,
                                'groupUUID':"0", 'node':'ns_1@' + servs_inout[0].ip, 'source':source,
                                'user':self.master.rest_username, "ip":self.ipAddress, "remote:port":57457}
@@ -300,23 +300,23 @@ class auditTest(BaseTestCase):
                                      viewFragmntThreshold=10)
 
         elif (ops == 'modifyCompactionSettingsTime'):
-            expectedResults = {"parallel_db_and_view_compaction":False,
-                               "database_fragmentation_threshold:percentage":50,
-                               "database_fragmentation_threshold:size":10,
-                               "view_fragmentation_threshold:percentage":50,
-                               "view_fragmentation_threshold:size":10,
-                               "allowed_time_period:abort_outside":True,
-                               "allowed_time_period:to_minute":15,
-                               "allowed_time_period:from_minute":12,
-                               "allowed_time_period:to_hour":1,
-                               "allowed_time_period:from_hour":1,
-                               "purge_interval":3,
-                               "source":"ns_server",
-                               "user":"Administrator",
-                               'source':source,
-                               "user":user,
-                               'ip':self.ipAddress,
-                               'port':1234,
+            expectedResults = {"parallel_db_and_view_compaction": False,
+                               "database_fragmentation_threshold:percentage": 50,
+                               "database_fragmentation_threshold:size": 10,
+                               "view_fragmentation_threshold:percentage": 50,
+                               "view_fragmentation_threshold:size": 10,
+                               "allowed_time_period:abort_outside": True,
+                               "allowed_time_period:to_minute": 15,
+                               "allowed_time_period:from_minute": 12,
+                               "allowed_time_period:to_hour": 1,
+                               "allowed_time_period:from_hour": 1,
+                               "purge_interval": 3,
+                               "source": "ns_server",
+                               "user": "Administrator",
+                               'source': source,
+                               "user": user,
+                               'ip': self.ipAddress,
+                               'port': 1234,
                                }
             rest.set_auto_compaction(dbFragmentThresholdPercentage=50,
                                      viewFragmntThresholdPercentage=50,
@@ -453,7 +453,7 @@ class auditTest(BaseTestCase):
         #User must be pre-created in LDAP in advance
         elif (ops in ['ldapLogin']):
             rest = RestConnection(self.master)
-            self.set_user_role(rest,username)
+            self.set_user_role(rest, username)
             status, content = rest.validateLogin(username, password, True, getContent=True)
             sessionID = (((status['set-cookie']).split("="))[1]).split(";")[0]
             expectedResults = {'source':'external', 'user':username, 'password':password, 'roles':roles, 'ip':self.ipAddress, "port":123456, 'sessionid':sessionID}
@@ -530,7 +530,7 @@ class auditTest(BaseTestCase):
                                     "flush_enabled":False, "num_threads":3, "source":source, \
                                    "user":user, "ip":self.ipAddress, "port":57457, 'sessionid':'', 'conflict_resolution_type':'seqno'}
                 rest.create_bucket(expectedResults['bucket_name'], expectedResults['ram_quota'] / 1048576, expectedResults['auth_type'], 'password', expectedResults['num_replicas'], \
-                                   '11211', 'membase', 0, expectedResults['num_threads'], 0 , 'valueOnly')
+                                   '11211', 'membase', 0, expectedResults['num_threads'], 0, 'valueOnly')
 
                 self.checkConfig(self.eventID, server, expectedResults)
 
@@ -633,36 +633,36 @@ class auditTest(BaseTestCase):
 
 
     def test_internalSettingsXDCR(self):
-        ops = self.input.param("ops",None)
-        value = self.input.param("value",None)
+        ops = self.input.param("ops", None)
+        value = self.input.param("value", None)
         rest = RestConnection(self.master)
         user = self.master.rest_username
         source = 'ns_server'
-        input = self.input.param("input",None)
+        input = self.input.param("input", None)
 
         replications = rest.get_replications()
         for repl in replications:
             src_bucket = repl.get_src_bucket()
             dst_bucket = repl.get_dst_bucket()
-            rest.set_xdcr_param(src_bucket.name, dst_bucket.name, input,value)
+            rest.set_xdcr_param(src_bucket.name, dst_bucket.name, input, value)
         expectedResults = {"user":user, "local_cluster_name":self.master.ip+":8091", ops:value,
                                "source":source}
 
-        self.checkConfig(self.eventID,self.master,expectedResults)
+        self.checkConfig(self.eventID, self.master, expectedResults)
 
     def test_internalSettingLocal(self):
-        ops = self.input.param("ops",None)
+        ops = self.input.param("ops", None)
         if ":" in ops:
-            ops = ops.replace(":",",")
+            ops = ops.replace(":", ",")
             ops = '{' + ops + '}'
-        value = self.input.param("value",None)
+        value = self.input.param("value", None)
         rest = RestConnection(self.master)
         user = self.master.rest_username
         source = 'ns_server'
-        input = self.input.param("input",None)
+        input = self.input.param("input", None)
 
 
-        rest.set_internalSetting(input,value)
+        rest.set_internalSetting(input, value)
         expectedResults = {"user":user, ops:value,"source":source,"ip":self.ipAddress, "port":57457}
 
-        self.checkConfig(self.eventID,self.master,expectedResults)
+        self.checkConfig(self.eventID, self.master, expectedResults)

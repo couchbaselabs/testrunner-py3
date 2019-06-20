@@ -2,9 +2,9 @@ import copy
 
 from membase.helper.cluster_helper import ClusterOperationHelper
 from couchbase_helper.documentgenerator import BlobGenerator
-from xdcrnewbasetests import XDCRNewBaseTest
-from xdcrnewbasetests import NodeHelper
-from xdcrnewbasetests import Utility, BUCKET_NAME, OPS
+from .xdcrnewbasetests import XDCRNewBaseTest
+from .xdcrnewbasetests import NodeHelper
+from .xdcrnewbasetests import Utility, BUCKET_NAME, OPS
 from remote.remote_util import RemoteMachineShellConnection
 from lib.memcached.helper.data_helper import MemcachedClientHelper
 from membase.api.rest_client import RestConnection
@@ -286,7 +286,7 @@ class bidirectional(XDCRNewBaseTest):
                 for view in views:
                     self.src_cluster.query_view(prefix + ddoc_name, view.name, query)
                     self.dest_cluster.query_view(prefix + ddoc_name, view.name, query)
-                if set([task.state for task in tasks]) != set(["FINISHED"]):
+                if {task.state for task in tasks} != {"FINISHED"}:
                     continue
                 else:
                     if self._wait_for_expiration:
@@ -406,7 +406,7 @@ class bidirectional(XDCRNewBaseTest):
                                                         self.src_master.rest_username,
                                                         self.src_master.rest_password)
                     output, _ = self.shell.execute_command(cmd)
-                self.assertNotEquals(len(output), 0, "Full disk warning not generated as expected in %s" % node.ip)
+                self.assertNotEqual(len(output), 0, "Full disk warning not generated as expected in %s" % node.ip)
                 self.log.info("Full disk warning generated as expected in %s" % node.ip)
 
                 self.shell.delete_files(zip_file)

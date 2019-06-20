@@ -10,7 +10,7 @@ from couchbase_helper.query_definitions import QueryDefinition
 from couchbase_helper.tuq_generators import TuqGenerators
 from membase.api.rest_client import RestConnection
 from membase.helper.bucket_helper import BucketOperationHelper
-from base_2i import BaseSecondaryIndexingTests
+from .base_2i import BaseSecondaryIndexingTests
 
 log = logging.getLogger(__name__)
 
@@ -149,15 +149,15 @@ class SecondaryIndexDatasizeTests(BaseSecondaryIndexingTests):
             self.get_dgm_for_plasma(indexer_nodes=[self.dgmServer])
         query_definitions = self._create_indexes(buckets)
         self.sleep(20)
-        array_size = random.choice(range(10, 15))
-        item_size = random.choice(range(10, 15))
+        array_size = random.choice(list(range(10, 15)))
+        item_size = random.choice(list(range(10, 15)))
         self.upload_documents(num_items=1000, item_size=item_size, array_size=array_size, buckets=buckets)
         rest = RestConnection(self.master)
         index_map = rest.get_index_id_map()
         for j in range(self.iterations):
             log.info("Iteration: {0}".format(j))
-            array_size = random.choice(range(10, 15))
-            item_size = random.choice(range(10, 15))
+            array_size = random.choice(list(range(10, 15)))
+            item_size = random.choice(list(range(10, 15)))
             self.upload_documents(num_items=1000, item_size=item_size,
                                   array_size=array_size, buckets=buckets, update_docs=True)
             for bucket in buckets:
@@ -172,8 +172,8 @@ class SecondaryIndexDatasizeTests(BaseSecondaryIndexingTests):
                              msg.format(query_definition.index_name,
                                         actual_result, expected_result))
             self.sleep(20)
-            array_size = random.choice(range(1000, 5000))
-            item_size = random.choice(range(1000, 5000))
+            array_size = random.choice(list(range(1000, 5000)))
+            item_size = random.choice(list(range(1000, 5000)))
             self.upload_documents(num_items=1000, item_size=item_size,
                                   array_size=array_size, buckets=buckets, update_docs=True)
             for bucket in buckets:
@@ -204,11 +204,11 @@ class SecondaryIndexDatasizeTests(BaseSecondaryIndexingTests):
         generators = []
         for j in range(self.iterations):
             for i in range(10):
-                name = FIRST_NAMES[random.choice(range(len(FIRST_NAMES)))]
-                id_size = random.choice(range(5, 10))
+                name = FIRST_NAMES[random.choice(list(range(len(FIRST_NAMES))))]
+                id_size = random.choice(list(range(5, 10)))
                 short_str = "".join(random.choice(lowercase) for k in range(id_size))
                 id = "{0}-{1}".format(name, short_str)
-                age = random.choice(range(4, 19))
+                age = random.choice(list(range(4, 19)))
                 bigValues = "".join(random.choice(lowercase) for k in range(5))
                 generators.append(DocumentGenerator(
                     id, template, [name], [age], [bigValues], start=0, end=10))
@@ -219,11 +219,11 @@ class SecondaryIndexDatasizeTests(BaseSecondaryIndexingTests):
             self.multi_query_using_index(buckets=buckets,
                                          query_definitions=[query_definition])
             for i in range(10):
-                name = FIRST_NAMES[random.choice(range(len(FIRST_NAMES)))]
-                id_size = random.choice(range(100, 200))
+                name = FIRST_NAMES[random.choice(list(range(len(FIRST_NAMES))))]
+                id_size = random.choice(list(range(100, 200)))
                 long_str = "".join(random.choice(lowercase) for k in range(id_size))
                 id = "{0}-{1}".format(name, long_str)
-                age = random.choice(range(4, 19))
+                age = random.choice(list(range(4, 19)))
                 bigValues = "".join(random.choice(lowercase) for k in range(5))
                 generators.append(DocumentGenerator(
                     id, template, [name], [age], [bigValues], start=0, end=10))
@@ -253,12 +253,12 @@ class SecondaryIndexDatasizeTests(BaseSecondaryIndexingTests):
         generators = []
         for j in range(self.iterations):
             for i in range(10):
-                name = FIRST_NAMES[random.choice(range(len(FIRST_NAMES)))]
-                id_size = random.choice(range(5, 200))
+                name = FIRST_NAMES[random.choice(list(range(len(FIRST_NAMES))))]
+                id_size = random.choice(list(range(5, 200)))
                 short_str = "".join(random.choice(lowercase) for k in range(id_size))
                 id = "{0}-{1}".format(name, short_str)
-                age = random.choice(range(4, 19))
-                bigValue_size = random.choice(range(10, 5000))
+                age = random.choice(list(range(4, 19)))
+                bigValue_size = random.choice(list(range(10, 5000)))
                 bigValues = "".join(random.choice(lowercase) for k in range(bigValue_size))
                 generators.append(DocumentGenerator(
                     id, template, [name], [age], [bigValues], start=0, end=10))
@@ -408,7 +408,7 @@ class SecondaryIndexDatasizeTests(BaseSecondaryIndexingTests):
                 index_id = "unhandled_items_" + str(random.random()*100000)
             encoded_array = []
             name = "".join(random.choice(lowercase) for k in range(item_length))
-            age = random.choice(range(4, 59))
+            age = random.choice(list(range(4, 59)))
             big_value_array = [name]
             for j in range(array_elements):
                 element = "".join(random.choice(lowercase) for k in range(array_element_size))

@@ -174,7 +174,7 @@ class EventingSanity(EventingBaseTest):
         # delete all documents
         self.load(self.gens_load, buckets=self.src_bucket, flag=self.item_flag, verify_data=False,
                   batch_size=self.batch_size, op_type='delete')
-        self.verify_source_bucket_mutation(self.docs_per_day * 2016,deletes=True,timeout=1200)
+        self.verify_source_bucket_mutation(self.docs_per_day * 2016, deletes=True, timeout=1200)
         self.undeploy_and_delete_function(body)
 
     def test_source_doc_mutations_with_timers(self):
@@ -190,7 +190,7 @@ class EventingSanity(EventingBaseTest):
         # delete all documents
         self.load(self.gens_load, buckets=self.src_bucket, flag=self.item_flag, verify_data=False,
                   batch_size=self.batch_size, op_type='delete')
-        self.verify_source_bucket_mutation(self.docs_per_day * 2016,deletes=True,timeout=1200)
+        self.verify_source_bucket_mutation(self.docs_per_day * 2016, deletes=True, timeout=1200)
         self.undeploy_and_delete_function(body)
 
     def test_source_bucket_mutations(self):
@@ -240,14 +240,14 @@ class EventingSanity(EventingBaseTest):
                   batch_size=self.batch_size*2)
         self.resume_function(body)
         # Wait for eventing to catch up with all the create mutations and verify results
-        self.verify_eventing_results(self.function_name, self.docs_per_day * 2016*2,skip_stats_validation=True)
+        self.verify_eventing_results(self.function_name, self.docs_per_day * 2016*2, skip_stats_validation=True)
         self.undeploy_and_delete_function(body)
 
 
     def test_source_bucket_mutation_for_dcp_stream_boundary_from_now(self):
         self.load(self.gens_load, buckets=self.src_bucket, flag=self.item_flag, verify_data=False,
                   batch_size=self.batch_size)
-        body = self.create_save_function_body(self.function_name,HANDLER_CODE.BUCKET_OP_WITH_SOURCE_BUCKET_MUTATION ,
+        body = self.create_save_function_body(self.function_name, HANDLER_CODE.BUCKET_OP_WITH_SOURCE_BUCKET_MUTATION,
                                               dcp_stream_boundary="from_now", sock_batch_size=1, worker_count=4,
                                               cpp_worker_thread_count=4)
         self.deploy_function(body)

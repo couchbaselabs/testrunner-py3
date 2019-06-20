@@ -238,7 +238,7 @@ class RebalanceBaseTest(unittest.TestCase):
         # TODO: assert no value greater than 1
         # TODO: assert sum of mutation ratios not greater than 1
 
-        for bucket in bucket_data.keys():
+        for bucket in list(bucket_data.keys()):
             get_task = None
             del_task = None
             exp_task = None
@@ -304,7 +304,7 @@ class RebalanceBaseTest(unittest.TestCase):
     @staticmethod
     def finish_bucket_task(bucket_name_info):
         log = logger.Logger().get_logger()
-        for k, _t in bucket_name_info['tasks'].items():
+        for k, _t in list(bucket_name_info['tasks'].items()):
             if _t is not None:
                 log.info("Waiting for {0} task".format(k))
                 _t.result()
@@ -404,7 +404,7 @@ class RebalanceBaseTest(unittest.TestCase):
             # run data integrity
             error_list = RebalanceBaseTest.do_kv_verification(task_manager, rest, bucket_data)
 
-            [self.assertEqual(0, len(errors.items())) for errors in error_list]
+            [self.assertEqual(0, len(list(errors.items()))) for errors in error_list]
 
     @staticmethod
     def check_resident_ratio(self, master):

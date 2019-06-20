@@ -1,7 +1,7 @@
 import logging
 import random
 
-from tuq import QueryTests
+from .tuq import QueryTests
 
 log = logging.getLogger(__name__)
 
@@ -77,7 +77,7 @@ class DateTimeFunctionClass(QueryTests):
                 query = 'SELECT DATE PART_MILLIS({0}, "{1}")'.format(expression, part)
                 try:
                     actual_result = self.run_cbq_query(query)
-                except Exception, ex:
+                except Exception as ex:
                     msg = "syntax error"
                     if msg not in str(ex):
                         raise

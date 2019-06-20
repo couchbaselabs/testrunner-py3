@@ -15,7 +15,7 @@ from builds.build_query import BuildQuery
 import testconstants
 import copy
 
-from basetestcase import BaseTestCase
+from .basetestcase import BaseTestCase
 
 class BackupRestoreTests(BaseTestCase):
     input = None
@@ -209,7 +209,7 @@ class BackupRestoreTests(BaseTestCase):
                 msg = "expiry was set to {0} but key: {1} did not expire after waiting for {2}+ seconds"
                 self.fail(msg.format(expiry, key, expiry))
             except mc_bin_client.MemcachedError as error:
-                self.assertEquals(error.status, 1,
+                self.assertEqual(error.status, 1,
                                   msg="expected error code {0} but saw error code {1}".format(1, error.status))
         client.close()
         self.log.info("verified that those keys inserted with expiry set to {0} have expired".format(expiry))

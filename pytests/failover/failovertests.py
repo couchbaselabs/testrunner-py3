@@ -4,7 +4,7 @@ from membase.api.rest_client import RestConnection, RestHelper
 from membase.helper.rebalance_helper import RebalanceHelper
 from remote.remote_util import RemoteMachineShellConnection
 from remote.remote_util import RemoteUtilHelper
-from failoverbasetests import FailoverBaseTest
+from .failoverbasetests import FailoverBaseTest
 
 GRACEFUL = "graceful"
 
@@ -209,7 +209,7 @@ class FailoverTests(FailoverBaseTest):
         # Verify Active and Replica Bucket Count
         if self.num_replicas > 0:
             nodes = self.get_nodes_in_cluster(self.master)
-            self.vb_distribution_analysis(servers=nodes, buckets=self.buckets, std=20.0 , total_vbuckets=self.total_vbuckets)
+            self.vb_distribution_analysis(servers=nodes, buckets=self.buckets, std=20.0, total_vbuckets=self.total_vbuckets)
         self.log.info("End VERIFICATION for Rebalance after Failover Only")
 
     def run_add_back_operation_and_verify(self, chosen, prev_vbucket_stats, record_static_data_set, prev_failover_stats):
@@ -296,7 +296,7 @@ class FailoverTests(FailoverBaseTest):
         # Verify Active and Replica Bucket Count
         if self.num_replicas > 0:
             nodes = self.get_nodes_in_cluster(self.master)
-            self.vb_distribution_analysis(servers=nodes, buckets=self.buckets, std=20.0 , total_vbuckets=self.total_vbuckets)
+            self.vb_distribution_analysis(servers=nodes, buckets=self.buckets, std=20.0, total_vbuckets=self.total_vbuckets)
 
         self.log.info("End VERIFICATION for Add-back and rebalance")
 
@@ -394,7 +394,7 @@ class FailoverTests(FailoverBaseTest):
         # Verify Active and Replica Bucket Count
         if self.num_replicas > 0:
             nodes = self.filter_servers(self.servers, chosen)
-            self.vb_distribution_analysis(servers=nodes, buckets=self.buckets, std=20.0 , total_vbuckets=self.total_vbuckets, type="failover", graceful=(self.graceful and graceful_failover))
+            self.vb_distribution_analysis(servers=nodes, buckets=self.buckets, std=20.0, total_vbuckets=self.total_vbuckets, type="failover", graceful=(self.graceful and graceful_failover))
 
     def run_failover_operations_with_ops(self, chosen, failover_reason):
         """ Method to run fail over operations used in the test scenario based on failover reason """
@@ -480,7 +480,7 @@ class FailoverTests(FailoverBaseTest):
         try:
             for task in mutation_ops_tasks:
                 task.result()
-        except Exception, ex:
+        except Exception as ex:
             self.log.info(ex)
 
     def run_mutation_operations_after_failover(self):
@@ -497,7 +497,7 @@ class FailoverTests(FailoverBaseTest):
         try:
             for task in mutation_ops_tasks:
                 task.result()
-        except Exception, ex:
+        except Exception as ex:
             self.log.info(ex)
 
     def define_maps_during_failover(self, recoveryType=[]):

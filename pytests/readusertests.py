@@ -1,7 +1,7 @@
 import logger
 
 from membase.api.rest_client import RestConnection
-from basetestcase import BaseTestCase
+from .basetestcase import BaseTestCase
 from membase.api.exception import BucketCreationException, \
             DesignDocCreationException, AddNodeException, \
             FailoverFailedException
@@ -35,7 +35,7 @@ class ROUserTests(BaseTestCase):
         try:
             rest.create_bucket(bucket='bucket0', ramQuotaMB=100,
                                authType='sasl', saslPassword='sasl')
-        except BucketCreationException, e:
+        except BucketCreationException as e:
             self.log.info("Unable to create the bucket. Expected")
         else:
             self.fail("Created bucket. But user is read only")
@@ -60,7 +60,7 @@ class ROUserTests(BaseTestCase):
         self.buckets[0].authType = ""
         try:
             rest.delete_view(self.buckets[0], ddoc.views[0])
-        except Exception, ex:
+        except Exception as ex:
             self.log.info("Unable to delete ddoc. Expected")
             self.buckets[0].authType = "sasl"
         else:

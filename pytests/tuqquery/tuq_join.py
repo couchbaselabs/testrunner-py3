@@ -1,6 +1,6 @@
 import copy
 from tuqquery.tuq import QueryTests
-from tuq_sanity import QuerySanityTests
+from .tuq_sanity import QuerySanityTests
 import time
 
 JOIN_INNER = "INNER"
@@ -15,7 +15,7 @@ class JoinTests(QuerySanityTests, QueryTests):
             super(JoinTests, self).setUp()
             self.gens_tasks = self.gen_docs(type='tasks')
             self.type_join = self.input.param("type_join", JOIN_INNER)
-        except Exception, ex:
+        except Exception as ex:
             self.log.error("ERROR SETUP FAILED: %s" % str(ex))
             raise ex
 
@@ -88,14 +88,14 @@ class JoinTests(QuerySanityTests, QueryTests):
             actual_result = self.run_cbq_query()
             self.assertEqual(actual_result['status'], 'success', 'Query was not run successfully')
             self.query = "explain SELECT employee.name, employee.join_day " +\
-            "FROM %s as employee %s JOIN %s as new_project " % (self.buckets[0].name, self.type_join,self.buckets[0].name) +\
+            "FROM %s as employee %s JOIN %s as new_project " % (self.buckets[0].name, self.type_join, self.buckets[0].name) +\
             "ON KEY new_project.join_day FOR employee where new_project.join_day is not null"
             actual_result = self.run_cbq_query()
             self.assertTrue("covers" in str(actual_result))
             self.assertEqual(actual_result['status'], 'success', 'Query was not run successfully')
             self.test_explain_particular_index("idxbidirec")
             self.query = "SELECT employee.name, employee.join_day " +\
-            "FROM %s as employee %s JOIN %s as new_project " % (self.buckets[0].name, self.type_join,self.buckets[0].name)  +\
+            "FROM %s as employee %s JOIN %s as new_project " % (self.buckets[0].name, self.type_join, self.buckets[0].name)  +\
             "ON KEY new_project.join_day FOR employee where new_project.join_day is not null"
             actual_result = self.run_cbq_query()
             #self.assertTrue(actual_result['metrics']['resultCount'] == 0, 'Query was not run successfully')
@@ -108,11 +108,11 @@ class JoinTests(QuerySanityTests, QueryTests):
             self.run_cbq_query()
             self.query = "CREATE INDEX ix3 ON default(altid, name, DISTINCT ARRAY p FOR p IN phones END)"
             self.run_cbq_query()
-            self.query = 'INSERT into %s (key , value) VALUES ("%s", %s)' % ("default", "w001", {"type":"wdoc", "docid":"x001","name":"wdoc","phones":["123-456-7890","123-456-7891"],"altid":"x001"})
+            self.query = 'INSERT into %s (key , value) VALUES ("%s", %s)' % ("default", "w001", {"type":"wdoc", "docid":"x001","name":"wdoc","phones":["123-456-7890", "123-456-7891"],"altid":"x001"})
             self.run_cbq_query()
-            self.query = 'INSERT into %s (key , value) VALUES ("%s", %s)' % ("default", "pdoc1", {"type":"pdoc", "docid":"x001","name":"pdoc","phones":["123-456-7890","123-456-7891"],"altid":"x001"})
+            self.query = 'INSERT into %s (key , value) VALUES ("%s", %s)' % ("default", "pdoc1", {"type":"pdoc", "docid":"x001","name":"pdoc","phones":["123-456-7890", "123-456-7891"],"altid":"x001"})
             self.run_cbq_query()
-            self.query = 'INSERT into %s (key , value) VALUES ("%s", %s)' % ("default", "pdoc2", {"type":"pdoc", "docid":"w001","name":"pdoc","phones":["123-456-7890","123-456-7891"],"altid":"w001"})
+            self.query = 'INSERT into %s (key , value) VALUES ("%s", %s)' % ("default", "pdoc2", {"type":"pdoc", "docid":"w001","name":"pdoc","phones":["123-456-7890", "123-456-7891"],"altid":"w001"})
             self.run_cbq_query()
             self.query = 'explain SELECT meta(b1).id b1id FROM default b1 JOIN default b2 ON KEY b2.docid FOR b1 WHERE meta(b1).id > ""'
             actual_result= self.run_cbq_query()
@@ -122,35 +122,35 @@ class JoinTests(QuerySanityTests, QueryTests):
             self.query = 'SELECT meta(b1).id b1id FROM default b1 JOIN default b2 ON KEY b2.docid FOR b1 WHERE meta(b1).id > ""'
             actual_result= self.run_cbq_query()
 
-            self.assertTrue(actual_result['results']==[{u'b1id': u'w001'}])
+            self.assertTrue(actual_result['results']==[{'b1id': 'w001'}])
             self.query = 'explain SELECT meta(b1).id b1id, meta(b2).id b2id FROM default b1 JOIN default b2 ON KEY b2.docid FOR b1 WHERE meta(b1).id > ""'
             actual_result= self.run_cbq_query()
             self.assertTrue("covers" in str(actual_result))
             self.assertTrue("ix1" in str(actual_result))
             self.query = 'SELECT meta(b1).id b1id, meta(b2).id b2id FROM default b1 JOIN default b2 ON KEY b2.docid FOR b1 WHERE meta(b1).id > ""'
             actual_result= self.run_cbq_query()
-            self.assertTrue(actual_result['results']==[{u'b1id': u'w001', u'b2id': u'pdoc2'}])
+            self.assertTrue(actual_result['results']==[{'b1id': 'w001', 'b2id': 'pdoc2'}])
             self.query = 'explain SELECT meta(b1).id b1id, b2.docid FROM default b1 JOIN default b2 ON KEY b2.docid FOR b1 WHERE meta(b1).id > ""'
             actual_result= self.run_cbq_query()
             self.assertTrue("covers" in str(actual_result))
             self.assertTrue("ix1" in str(actual_result))
             self.query = 'SELECT meta(b1).id b1id, b2.docid FROM default b1 JOIN default b2 ON KEY b2.docid FOR b1 WHERE meta(b1).id > ""'
             actual_result= self.run_cbq_query()
-            self.assertTrue(actual_result['results']==[{u'docid': u'w001', u'b1id': u'w001'}])
+            self.assertTrue(actual_result['results']==[{'docid': 'w001', 'b1id': 'w001'}])
             self.query = 'explain SELECT meta(b1).id b1id, b2.name FROM default b1 JOIN default b2 ON KEY b2.docid FOR b1 WHERE meta(b1).id > ""'
             actual_result= self.run_cbq_query()
             self.assertTrue("covers" in str(actual_result))
             self.assertTrue("ix1" in str(actual_result))
             self.query = 'SELECT meta(b1).id b1id, b2.name FROM default b1 JOIN default b2 ON KEY b2.docid FOR b1 WHERE meta(b1).id > ""'
             actual_result= self.run_cbq_query()
-            self.assertTrue(actual_result['results']==[{u'b1id': u'w001', u'name': u'pdoc'}])
+            self.assertTrue(actual_result['results']==[{'b1id': 'w001', 'name': 'pdoc'}])
             self.query = 'explain SELECT meta(b1).id b1id, b2.name, b3.docid FROM default b1 JOIN default b2 ON KEY b2.docid FOR b1 JOIN default b3 ON KEY b3.docid FOR b1 WHERE meta(b1).id > ""'
             actual_result= self.run_cbq_query()
             self.assertTrue("covers" in str(actual_result))
             self.assertTrue("ix1" in str(actual_result))
             self.query = 'SELECT meta(b1).id b1id, b2.name, b3.docid FROM default b1 JOIN default b2 ON KEY b2.docid FOR b1 JOIN default b3 ON KEY b3.docid FOR b1 WHERE meta(b1).id > ""'
             actual_result= self.run_cbq_query()
-            self.assertTrue(actual_result['results']==[{u'docid': u'w001', u'b1id': u'w001', u'name': u'pdoc'}])
+            self.assertTrue(actual_result['results']==[{'docid': 'w001', 'b1id': 'w001', 'name': 'pdoc'}])
             self.query = 'explain SELECT meta(b1).id b1id, b2.name, b3.docid  FROM default b1 JOIN default b2 ON KEY b2.docid FOR b1 JOIN default b3 ON KEY b3.docid FOR b2 WHERE meta(b1).id > ""'
             actual_result= self.run_cbq_query()
             self.assertTrue("covers" in str(actual_result))
@@ -181,7 +181,7 @@ class JoinTests(QuerySanityTests, QueryTests):
             self.assertTrue(actual_result['metrics']['resultCount']==0)
             self.query = 'SELECT meta(b1).id b1id, b2 from default b1 JOIN default b2 ON KEY b2.docid FOR b1 WHERE meta(b1).id > ""'
             actual_result=self.run_cbq_query()
-            self.assertTrue(actual_result['results']==[{u'b1id': u'w001', u'b2': {u'phones': [u'123-456-7890', u'123-456-7891'], u'type': u'pdoc', u'docid': u'w001', u'name': u'pdoc', u'altid': u'w001'}}])
+            self.assertTrue(actual_result['results']==[{'b1id': 'w001', 'b2': {'phones': ['123-456-7890', '123-456-7891'], 'type': 'pdoc', 'docid': 'w001', 'name': 'pdoc', 'altid': 'w001'}}])
 
             self.query = 'explain SELECT meta(b1).id b1id from default b1 NEST default b2 ON KEY b2.docid FOR b1 WHERE meta(b1).id > ""'
             actual_result=self.run_cbq_query()
@@ -190,7 +190,7 @@ class JoinTests(QuerySanityTests, QueryTests):
             self.assertTrue("(`b2`.`docid`)" in str(actual_result))
             self.query = 'SELECT meta(b1).id b1id from default b1 NEST default b2 ON KEY b2.docid FOR b1 WHERE meta(b1).id > ""'
             actual_result=self.run_cbq_query()
-            self.assertTrue(actual_result['results']==[{u'b1id': u'w001'}])
+            self.assertTrue(actual_result['results']==[{'b1id': 'w001'}])
             self.query = 'explain SELECT meta(b1).id b1id, b2 from default b1 NEST default b2 ON KEY b2.docid FOR b1 WHERE meta(b1).id > ""'
             actual_result=self.run_cbq_query()
             self.assertTrue("covers" in str(actual_result))
@@ -198,7 +198,7 @@ class JoinTests(QuerySanityTests, QueryTests):
             self.assertTrue("(`b2`.`docid`)" in str(actual_result))
             self.query = 'SELECT meta(b1).id b1id, b2 from default b1 NEST default b2 ON KEY b2.docid FOR b1 WHERE meta(b1).id > ""'
             actual_result=self.run_cbq_query()
-            self.assertTrue( actual_result['results']== [{u'b1id': u'w001', u'b2': [{u'phones': [u'123-456-7890', u'123-456-7891'], u'type': u'pdoc', u'docid': u'w001', u'name': u'pdoc', u'altid': u'w001'}]}] )
+            self.assertTrue( actual_result['results']== [{'b1id': 'w001', 'b2': [{'phones': ['123-456-7890', '123-456-7891'], 'type': 'pdoc', 'docid': 'w001', 'name': 'pdoc', 'altid': 'w001'}]}] )
             self.query = 'delete from default use keys["w001","pdoc1","pdoc2"]'
             self.run_cbq_query()
 
@@ -213,10 +213,10 @@ class JoinTests(QuerySanityTests, QueryTests):
            self.run_cbq_query()
            self.query = 'SELECT * FROM default a NEST default b ON KEY b.parent FOR a'
            actual_result = self.run_cbq_query()
-           self.assertTrue(actual_result['results']==([{u'a': {u'_type': u'service', u'_id': u'a_12345'}, u'b': [{u'_id': u'b_12345', u'data': {u'a': u'b', u'c': u'd'}, u'parent': u'a_12345'}, {u'_id': u'b_12346', u'data': {u'd': u'f', u'6': u'3'}, u'parent': u'a_12345'}]}]))
+           self.assertTrue(actual_result['results']==([{'a': {'_type': 'service', '_id': 'a_12345'}, 'b': [{'_id': 'b_12345', 'data': {'a': 'b', 'c': 'd'}, 'parent': 'a_12345'}, {'_id': 'b_12346', 'data': {'d': 'f', '6': '3'}, 'parent': 'a_12345'}]}]))
            self.query = 'SELECT * FROM default a join default b ON KEY b.parent FOR a'
            actual_result = self.run_cbq_query()
-           self.assertTrue(actual_result['results']==([{u'a': {u'_type': u'service', u'_id': u'a_12345'}, u'b': {u'_id': u'b_12345', u'data': {u'a': u'b', u'c': u'd'}, u'parent': u'a_12345'}}, {u'a': {u'_type': u'service', u'_id': u'a_12345'}, u'b': {u'_id': u'b_12346', u'data': {u'd': u'f', u'6': u'3'}, u'parent': u'a_12345'}}]))
+           self.assertTrue(actual_result['results']==([{'a': {'_type': 'service', '_id': 'a_12345'}, 'b': {'_id': 'b_12345', 'data': {'a': 'b', 'c': 'd'}, 'parent': 'a_12345'}}, {'a': {'_type': 'service', '_id': 'a_12345'}, 'b': {'_id': 'b_12346', 'data': {'d': 'f', '6': '3'}, 'parent': 'a_12345'}}]))
            self.query = 'delete from default use keys ["a_12345","b_12345","b_12346"]'
            self.run_cbq_query()
 
@@ -228,7 +228,7 @@ class JoinTests(QuerySanityTests, QueryTests):
             for ind in ind_list:
                 index_name = "coveringindex%s" % ind
                 if ind =="one":
-                    self.query = "CREATE INDEX %s ON %s(name, tasks_ids,job_title)  USING %s" % (index_name, bucket.name,self.index_type)
+                    self.query = "CREATE INDEX %s ON %s(name, tasks_ids,job_title)  USING %s" % (index_name, bucket.name, self.index_type)
                     # if self.gsi_type:
                     #     self.query += " WITH {'index_type': 'memdb'}"
                 self.run_cbq_query()
@@ -258,13 +258,13 @@ class JoinTests(QuerySanityTests, QueryTests):
                          "FROM %s as employee %s JOIN default as new_project_full " % (bucket.name, self.type_join) +\
                          "ON KEYS employee.tasks_ids WHERE employee.name == 'employee-9' limit 10"
             result = self.run_cbq_query()
-            self.assertEqual(actual_result,sorted(result['results']))
+            self.assertEqual(actual_result, sorted(result['results']))
           finally:
             self.query = "drop primary index on %s" %bucket.name
             self.run_cbq_query()
             #self.assertTrue(expected_result == actual_result)
             for index_name in created_indexes:
-                self.query = "DROP INDEX %s.%s USING %s" % (bucket.name, index_name,self.index_type)
+                self.query = "DROP INDEX %s.%s USING %s" % (bucket.name, index_name, self.index_type)
                 self.run_cbq_query()
 
     def test_where_join_keys_not_equal(self):
@@ -340,7 +340,7 @@ class JoinTests(QuerySanityTests, QueryTests):
                                for doc in expected_result if doc and 'join_day' in doc and\
                                doc['join_day'] <= 2]
             expected_result = sorted(expected_result)
-            self.assertTrue(actual_result,expected_result)
+            self.assertTrue(actual_result, expected_result)
             #self._verify_results(actual_result, expected_result)
 
     def test_where_join_keys_equal_more_covering(self):
@@ -351,7 +351,7 @@ class JoinTests(QuerySanityTests, QueryTests):
             for ind in ind_list:
                 index_name = "coveringindex%s" % ind
                 if ind =="one":
-                    self.query = "CREATE INDEX %s ON %s(join_day, tasks_ids, job_title)  USING %s" % (index_name, bucket.name,self.index_type)
+                    self.query = "CREATE INDEX %s ON %s(join_day, tasks_ids, job_title)  USING %s" % (index_name, bucket.name, self.index_type)
                     # if self.gsi_type:
                     #     self.query += " WITH {'index_type': 'memdb'}"
                 self.run_cbq_query()
@@ -376,16 +376,16 @@ class JoinTests(QuerySanityTests, QueryTests):
             expected_result = sorted(expected_result, key=lambda doc: (doc['join_day']))[0:10]
             #self.assertTrue(actual_result, expected_result)
             for index_name in created_indexes:
-                self.query = "DROP INDEX %s.%s USING %s" % (bucket.name, index_name,self.index_type)
+                self.query = "DROP INDEX %s.%s USING %s" % (bucket.name, index_name, self.index_type)
                 self.run_cbq_query()
             self.query = "CREATE PRIMARY INDEX ON %s" % bucket.name
             self.run_cbq_query()
-            self.sleep(15,'wait for index')
+            self.sleep(15, 'wait for index')
             self.query = "SELECT employee.join_day, employee.tasks_ids, new_project_full.job_title new_project " +\
                          "FROM %s as employee %s JOIN default as new_project_full " % (bucket.name, self.type_join) +\
                          "ON KEYS employee.tasks_ids WHERE employee.join_day <= 2  order by employee.join_day limit 10"
             result = self.run_cbq_query()
-            self.assertEqual(actual_result,sorted(result['results']))
+            self.assertEqual(actual_result, sorted(result['results']))
             self.query = "DROP PRIMARY INDEX ON %s" % bucket.name
             self.run_cbq_query()
 
@@ -406,7 +406,7 @@ class JoinTests(QuerySanityTests, QueryTests):
 
     def test_unnest(self):
         for bucket in self.buckets:
-            self.query = "SELECT emp.name, task FROM %s emp %s UNNEST emp.tasks_ids task" % (bucket.name,self.type_join)
+            self.query = "SELECT emp.name, task FROM %s emp %s UNNEST emp.tasks_ids task" % (bucket.name, self.type_join)
             actual_result = self.run_cbq_query()
             actual_result = sorted(actual_result['results'])
             expected_result = self.generate_full_docs_list(self.gens_load)
@@ -460,7 +460,7 @@ class JoinTests(QuerySanityTests, QueryTests):
 
     def test_prepared_unnest(self):
         for bucket in self.buckets:
-            self.query = "SELECT emp.name, task FROM %s emp %s UNNEST emp.tasks_ids task" % (bucket.name,self.type_join)
+            self.query = "SELECT emp.name, task FROM %s emp %s UNNEST emp.tasks_ids task" % (bucket.name, self.type_join)
             self.prepared_common_body()
 
 ##############################################################################################
@@ -470,7 +470,7 @@ class JoinTests(QuerySanityTests, QueryTests):
 
     def test_subquery_count(self):
         for bucket in self.buckets:
-            self.query = "select name, ARRAY_LENGTH((select task_name  from %s d use keys %s)) as cn from %s" % (bucket.name, str(['test_task-%s' % i for i in xrange(0, 29)]),
+            self.query = "select name, ARRAY_LENGTH((select task_name  from %s d use keys %s)) as cn from %s" % (bucket.name, str(['test_task-%s' % i for i in range(0, 29)]),
                                                                                                                     bucket.name)
             self.run_cbq_query()
             actual_result = self.run_cbq_query()
@@ -482,7 +482,7 @@ class JoinTests(QuerySanityTests, QueryTests):
 
     def test_subquery_select(self):
         for bucket in self.buckets:
-            self.query = "select task_name, (select count(task_name) cn from %s d use keys %s) as names from %s" % (bucket.name, str(['test_task-%s' % i for i in xrange(0, 29)]),
+            self.query = "select task_name, (select count(task_name) cn from %s d use keys %s) as names from %s" % (bucket.name, str(['test_task-%s' % i for i in range(0, 29)]),
                                                                                                                     bucket.name)
             self.run_cbq_query()
             actual_result = self.run_cbq_query()
@@ -496,7 +496,7 @@ class JoinTests(QuerySanityTests, QueryTests):
 
     def test_prepared_subquery_select(self):
         for bucket in self.buckets:
-            self.query = "select task_name, (select count(task_name) cn from %s d use keys %s) as names from %s" % (bucket.name, str(['test_task-%s' % i for i in xrange(0, 29)]),
+            self.query = "select task_name, (select count(task_name) cn from %s d use keys %s) as names from %s" % (bucket.name, str(['test_task-%s' % i for i in range(0, 29)]),
                                                                                                                     bucket.name)
             self.prepared_common_body()
 
@@ -505,7 +505,7 @@ class JoinTests(QuerySanityTests, QueryTests):
             self.query = "select name, join_day from %s where join_day =" % (bucket.name) +\
             " (select AVG(join_day) as average from %s d use keys %s)[0].average" % (bucket.name,
                                                                                str(['query-test-Sales-2010-1-1-%s' % i
-                                                                                    for i in xrange(0, self.docs_per_day)]))
+                                                                                    for i in range(0, self.docs_per_day)]))
             all_docs_list = self.generate_full_docs_list(self.gens_load)
             actual_result = self.run_cbq_query()
             actual_result = sorted(actual_result['results'])
@@ -518,7 +518,7 @@ class JoinTests(QuerySanityTests, QueryTests):
             self.query = "select name, join_day from %s where join_day IN " % (bucket.name) +\
             " (select ARRAY_AGG(join_day) as average from %s d use keys %s)[0].average" % (bucket.name,
                                                                                str(['query-test-Sales-2010-1-1-%s' % i
-                                                                                    for i in xrange(0, self.docs_per_day)]))
+                                                                                    for i in range(0, self.docs_per_day)]))
             all_docs_list = self.generate_full_docs_list(self.gens_load)
             actual_result = self.run_cbq_query()
             actual_result = sorted(actual_result['results'])
@@ -657,8 +657,8 @@ class JoinTests(QuerySanityTests, QueryTests):
         for bucket in self.buckets:
             keys_select = []
             generator = copy.deepcopy(self.gens_tasks[0])
-            for i in xrange(5):
-                key, _ = generator.next()
+            for i in range(5):
+                key, _ = next(generator)
                 keys_select.append(key)
             self.query = 'select task_name FROM %s USE KEYS %s' % (bucket.name, keys_select)
             actual_result = self.run_cbq_query()
@@ -682,7 +682,7 @@ class JoinTests(QuerySanityTests, QueryTests):
     def test_key_array(self):
         for bucket in self.buckets:
             gen_select = copy.deepcopy(self.gens_tasks[0])
-            key_select, value_select = gen_select.next()
+            key_select, value_select = next(gen_select)
             self.query = 'SELECT * FROM %s USE KEYS ARRAY emp._id FOR emp IN [%s] END' % (bucket.name, value_select)
             actual_result = self.run_cbq_query()
             actual_result = sorted(actual_result['results'])
@@ -691,7 +691,7 @@ class JoinTests(QuerySanityTests, QueryTests):
             expected_result = sorted(expected_result)
             self._verify_results(actual_result, expected_result)
 
-            key2_select, value2_select = gen_select.next()
+            key2_select, value2_select = next(gen_select)
             self.query = 'SELECT * FROM %s USE KEYS ARRAY emp._id FOR emp IN [%s,%s] END' % (bucket.name, value_select, value2_select)
             actual_result = self.run_cbq_query()
             actual_result = sorted(actual_result['results'])

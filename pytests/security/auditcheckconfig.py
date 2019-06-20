@@ -10,11 +10,11 @@ from membase.api.exception import ReadDocumentException
 from membase.api.exception import DesignDocCreationException
 from membase.helper.cluster_helper import ClusterOperationHelper
 from remote.remote_util import RemoteMachineShellConnection
-import commands
+import subprocess
 from security.auditmain import audit
 from clitest.cli_base import CliBaseTest
 import socket
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 
 class auditcheckconfig(BaseTestCase):
@@ -529,7 +529,7 @@ class auditCLITest(CliBaseTest):
                 rest = RestConnection(self.master)
                 self.setupLDAPSettings(rest)
                 #rest.ldapUserRestOperation(True, [[self.ldapUser]], exclude=None)
-                self.set_user_role(rest,self.ldapUser)
+                self.set_user_role(rest, self.ldapUser)
 
     def tearDown(self):
         super(auditCLITest, self).tearDown()
@@ -538,9 +538,9 @@ class auditCLITest(CliBaseTest):
         payload = "name=" + username + "&roles=" + user_role
         content = rest.set_user_roles(user_id=username, payload=payload)
 
-    def setupLDAPSettings (self,rest):
+    def setupLDAPSettings (self, rest):
         api = rest.baseUrl + 'settings/saslauthdAuth'
-        params = urllib.urlencode({"enabled":'true',"admins":[],"roAdmins":[]})
+        params = urllib.parse.urlencode({"enabled":'true',"admins":[],"roAdmins":[]})
         status, content, header = rest._http_request(api, 'POST', params)
         return status, content, header
 

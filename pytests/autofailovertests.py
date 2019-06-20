@@ -8,7 +8,7 @@ from membase.helper.cluster_helper import ClusterOperationHelper
 from membase.helper.rebalance_helper import RebalanceHelper
 from memcached.helper.data_helper import MemcachedClientHelper
 from remote.remote_util import RemoteMachineShellConnection, RemoteUtilHelper
-from security.rbac_base import RbacBase
+from .security.rbac_base import RbacBase
 
 
 
@@ -144,7 +144,7 @@ class AutoFailoverTests(unittest.TestCase):
             self.fail('failed to change autofailover_settings! See MB-7282')
         #read settings and verify
         settings = self.rest.get_autofailover_settings()
-        self.assertEquals(settings.enabled, True)
+        self.assertEqual(settings.enabled, True)
 
     def test_disable(self):
         status = self.rest.update_autofailover_settings(False, self.timeout)
@@ -152,7 +152,7 @@ class AutoFailoverTests(unittest.TestCase):
             self.fail('failed to change autofailover_settings! See MB-7282')
         #read settings and verify
         settings = self.rest.get_autofailover_settings()
-        self.assertEquals(settings.enabled, False)
+        self.assertEqual(settings.enabled, False)
 
     def test_valid_timeouts(self):
         timeouts = [30, 31, 300, 3600]

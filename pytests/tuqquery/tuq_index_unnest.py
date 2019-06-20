@@ -1,4 +1,4 @@
-from tuq import QueryTests
+from .tuq import QueryTests
 
 class QueryINDEXUNNESTTests(QueryTests):
     def setUp(self):
@@ -50,7 +50,7 @@ class QueryINDEXUNNESTTests(QueryTests):
 
         index_1 = {'name': 'idx',
                    'bucket': 'default',
-                   'fields': (("ALL ARRAY v1 FOR v1 IN VMs END",0), ("email",1), ("department",2)),
+                   'fields': (("ALL ARRAY v1 FOR v1 IN VMs END", 0), ("email", 1), ("department", 2)),
                    'state': 'online',
                    'using': self.index_type.lower(),
                    'is_primary': False}

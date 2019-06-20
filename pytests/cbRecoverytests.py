@@ -1,4 +1,4 @@
-from xdcr.xdcrbasetests import XDCRReplicationBaseTest
+from .xdcr.xdcrbasetests import XDCRReplicationBaseTest
 from remote.remote_util import RemoteMachineShellConnection
 from membase.api.rest_client import RestConnection, RestHelper
 from membase.api.exception import CBRecoveryFailedException, InvalidArgumentException, BucketCreationException
@@ -14,7 +14,7 @@ class CBRbaseclass(XDCRReplicationBaseTest):
             return
         # read settings and verify
         settings = _rest_.get_autofailover_settings()
-        self.assertEquals(settings.enabled, True)
+        self.assertEqual(settings.enabled, True)
 
     def _autofail_disable(self, _rest_):
         status = _rest_.update_autofailover_settings(False, self.wait_timeout / 2)
@@ -23,7 +23,7 @@ class CBRbaseclass(XDCRReplicationBaseTest):
             return
         # read settings and verify
         settings = _rest_.get_autofailover_settings()
-        self.assertEquals(settings.enabled, False)
+        self.assertEqual(settings.enabled, False)
 
     def wait_for_failover_or_assert(self, master, autofailover_count, timeout):
         time_start = time.time()
@@ -156,8 +156,8 @@ class CBRbaseclass(XDCRReplicationBaseTest):
         Dictionaries that are to contain information about
         number of vbuckets on each node in cluster
         """
-        pre_dict = dict((i, 0) for i in xrange(initial_set))
-        post_dict = dict((i, 0) for i in xrange(final_set))
+        pre_dict = dict((i, 0) for i in range(initial_set))
+        post_dict = dict((i, 0) for i in range(final_set))
 
         for i in map_before:
             for j in range(initial_set):
@@ -283,7 +283,7 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                          standard_params=self._create_bucket_params(server=self.src_master, size=100, replicas=1)
                          self._create_standard_bucket(name=name, port=STANDARD_BUCKET_PORT+10,
                                                              bucket_params=standard_params)
-                     except BucketCreationException, e:
+                     except BucketCreationException as e:
                          self.log.info("bucket creation failed during cbrecovery as expected")
                      # but still able to create bucket on destination
                      standard_params = self._create_bucket_params(server=self.dest_master, size=100, replicas=1)
@@ -298,7 +298,7 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                     try:
                         self.cbr_routine(self.dest_master, self.src_master)
                         self.log.exception("cbrecovery should be failed when rebalance is in progress")
-                    except CBRecoveryFailedException, e:
+                    except CBRecoveryFailedException as e:
                         self.log.info("cbrecovery failed  as expected when there are no failovered nodes")
                     reached = RestHelper(rest).rebalance_reached()
                     self.assertTrue(reached, "rebalance failed or did not completed")
@@ -313,14 +313,14 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                     try:
                         self.cbr_routine(self.dest_master, self.src_master)
                         self.log.exception("cbrecovery should be failed when rebalance has been stopped")
-                    except CBRecoveryFailedException, e:
+                    except CBRecoveryFailedException as e:
                         self.log.info("cbrecovery failed  as expected when there are no failovered nodes")
                 elif "rebalance_when_recovering" in when_step:
                     # try to call  rebalance during cbrecovery
                     try:
                         self.trigger_rebalance(rest)
                         self.log.exception("rebalance is not permitted during cbrecovery")
-                    except InvalidArgumentException, e:
+                    except InvalidArgumentException as e:
                         self.log.info("can't call rebalance during cbrecovery as expected")
                     # here we try to re-call cbrecovery(seems it's supported even it's still running)
                     self.cbr_routine(self.dest_master, self.src_master)
@@ -356,7 +356,7 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                          standard_params=self._create_bucket_params(server=self.dest_master, size=100, replicas=1)
                          self.cluster.create_standard_bucket(name=name, port=STANDARD_BUCKET_PORT + 10,
                                                              bucket_params=standard_params)
-                     except BucketCreationException, e:
+                     except BucketCreationException as e:
                          self.log.info("bucket creation failed during cbrecovery as expected")
                      standard_params = self._create_bucket_params(server=self.src_master, size=100, replicas=1)
                      self.cluster.create_standard_bucket(name=name, port=STANDARD_BUCKET_PORT + 10,
@@ -368,7 +368,7 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                     try:
                         self.cbr_routine(self.src_master, self.dest_master)
                         self.log.exception("cbrecovery should be failed when rebalance is in progress")
-                    except CBRecoveryFailedException, e:
+                    except CBRecoveryFailedException as e:
                         self.log.info("cbrecovery failed  as expected when there are no failovered nodes")
                     reached = RestHelper(rest).rebalance_reached()
                     self.assertTrue(reached, "rebalance failed or did not completed")
@@ -379,14 +379,14 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
                     try:
                         self.cbr_routine(self.src_master, self.dest_master)
                         self.log.exception("cbrecovery should be failed when rebalance has been stopped")
-                    except CBRecoveryFailedException, e:
+                    except CBRecoveryFailedException as e:
                         self.log.info("cbrecovery failed  as expected when there are no failovered nodes")
                 elif "rebalance_when_recovering" in when_step:
                     # try to call  rebalance during cbrecovery
                     try:
                         self.trigger_rebalance(rest)
                         self.log.exception("rebalance is not permitted during cbrecovery")
-                    except InvalidArgumentException, e:
+                    except InvalidArgumentException as e:
                         self.log.info("can't call rebalance during cbrecovery as expected")
                     # here we try to re-call cbrecovery(seems it's supported even it's still running)
                     self.cbr_routine(self.src_master, self.dest_master)

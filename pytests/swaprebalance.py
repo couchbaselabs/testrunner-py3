@@ -13,8 +13,8 @@ from threading import Thread
 from remote.remote_util import RemoteMachineShellConnection
 from memcached.helper.data_helper import MemcachedClientHelper
 from membase.api.exception import RebalanceFailedException
-from basetestcase import BaseTestCase
-from security.rbac_base import RbacBase
+from .basetestcase import BaseTestCase
+from .security.rbac_base import RbacBase
 
 class SwapRebalanceBase(unittest.TestCase):
 
@@ -27,7 +27,7 @@ class SwapRebalanceBase(unittest.TestCase):
         self.servers = self.input.servers
         serverInfo = self.servers[0]
         rest = RestConnection(serverInfo)
-        if len(set([server.ip for server in self.servers])) == 1:
+        if len({server.ip for server in self.servers}) == 1:
             ip = rest.get_nodes_self().ip
             for server in self.servers:
                 server.ip = ip
@@ -79,7 +79,7 @@ class SwapRebalanceBase(unittest.TestCase):
             self.log.info("==============  SwapRebalanceBase setup was finished for test #{0} {1} =============="
                       .format(self.case_number, self._testMethodName))
             SwapRebalanceBase._log_start(self)
-        except Exception, e:
+        except Exception as e:
             self.cluster_helper.shutdown()
             self.fail(e)
 
@@ -439,7 +439,7 @@ class SwapRebalanceBase(unittest.TestCase):
             times = 2
             if self.cluster_run:
                 times = 20
-            for i in xrange(times):
+            for i in range(times):
                 try:
                     _mc = MemcachedClientHelper.direct_client(master, bucket)
                     pid = _mc.stats()["pid"]
@@ -474,7 +474,7 @@ class SwapRebalanceBase(unittest.TestCase):
             self.assertFalse(RestHelper(rest).is_cluster_rebalanced(), msg="cluster need rebalance")
             knownNodes = rest.node_statuses();
             self.log.info("nodes are still in cluster: {0}".format([(node.ip, node.port) for node in knownNodes]))
-            ejectedNodes = list(set(optNodesIds) & set([node.id for node in knownNodes]))
+            ejectedNodes = list(set(optNodesIds) & {node.id for node in knownNodes})
             rest.rebalance(otpNodes=[node.id for node in knownNodes], ejectedNodes=ejectedNodes)
             self.assertTrue(rest.monitorRebalance(),
                             msg="rebalance operation failed after adding node {0}".format(toBeEjectedNodes))
@@ -560,7 +560,7 @@ class SwapRebalanceBase(unittest.TestCase):
         add_back_servers = []
         nodes = rest.get_nodes()
         for server in nodes:
-            if isinstance(server.ip, unicode):
+            if isinstance(server.ip, str):
                 add_back_servers.append(server)
         final_add_back_servers = []
         for server in self.servers:

@@ -11,8 +11,8 @@ from couchbase.cluster import PasswordAuthenticator
 import couchbase.subdocument as SD
 from couchbase.exceptions import CouchbaseTransientError
 
-import constants
-from ValueGenerator import ValueGenerator
+from . import constants
+from .ValueGenerator import ValueGenerator
 
 
 # Example usage: python main.py -ip 192.168.56.111 -u Administrator -p password -b default -n 5
@@ -64,7 +64,7 @@ class JSONDoc(object):
         cur_size = 0
         batches.append(cur_batch)
 
-        for key, value in json_docs.items():
+        for key, value in list(json_docs.items()):
             cur_batch[key] = value
             cur_size += len(key) + len(value) + 24
             if cur_size > BYTES_PER_BATCH:
@@ -131,8 +131,8 @@ class JSONDoc(object):
             logging.error("Unable to find template file , data not loaded!")
 
         valuegen = ValueGenerator()
-        for key, value in content.items():
-            if key in constants.generator_methods.keys():
+        for key, value in list(content.items()):
+            if key in list(constants.generator_methods.keys()):
                 if len(value) > 1:
                     argsdict = self.parseargs(value)
                 else:

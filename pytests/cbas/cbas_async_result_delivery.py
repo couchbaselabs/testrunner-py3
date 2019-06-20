@@ -1,4 +1,4 @@
-from cbas_base import *
+from .cbas_base import *
 import datetime
 
 class CBASAsyncResultDeliveryTests(CBASBaseTest):
@@ -79,7 +79,7 @@ class CBASAsyncResultDeliveryTests(CBASBaseTest):
 
             # Validate if the results with mode and without mode are the same
             if not (results == immediate_results):
-                self.log.info("Results with mode = %s : %s",(self.mode, results))
+                self.log.info("Results with mode = %s : %s", (self.mode, results))
                 self.log.info("Results with legacy mode : %s", immediate_results)
 
                 self.fail("Results not correct")

@@ -134,7 +134,7 @@ class EvictionKV(EvictionBase):
 
         self.load_set_to_be_evicted(20, 100)
         self.run_expiry_pager()
-        print "sleep 40 seconds and verify all items expired"
+        print("sleep 40 seconds and verify all items expired")
         time.sleep(40)
         self._verify_all_buckets(self.master)
         self.cluster.wait_for_stats([self.master],
@@ -234,14 +234,14 @@ class EvictionKV(EvictionBase):
         output, error = shell.execute_command("/opt/couchbase/bin/cbstats localhost:11210 -b default"
                                               " all -u Administrator -p password | grep ephemeral")
         if self.input.param('eviction_policy', 'noEviction') == 'noEviction':
-            self.assertEquals([' ep_bucket_type:                                        ephemeral',
+            self.assertEqual([' ep_bucket_type:                                        ephemeral',
                                ' ep_dcp_ephemeral_backfill_type:                        buffered',
                                ' ep_ephemeral_full_policy:                              fail_new_data',
                                ' ep_ephemeral_metadata_purge_age:                       259200',
                                ' ep_ephemeral_metadata_purge_chunk_duration:            20',
                                ' ep_ephemeral_metadata_purge_interval:                  60'], output)
         else:
-            self.assertEquals([' ep_bucket_type:                                        ephemeral',
+            self.assertEqual([' ep_bucket_type:                                        ephemeral',
                                ' ep_dcp_ephemeral_backfill_type:                        buffered',
                                ' ep_ephemeral_full_policy:                              auto_delete',
                                ' ep_ephemeral_metadata_purge_age:                       259200',
@@ -251,14 +251,14 @@ class EvictionKV(EvictionBase):
         output, error = shell.execute_command("/opt/couchbase/bin/cbstats localhost:11210 -b default "
                                               "vbucket-details -u Administrator -p password "
                                               "| grep seqlist_deleted_count")
-        self.assertEquals(' vb_0:seqlist_deleted_count:              0', output[0])
+        self.assertEqual(' vb_0:seqlist_deleted_count:              0', output[0])
 
         item_count = rest.get_bucket(self.buckets[0]).stats.itemCount
         self.log.info('rest.get_bucket(self.buckets[0]).stats.itemCount: %s' % item_count)
         output, error = shell.execute_command("/opt/couchbase/bin/cbstats localhost:11210 -b default all"
                                               " -u Administrator -p password | grep curr_items")
         self.log.info(output)
-        self.assertEquals(' curr_items:                                            %s' % item_count, output[0])
+        self.assertEqual(' curr_items:                                            %s' % item_count, output[0])
 
         self.log.info('The number of items when almost reached OOM is {0}'.format(item_count))
 
@@ -281,14 +281,14 @@ class EvictionKV(EvictionBase):
         self.log.info("items count after we tried to add +50 per : %s" % item_count)
         output, error = shell.execute_command("/opt/couchbase/bin/cbstats localhost:11210 -b default all"
                                               " -u Administrator -p password | grep curr_items")
-        self.assertEquals(' curr_items:                                            %s' % item_count, output[0])
+        self.assertEqual(' curr_items:                                            %s' % item_count, output[0])
 
         output, error = shell.execute_command("/opt/couchbase/bin/cbstats localhost:11210 -b default "
                                               "vbucket-details -u Administrator -p password "
                                               "| grep seqlist_deleted_count")
         self.log.info(output)
         if self.input.param('eviction_policy', 'noEviction') == 'noEviction':
-            self.assertEquals(' vb_0:seqlist_deleted_count:              0', output[0], 'have deleted items!')
+            self.assertEqual(' vb_0:seqlist_deleted_count:              0', output[0], 'have deleted items!')
         else:
             self.assertTrue(int(output[0].replace(' vb_0:seqlist_deleted_count:              ', '')) > 0,
                             'no deleted items!')
@@ -306,7 +306,7 @@ class EvictionKV(EvictionBase):
                 task.result()
                 self.fail("Views not allowed for ephemeral buckets")
             except DesignDocCreationException as e:
-                self.assertEquals(e._message,
+                self.assertEqual(e._message,
                                   'Error occured design document _design/ddoc1: {"error":"not_found","reason":"views are supported only on couchbase buckets"}\n')
 
 
@@ -332,12 +332,12 @@ class EphemeralBackupRestoreTest(EvictionBase):
         output, error = self.shell.execute_command("/opt/couchbase/bin/cbbackupmgr config "
                                                    "--archive /tmp/backups --repo example")
         self.log.info(output)
-        self.assertEquals('Backup repository `example` created successfully in archive `/tmp/backups`', output[0])
+        self.assertEqual('Backup repository `example` created successfully in archive `/tmp/backups`', output[0])
         output, error = self.shell.execute_command(
             "/opt/couchbase/bin/cbbackupmgr backup --archive /tmp/backups --repo example "
             "--cluster couchbase://127.0.0.1 --username Administrator --password password")
         self.log.info(output)
-        self.assertEquals('Backup successfully completed', output[1])
+        self.assertEqual('Backup successfully completed', output[1])
         BucketOperationHelper.delete_all_buckets_or_assert(self.servers, self)
         imp_rest = RestConnection(self.master)
         info = imp_rest.get_nodes_self()
@@ -354,7 +354,7 @@ class EphemeralBackupRestoreTest(EvictionBase):
                                                    "--username Administrator --password password --start %s" % output[
                                                        0])
         self.log.info(output)
-        self.assertEquals('Restore completed successfully', output[1])
+        self.assertEqual('Restore completed successfully', output[1])
         self._verify_all_buckets(self.master)
 
 
@@ -416,7 +416,7 @@ class EphemeralBucketsOOM(EvictionBase, DCPBase):
 
         NUMBER_OF_DOCUMENTS_TO_DELETE = 4000
 
-        for i in xrange(item_count, item_count + NUMBER_OF_DOCUMENTS_TO_DELETE):
+        for i in range(item_count, item_count + NUMBER_OF_DOCUMENTS_TO_DELETE):
             mc_client.delete(EphemeralBucketsOOM.KEY_ROOT + str(i))
 
         stats = rest.get_bucket(self.buckets[0]).stats
@@ -501,9 +501,9 @@ class EphemeralBucketsOOM(EvictionBase, DCPBase):
                     index = int(i['key'][EphemeralBucketsOOM.KEY_ROOT_LENGTH:])
                     deleted_keys.append(index)
                     num += 1
-        self.assertEquals([], deleted_keys)
+        self.assertEqual([], deleted_keys)
         
-        for i in xrange(200):
+        for i in range(200):
             key = random.randint(0, 1200)
             mc_client.get(EphemeralBucketsOOM.KEY_ROOT + str(key))
             keys_that_were_accessed.append(key)
@@ -535,14 +535,14 @@ class EphemeralBucketsOOM(EvictionBase, DCPBase):
                     num += 1
         item_count = rest.get_bucket(self.buckets[0]).stats.itemCount
         self.log.info('The number of items is {0}'.format(item_count))
-        self.assertEquals(set([]), set(keys_that_were_accessed).intersection(deleted_keys))
+        self.assertEqual(set([]), set(keys_that_were_accessed).intersection(deleted_keys))
 
         # one more iteration
         deleted_keys = []
         keys_that_were_accessed = []
         set(keys_that_were_accessed).intersection(deleted_keys)
 
-        for i in xrange(200):
+        for i in range(200):
             key = random.randint(0, 12000)
             try:
                 mc_client.get(EphemeralBucketsOOM.KEY_ROOT + str(key))
@@ -570,7 +570,7 @@ class EphemeralBucketsOOM(EvictionBase, DCPBase):
         for vb in vbuckets[0:self.vbuckets]:
             vbucket = vb.id
             vb_uuid, _, high_seqno = self.vb_info(self.servers[0], vbucket, bucket=self.buckets[0])
-            print vb.id, 'streaming from', pre_delete_sequence_numbers[vb.id], ' to ', high_seqno
+            print(vb.id, 'streaming from', pre_delete_sequence_numbers[vb.id], ' to ', high_seqno)
             stream = dcp_client.stream_req(vbucket, 0, pre_delete_sequence_numbers[vb.id], high_seqno, vb_uuid)
             responses = stream.run()
             for i in responses:
@@ -581,7 +581,7 @@ class EphemeralBucketsOOM(EvictionBase, DCPBase):
                     num += 1
         item_count = rest.get_bucket(self.buckets[0]).stats.itemCount
         self.log.info('The number of items is {0}'.format(item_count))
-        self.assertEquals(set([]), set(keys_that_were_accessed).intersection(deleted_keys))
+        self.assertEqual(set([]), set(keys_that_were_accessed).intersection(deleted_keys))
 
 class EvictionDCP(EvictionBase, DCPBase):
 
@@ -609,7 +609,7 @@ class EvictionDCP(EvictionBase, DCPBase):
         time.sleep(10)
         # get the item count
         item_count = self.rest.get_bucket(self.buckets[0]).stats.itemCount
-        self.assertEquals(item_count, self.num_items)
+        self.assertEqual(item_count, self.num_items)
 
         expired_keys = []
         # check if all the keys expired
@@ -623,7 +623,7 @@ class EvictionDCP(EvictionBase, DCPBase):
                 msg = "expiry was set to {0} but key: {1} did not expire after waiting for {2}+ seconds"
                 self.log.info(msg.format(10, key, 10))
             except mc_bin_client.MemcachedError as error:
-                self.assertEquals(error.status, 1)
+                self.assertEqual(error.status, 1)
 
         for vb in vbuckets[0:self.vbuckets]:
             vbucket = vb.id
@@ -638,9 +638,9 @@ class EvictionDCP(EvictionBase, DCPBase):
 
 
         item_count = self.rest.get_bucket(self.buckets[0]).stats.itemCount
-        self.assertEquals(item_count, 0)
+        self.assertEqual(item_count, 0)
         check_values = set(keys).intersection(expired_keys) # check if any key is not expired
-        self.assertEquals(len(check_values), self.num_items)
+        self.assertEqual(len(check_values), self.num_items)
 
     def test_stream_deletioneviction(self):
         # eviction.evictionkv.EvictionDCP.test_stream_deletioneviction,dgm_run=True,eviction_policy=fullEviction
@@ -654,7 +654,7 @@ class EvictionDCP(EvictionBase, DCPBase):
 
         # get the item count
         item_count = self.rest.get_bucket(self.buckets[0]).stats.itemCount
-        self.assertEquals(item_count, self.num_items)
+        self.assertEqual(item_count, self.num_items)
 
         keys=[]
         for i in range(1000):
@@ -670,7 +670,7 @@ class EvictionDCP(EvictionBase, DCPBase):
                 keys_to_be_deleted.append(key)
                 keys.remove(key)
             except mc_bin_client.MemcachedError as error:
-                self.assertEquals(error.status, 1) # if key is already deleted then ignore the error
+                self.assertEqual(error.status, 1) # if key is already deleted then ignore the error
 
         expired_keys = []
         deleted_keys = []
@@ -683,7 +683,7 @@ class EvictionDCP(EvictionBase, DCPBase):
                 msg = "expiry was set to {0} but key: {1} did not expire after waiting for {2}+ seconds"
                 self.log.info(msg.format(40, key, 40))
             except mc_bin_client.MemcachedError as error:
-                self.assertEquals(error.status, 1)
+                self.assertEqual(error.status, 1)
 
         for vb in vbuckets[0:self.vbuckets]:
             vbucket = vb.id
@@ -700,8 +700,8 @@ class EvictionDCP(EvictionBase, DCPBase):
 
 
         item_count = self.rest.get_bucket(self.buckets[0]).stats.itemCount
-        self.assertEquals(item_count, 0)
-        self.assertEquals(len(keys_to_be_deleted), len(deleted_keys))
-        self.assertEquals(len(keys), len(expired_keys))
+        self.assertEqual(item_count, 0)
+        self.assertEqual(len(keys_to_be_deleted), len(deleted_keys))
+        self.assertEqual(len(keys), len(expired_keys))
 
 
