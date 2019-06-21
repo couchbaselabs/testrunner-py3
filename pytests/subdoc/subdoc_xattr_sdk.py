@@ -18,7 +18,7 @@ from newupgradebasetest import NewUpgradeBaseTest
 from remote.remote_util import RemoteMachineShellConnection
 from sdk_client import SDKClient
 
-from subdoc_base import SubdocBaseTest
+from .subdoc_base import SubdocBaseTest
 
 
 class SubdocXattrSdkTest(SubdocBaseTest):

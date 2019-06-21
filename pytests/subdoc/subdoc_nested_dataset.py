@@ -1,4 +1,4 @@
-from subdoc_base import SubdocBaseTest
+from .subdoc_base import SubdocBaseTest
 import copy, json
 import yaml
 import random

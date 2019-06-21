@@ -1,5 +1,5 @@
 from couchbase_helper.documentgenerator import BlobGenerator
-from tuq import QueryTests
+from .tuq import QueryTests
 from TestInput import TestInputSingleton
 from security.rbac_base import RbacBase
 from lib.membase.api.rest_client import RestConnection

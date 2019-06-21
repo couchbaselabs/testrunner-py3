@@ -3,7 +3,7 @@ import logger
 import os
 
 from membase.api.rest_client import RestConnection, RestHelper
-from basetestcase import BaseTestCase
+from .basetestcase import BaseTestCase
 from remote.remote_util import RemoteMachineShellConnection
 from lib.testconstants import LINUX_CB_PATH
 

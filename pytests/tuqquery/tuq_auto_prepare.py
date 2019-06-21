@@ -1,5 +1,5 @@
 from membase.api.rest_client import RestConnection, RestHelper
-from tuq import QueryTests
+from .tuq import QueryTests
 from remote.remote_util import RemoteMachineShellConnection
 from membase.api.exception import CBQError
 

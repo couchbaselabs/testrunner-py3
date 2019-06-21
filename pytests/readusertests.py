@@ -1,7 +1,7 @@
 import logger
 
 from membase.api.rest_client import RestConnection
-from basetestcase import BaseTestCase
+from .basetestcase import BaseTestCase
 from membase.api.exception import BucketCreationException, \
             DesignDocCreationException, AddNodeException, \
             FailoverFailedException

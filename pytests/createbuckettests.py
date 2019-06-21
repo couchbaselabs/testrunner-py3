@@ -7,7 +7,7 @@ import time
 from membase.api.exception import BucketCreationException
 from membase.api.rest_client import RestConnection
 from remote.remote_util import RemoteMachineShellConnection
-from security.rbac_base import RbacBase
+from .security.rbac_base import RbacBase
 from membase.helper.bucket_helper import BucketOperationHelper
 
 class CreateMembaseBucketsTests(unittest.TestCase):

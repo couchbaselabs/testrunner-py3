@@ -1,4 +1,4 @@
-from cbas_base import *
+from .cbas_base import *
 from membase.api.rest_client import RestHelper
 
 class CBASFunctionalTests(CBASBaseTest):

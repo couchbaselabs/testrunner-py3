@@ -3,7 +3,7 @@ import struct, socket
 
 from couchbase_helper.documentgenerator import BlobGenerator
 from membase.api.rest_client import RestConnection
-from basetestcase import BaseTestCase
+from .basetestcase import BaseTestCase
 from remote.remote_util import RemoteMachineShellConnection
 from memcached.helper.data_helper import MemcachedClientHelper
 from memcacheConstants import MEMCACHED_REQUEST_MAGIC, DATA_TYPE,\

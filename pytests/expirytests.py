@@ -17,7 +17,7 @@ from membase.helper.cluster_helper import ClusterOperationHelper
 import memcacheConstants
 from memcached.helper.data_helper import MemcachedClientHelper
 from sdk_client import SDKSmartClient
-from security.rbac_base import RbacBase
+from .security.rbac_base import RbacBase
 
 class ExpiryTests(unittest.TestCase):
     log = None

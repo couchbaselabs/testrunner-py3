@@ -2,7 +2,7 @@
 """
 Python based MySQL interface
 """
-from rqg_query_helper import RQGQueryHelper
+from .rqg_query_helper import RQGQueryHelper
 from lib.postgres_client import PostgresClient
 import pdb
 import psycopg2

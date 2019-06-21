@@ -1,7 +1,7 @@
 import logging
 import threading
 import json
-from tuq_monitoring import QueryMonitoringTests
+from .tuq_monitoring import QueryMonitoringTests
 
 class QueryProfilingTests(QueryMonitoringTests):
     def setUp(self):

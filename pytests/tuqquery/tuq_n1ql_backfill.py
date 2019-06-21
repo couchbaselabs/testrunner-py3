@@ -1,4 +1,4 @@
-from tuq import QueryTests
+from .tuq import QueryTests
 import os
 from membase.api.rest_client import RestHelper
 from membase.api.exception import CBQError

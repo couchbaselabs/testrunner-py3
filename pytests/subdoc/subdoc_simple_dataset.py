@@ -1,6 +1,6 @@
 from lib.mc_bin_client import MemcachedClient, MemcachedError
 from lib.memcacheConstants import *
-from subdoc_base import SubdocBaseTest
+from .subdoc_base import SubdocBaseTest
 from membase.api.rest_client import RestConnection
 from memcached.helper.data_helper import VBucketAwareMemcached
 import copy, json

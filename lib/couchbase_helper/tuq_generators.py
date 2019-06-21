@@ -1,5 +1,5 @@
 import copy
-from documentgenerator import  DocumentGenerator
+from .documentgenerator import  DocumentGenerator
 import re
 import datetime
 import json
@@ -7,7 +7,7 @@ import random, string
 import os
 import logger
 
-from data import COUNTRIES, COUNTRY_CODE, FIRST_NAMES, LAST_NAMES
+from .data import COUNTRIES, COUNTRY_CODE, FIRST_NAMES, LAST_NAMES
 
 log = logger.Logger.get_logger()
 

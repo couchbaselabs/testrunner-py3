@@ -6,7 +6,7 @@ import time
 import os
 from TestInput import TestInputSingleton
 
-from tuq import QueryTests
+from .tuq import QueryTests
 from membase.api.rest_client import RestConnection
 from membase.api.exception import CBQError, ReadDocumentException
 from remote.remote_util import RemoteMachineShellConnection

@@ -1,4 +1,4 @@
-from xdcr.xdcrbasetests import XDCRReplicationBaseTest
+from .xdcr.xdcrbasetests import XDCRReplicationBaseTest
 from remote.remote_util import RemoteMachineShellConnection
 from membase.api.rest_client import RestConnection, RestHelper
 from membase.api.exception import CBRecoveryFailedException, InvalidArgumentException, BucketCreationException

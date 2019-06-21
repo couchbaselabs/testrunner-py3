@@ -1,5 +1,5 @@
 from xdcr.xdcrnewbasetests import XDCRNewBaseTest
-from createdeleteview import CreateDeleteViewTests
+from .createdeleteview import CreateDeleteViewTests
 from membase.api.exception import QueryViewException
 from couchbase_helper.document import View
 

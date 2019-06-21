@@ -4,7 +4,7 @@ import time
 from membase.api.rest_client import RestConnection
 from scripts.edgyjson.main import JSONDoc
 
-from xdcrnewbasetests import XDCRNewBaseTest
+from .xdcrnewbasetests import XDCRNewBaseTest
 
 
 class XDCRAdvFilterTests(XDCRNewBaseTest):

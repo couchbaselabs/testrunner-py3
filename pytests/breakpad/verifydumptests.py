@@ -3,9 +3,9 @@ import re
 import time
 import logger
 import threading
-from breakpadbase import BreakpadBase
+from .breakpadbase import BreakpadBase
 from membase.api.rest_client import RestConnection
-from logpoll import NSLogPoller
+from .logpoll import NSLogPoller
 
 log = logger.Logger.get_logger()
 

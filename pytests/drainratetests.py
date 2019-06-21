@@ -8,7 +8,7 @@ from membase.api.rest_client import RestConnection, RestHelper
 from membase.helper.bucket_helper import BucketOperationHelper
 from membase.helper.rebalance_helper import RebalanceHelper
 from memcached.helper.data_helper import MemcachedClientHelper
-from security.rbac_base import RbacBase
+from .security.rbac_base import RbacBase
 
 class DrainRateTests(unittest.TestCase):
     def setUp(self):

@@ -71,7 +71,7 @@ except ImportError:
     socks = None
 
 if sys.version_info >= (2, 3):
-    from iri2uri import iri2uri
+    from .iri2uri import iri2uri
 else:
     def iri2uri(uri):
         return uri

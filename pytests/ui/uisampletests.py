@@ -5,7 +5,7 @@ import unittest
 from selenium.common.exceptions import StaleElementReferenceException, ElementNotVisibleException
 from lib.testconstants import STANDARD_BUCKET_PORT
 
-from uibasetest import * 
+from .uibasetest import * 
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.support.ui import WebDriverWait

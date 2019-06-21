@@ -7,7 +7,7 @@ import logger
 import os
 from subprocess import Popen, PIPE
 from remote.remote_util import RemoteMachineShellConnection
-from tuq import QueryTests
+from .tuq import QueryTests
 import re
 
 log = logger.Logger.get_logger()

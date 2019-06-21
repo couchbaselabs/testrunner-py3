@@ -7,7 +7,7 @@ from datetime import date
 from remote.remote_util import RemoteMachineShellConnection
 from membase.api.exception import CBQError, ReadDocumentException
 from membase.api.rest_client import RestConnection
-from tuq import QueryTests
+from .tuq import QueryTests
 import random
 
 

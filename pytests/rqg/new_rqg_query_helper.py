@@ -2,7 +2,7 @@ import random
 import copy
 import string
 import pprint
-from base_query_helper import BaseRQGQueryHelper
+from .base_query_helper import BaseRQGQueryHelper
 
 
 '''

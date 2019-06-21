@@ -1,4 +1,4 @@
-from tuq import QueryTests
+from .tuq import QueryTests
 from membase.api.exception import CBQError
 from lib.membase.api.rest_client import RestConnection
 from pytests.fts.fts_base import CouchbaseCluster

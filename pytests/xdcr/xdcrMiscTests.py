@@ -2,8 +2,8 @@ from couchbase_helper.stats_tools import StatsCommon
 from membase.api.rest_client import RestConnection, Bucket
 from couchbase_helper.documentgenerator import BlobGenerator
 
-from xdcrbasetests import XDCRReplicationBaseTest
-from xdcrbasetests import XDCRConstants
+from .xdcrbasetests import XDCRReplicationBaseTest
+from .xdcrbasetests import XDCRConstants
 
 
 class XdcrMiscTests(XDCRReplicationBaseTest):

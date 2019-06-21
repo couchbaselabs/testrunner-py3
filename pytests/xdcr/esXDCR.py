@@ -1,7 +1,7 @@
 from couchbase_helper.documentgenerator import BlobGenerator, DocumentGenerator, JSONNonDocGenerator
 from membase.helper.rebalance_helper import RebalanceHelper
-from xdcrbasetests import XDCRReplicationBaseTest
-from esbasetests import ESReplicationBaseTest
+from .xdcrbasetests import XDCRReplicationBaseTest
+from .esbasetests import ESReplicationBaseTest
 from remote.remote_util import RemoteMachineShellConnection
 from random import randrange
 

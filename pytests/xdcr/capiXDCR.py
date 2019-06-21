@@ -10,8 +10,8 @@ from memcached.helper.data_helper import VBucketAwareMemcached
 from newupgradebasetest import NewUpgradeBaseTest
 from remote.remote_util import RemoteMachineShellConnection
 
-from xdcrnewbasetests import REPL_PARAM, NodeHelper
-from xdcrnewbasetests import XDCRNewBaseTest
+from .xdcrnewbasetests import REPL_PARAM, NodeHelper
+from .xdcrnewbasetests import XDCRNewBaseTest
 
 
 

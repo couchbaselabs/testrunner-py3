@@ -2,7 +2,7 @@ import copy
 import random
 import unittest
 import time
-from basetestcase import BaseTestCase
+from .basetestcase import BaseTestCase
 from couchbase_helper.documentgenerator import DocumentGenerator
 from membase.helper.cluster_helper import ClusterOperationHelper
 from remote.remote_util import RemoteMachineShellConnection

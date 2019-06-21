@@ -1,4 +1,4 @@
-from tuq import QueryTests
+from .tuq import QueryTests
 import random
 import string
 from random import randint

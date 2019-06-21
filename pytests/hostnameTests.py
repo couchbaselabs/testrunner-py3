@@ -1,12 +1,12 @@
 from membase.api.exception import ServerSelfJoinException, MembaseHttpExceptionTypes, ServerAlreadyJoinedException
 from membase.api.rest_client import RestConnection, RestHelper
-from basetestcase import BaseTestCase
+from .basetestcase import BaseTestCase
 from lib.remote.remote_util import RemoteMachineShellConnection, RemoteMachineHelper, RemoteUtilHelper
 from lib.memcached.helper.data_helper import MemcachedClientHelper
 from scripts.install import InstallerJob
 from membase.api.rest_client import RestConnection
 from couchbase_helper.documentgenerator import BlobGenerator
-from newupgradebasetest import NewUpgradeBaseTest
+from .newupgradebasetest import NewUpgradeBaseTest
 from builds.build_query import BuildQuery
 import re
 

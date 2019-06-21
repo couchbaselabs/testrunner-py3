@@ -1,7 +1,7 @@
 import time
 import logger
 from dcp.constants import VBSEQNO_STAT, PRODUCER
-from dcpbase import DCPBase
+from .dcpbase import DCPBase
 from membase.api.rest_client import RestConnection, RestHelper
 from mc_bin_client import MemcachedClient, MemcachedError
 from couchbase_helper.documentgenerator import BlobGenerator

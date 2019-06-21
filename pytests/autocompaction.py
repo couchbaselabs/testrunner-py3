@@ -6,7 +6,7 @@ import json
 import datetime
 from threading import Thread, Event
 from TestInput import TestInputSingleton
-from basetestcase import BaseTestCase
+from .basetestcase import BaseTestCase
 from membase.api.rest_client import RestConnection
 from membase.helper.bucket_helper import BucketOperationHelper
 from remote.remote_util import RemoteMachineShellConnection

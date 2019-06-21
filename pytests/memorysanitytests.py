@@ -6,7 +6,7 @@ from lib.remote.remote_util import RemoteMachineShellConnection
 from membase.api.rest_client import RestConnection
 from membase.helper.bucket_helper import BucketOperationHelper
 from couchbase_helper.documentgenerator import BlobGenerator, DocumentGenerator
-from basetestcase import BaseTestCase
+from .basetestcase import BaseTestCase
 from memcached.helper.data_helper import MemcachedClientHelper, VBucketAwareMemcached
 from couchbase_helper.stats_tools import StatsCommon
 

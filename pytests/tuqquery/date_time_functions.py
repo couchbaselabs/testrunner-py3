@@ -1,7 +1,7 @@
 import logging
 import random
 
-from tuq import QueryTests
+from .tuq import QueryTests
 
 log = logging.getLogger(__name__)
 

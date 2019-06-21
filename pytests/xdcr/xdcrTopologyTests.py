@@ -1,5 +1,5 @@
-from xdcrnewbasetests import XDCRNewBaseTest
-from xdcrnewbasetests import OPS
+from .xdcrnewbasetests import XDCRNewBaseTest
+from .xdcrnewbasetests import OPS
 
 
 class XDCRTopologyTest(XDCRNewBaseTest):

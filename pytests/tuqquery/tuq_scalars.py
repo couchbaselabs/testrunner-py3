@@ -1,4 +1,4 @@
-from tuq import QueryTests
+from .tuq import QueryTests
 from membase.api.exception import CBQError
 
 class ScalarFunctionsTests(QueryTests):

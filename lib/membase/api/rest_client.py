@@ -1,7 +1,7 @@
 import base64
 import json
 import urllib.request, urllib.parse, urllib.error
-import httplib2
+from . import httplib2
 import logger
 import traceback
 import socket
@@ -21,7 +21,7 @@ except ImportError:
     from lib.couchbase_helper.document import DesignDocument, View
 
 from memcached.helper.kvstore import KVStore
-from exception import ServerAlreadyJoinedException, ServerUnavailableException, InvalidArgumentException
+from .exception import ServerAlreadyJoinedException, ServerUnavailableException, InvalidArgumentException
 from membase.api.exception import BucketCreationException, ServerSelfJoinException, ClusterRemoteException, \
     RebalanceFailedException, FailoverFailedException, DesignDocCreationException, QueryViewException, \
     ReadDocumentException, GetBucketInfoFailed, CompactViewFailed, SetViewInfoNotFound, AddNodeException, \

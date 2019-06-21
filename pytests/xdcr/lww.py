@@ -1,8 +1,8 @@
 import zlib
 
 from couchbase_helper.documentgenerator import BlobGenerator, DocumentGenerator
-from xdcrnewbasetests import XDCRNewBaseTest, FloatingServers
-from xdcrnewbasetests import NodeHelper
+from .xdcrnewbasetests import XDCRNewBaseTest, FloatingServers
+from .xdcrnewbasetests import NodeHelper
 from membase.api.rest_client import RestConnection
 from testconstants import STANDARD_BUCKET_PORT
 from remote.remote_util import RemoteMachineShellConnection

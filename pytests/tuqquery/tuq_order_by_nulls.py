@@ -1,4 +1,4 @@
-from tuq import QueryTests
+from .tuq import QueryTests
 import math
 import copy
 from membase.api.exception import CBQError

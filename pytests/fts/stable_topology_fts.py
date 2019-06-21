@@ -10,7 +10,7 @@ from membase.helper.cluster_helper import ClusterOperationHelper
 from remote.remote_util import RemoteMachineShellConnection
 
 from TestInput import TestInputSingleton
-from fts_base import FTSBaseTest
+from .fts_base import FTSBaseTest
 from lib.membase.api.exception import FTSException, ServerUnavailableException
 from lib.membase.api.rest_client import RestConnection
 
@@ -178,7 +178,7 @@ class StableTopFTS(FTSBaseTest):
                                                 consistency_vectors=self.consistency_vectors)
             self.log.info("Hits: %s" % hits)
             try:
-                from fts_base import NodeHelper
+                from .fts_base import NodeHelper
                 NodeHelper.stop_couchbase(fts_node)
                 for i in range(list(self.consistency_vectors.values())[0].values()[0]):
                     self.async_perform_update_delete(self.upd_del_fields)
@@ -397,7 +397,7 @@ class StableTopFTS(FTSBaseTest):
         bucket = self._cb_cluster.get_bucket_by_name('default')
         index = self.create_index(bucket, "default_index")
         self.wait_for_indexing_complete()
-        from fts_base import INDEX_DEFAULTS
+        from .fts_base import INDEX_DEFAULTS
         alias_def = INDEX_DEFAULTS.ALIAS_DEFINITION
         alias_def['targets'][index.name] = {}
         alias_def['targets'][index.name]['indexUUID'] = index.get_uuid()
@@ -1727,7 +1727,7 @@ class StableTopFTS(FTSBaseTest):
         :return: Nothing
         """
         geo_index = self.create_geo_index_and_load()
-        from random_query_generator.rand_query_gen import FTSESQueryGenerator
+        from .random_query_generator.rand_query_gen import FTSESQueryGenerator
         testcase_failed = False
         for i in range(self.num_queries):
 	    self.log.info("Running Query no --> " + str(i))

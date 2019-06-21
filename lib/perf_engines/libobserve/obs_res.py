@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import struct
-from obs_def import ObserveKeyState, ObservePktFmt, OBS_OPCODE
+from .obs_def import ObserveKeyState, ObservePktFmt, OBS_OPCODE
 from memcacheConstants import RES_MAGIC_BYTE
 
 class ObserveResponseKey:

@@ -2,8 +2,8 @@
 
 import time
 
-from obs_def import ObserveKeyState, ObserveStatus
-from obs_helper import SyncDict
+from .obs_def import ObserveKeyState, ObserveStatus
+from .obs_helper import SyncDict
 
 class Observable:
 

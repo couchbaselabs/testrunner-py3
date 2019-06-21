@@ -3,8 +3,8 @@ import logger
 import time
 import unittest
 import copy
-from uibasetest import *
-from uisampletests import NavigationHelper, BucketHelper, ServerTestControls, ServerHelper
+from .uibasetest import *
+from .uisampletests import NavigationHelper, BucketHelper, ServerTestControls, ServerHelper
 from TestInput import TestInputSingleton
 from couchbase_helper.cluster import Cluster
 from membase.api.rest_client import RestConnection, Bucket

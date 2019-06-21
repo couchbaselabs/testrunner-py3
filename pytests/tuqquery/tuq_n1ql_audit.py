@@ -1,7 +1,7 @@
 from membase.api.rest_client import RestHelper
 from security.rbac_base import RbacBase
 from security.audittest import auditTest
-from tuq import QueryTests
+from .tuq import QueryTests
 from membase.api.exception import CBQError
 import logger
 log = logger.Logger.get_logger()

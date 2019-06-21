@@ -1,9 +1,9 @@
-from base_test_rqg import BaseRQGTests
-from new_rqg_mysql_client import RQGMySQLClientNew
-from new_rqg_query_helper import RQGQueryHelperNew
+from .base_test_rqg import BaseRQGTests
+from .new_rqg_mysql_client import RQGMySQLClientNew
+from .new_rqg_query_helper import RQGQueryHelperNew
 import threading
-from rqg_mysql_client import RQGMySQLClient
-from rqg_postgres_client import RQGPostgresClient
+from .rqg_mysql_client import RQGMySQLClient
+from .rqg_postgres_client import RQGPostgresClient
 import traceback
 
 class RQGTestsNew(BaseRQGTests):

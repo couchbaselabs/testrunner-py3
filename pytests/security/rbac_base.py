@@ -1,5 +1,5 @@
-from ldap_user import LdapUser
-from internal_user import InternalUser
+from .ldap_user import LdapUser
+from .internal_user import InternalUser
 from remote.remote_util import RemoteMachineShellConnection
 import urllib.request, urllib.parse, urllib.error
 import json

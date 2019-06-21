@@ -1,4 +1,4 @@
-from tuq import QueryTests
+from .tuq import QueryTests
 import threading
 import time
 import json

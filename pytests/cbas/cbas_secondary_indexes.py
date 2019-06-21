@@ -1,4 +1,4 @@
-from cbas_base import *
+from .cbas_base import *
 from couchbase import FMT_BYTES
 import threading
 import random

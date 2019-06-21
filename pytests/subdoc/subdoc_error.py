@@ -3,7 +3,7 @@ import logger
 from couchbase_helper.cluster import Cluster
 
 from membase.helper.subdoc_helper import SubdocHelper
-from subdoc_sanity import SubdocSanityTests, SimpleDataSet, DeeplyNestedDataSet
+from .subdoc_sanity import SubdocSanityTests, SimpleDataSet, DeeplyNestedDataSet
 
 
 class SubdocErrorTests(SubdocSanityTests):

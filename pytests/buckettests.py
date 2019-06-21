@@ -1,5 +1,5 @@
 import time
-from basetestcase import BaseTestCase
+from .basetestcase import BaseTestCase
 from remote.remote_util import RemoteMachineShellConnection
 from membase.api.rest_client import RestConnection, Bucket, RestHelper
 from membase.api.exception import BucketCreationException

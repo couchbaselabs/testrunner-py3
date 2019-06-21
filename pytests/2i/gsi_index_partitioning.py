@@ -3,7 +3,7 @@ import json
 import threading
 import time
 
-from base_2i import BaseSecondaryIndexingTests
+from .base_2i import BaseSecondaryIndexingTests
 from membase.api.rest_client import RestConnection, RestHelper
 import random
 from lib import testconstants
@@ -14,7 +14,7 @@ from threading import Thread
 from pytests.query_tests_helper import QueryHelperTests
 from couchbase_helper.documentgenerator import JsonDocGenerator
 from couchbase_helper.cluster import Cluster
-from gsi_replica_indexes import GSIReplicaIndexesTests
+from .gsi_replica_indexes import GSIReplicaIndexesTests
 from lib.membase.helper.cluster_helper import ClusterOperationHelper
 
 
