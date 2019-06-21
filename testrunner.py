@@ -281,20 +281,20 @@ class StoppableThreadWithResult(Thread):
     def __init__(self, group=None, target=None, name=None,
                  args=(), kwargs=None, verbose=None):
         super(StoppableThreadWithResult, self).__init__(group=group, target=target,
-                        name=name, args=args, kwargs=kwargs, verbose=verbose)
-        self._stop = Event()
+                        name=name, args=args, kwargs=kwargs)
+        self._stopper = Event()
 
-    def stop(self):
-        self._stop.set()
+    def stopit(self):
+        self._stopper.set()
         self._Thread__stop()
 
     def stopped(self):
-        return self._stop.isSet()
+        return self._stopper.isSet()
 
     def run(self):
-        if self._Thread__target is not None:
-            self._return = self._Thread__target(*self._Thread__args,
-                                                **self._Thread__kwargs)
+        if self._target is not None:
+            self._return = self._target(*self._args,
+                                                **self._kwargs)
 
     def join(self, timeout=None):
         Thread.join(self, timeout=None)
