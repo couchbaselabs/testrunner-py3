@@ -5,9 +5,9 @@ from couchbase_helper.documentgenerator import BlobGenerator
 from remote.remote_util import RemoteMachineShellConnection
 from membase.api.rest_client import RestConnection
 from memcached.helper.data_helper import LoadWithMcsoda
-from .xdcrnewbasetests import XDCRNewBaseTest
-from .xdcrnewbasetests import NodeHelper
-from .xdcrnewbasetests import Utility, BUCKET_NAME, OPS
+from xdcrnewbasetests import XDCRNewBaseTest
+from xdcrnewbasetests import NodeHelper
+from xdcrnewbasetests import Utility, BUCKET_NAME, OPS
 from scripts.install import InstallerJob
 from lib.memcached.helper.data_helper import MemcachedClientHelper
 
@@ -556,7 +556,7 @@ class unidirectional(XDCRNewBaseTest):
         """Tests with 2 buckets with customized optimisic replication thresholds
            one greater than value_size, other smaller
         """
-        from .xdcrnewbasetests import REPL_PARAM
+        from xdcrnewbasetests import REPL_PARAM
         self.setup_xdcr_and_load()
         self._wait_for_replication_to_catchup()
         for remote_cluster in self.src_cluster.get_remote_clusters():

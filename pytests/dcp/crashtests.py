@@ -1,7 +1,7 @@
 import time
 import logger
 from dcp.constants import *
-from .dcpbase import DCPBase
+from dcpbase import DCPBase
 from membase.api.rest_client import RestConnection, RestHelper
 from couchbase_helper.documentgenerator import BlobGenerator
 from remote.remote_util import RemoteMachineShellConnection

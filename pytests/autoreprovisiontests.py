@@ -11,7 +11,7 @@ from memcached.helper.data_helper import MemcachedClientHelper
 from remote.remote_util import RemoteMachineShellConnection, RemoteUtilHelper
 
 from TestInput import TestInputSingleton
-from .security.rbac_base import RbacBase
+from security.rbac_base import RbacBase
 
 log = logger.Logger.get_logger()
 

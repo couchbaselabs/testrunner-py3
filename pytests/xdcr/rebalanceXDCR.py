@@ -1,5 +1,5 @@
-from .xdcrnewbasetests import XDCRNewBaseTest
-from .xdcrnewbasetests import Utility, BUCKET_NAME, OPS
+from xdcrnewbasetests import XDCRNewBaseTest
+from xdcrnewbasetests import Utility, BUCKET_NAME, OPS
 """Testing Rebalance on Unidirectional and Bidirectional XDCR replication setup"""
 
 

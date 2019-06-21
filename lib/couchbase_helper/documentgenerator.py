@@ -7,7 +7,7 @@ from string import ascii_lowercase
 from string import digits
 import gzip
 from testconstants import DEWIKI, ENWIKI, ESWIKI, FRWIKI
-from .data import FIRST_NAMES, LAST_NAMES, DEPT, LANGUAGES
+from data import FIRST_NAMES, LAST_NAMES, DEPT, LANGUAGES
 
 class KVGenerator(object):
     def __init__(self, name, start, end):

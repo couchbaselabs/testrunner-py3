@@ -4,7 +4,7 @@ from membase.api.rest_client import RestConnection, RestHelper
 from membase.helper.rebalance_helper import RebalanceHelper
 from remote.remote_util import RemoteMachineShellConnection
 from remote.remote_util import RemoteUtilHelper
-from .failoverbasetests import FailoverBaseTest
+from failoverbasetests import FailoverBaseTest
 
 class NegativeFailoverTests(FailoverBaseTest):
 

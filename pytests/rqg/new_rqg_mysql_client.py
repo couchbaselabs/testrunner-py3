@@ -1,5 +1,5 @@
-from .base_rqg_mysql_client import BaseRQGMySQLClient
-from .new_rqg_query_helper import RQGQueryHelperNew
+from base_rqg_mysql_client import BaseRQGMySQLClient
+from new_rqg_query_helper import RQGQueryHelperNew
 
 class RQGMySQLClientNew(BaseRQGMySQLClient):
 

@@ -13,8 +13,8 @@ from threading import Thread
 from remote.remote_util import RemoteMachineShellConnection
 from memcached.helper.data_helper import MemcachedClientHelper
 from membase.api.exception import RebalanceFailedException
-from .basetestcase import BaseTestCase
-from .security.rbac_base import RbacBase
+from basetestcase import BaseTestCase
+from security.rbac_base import RbacBase
 
 class SwapRebalanceBase(unittest.TestCase):
 

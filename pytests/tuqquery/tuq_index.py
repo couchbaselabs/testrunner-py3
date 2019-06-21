@@ -1,7 +1,7 @@
 import uuid
-from .tuq import QueryTests
-from .tuq_join import JoinTests
-from .tuq_sanity import QuerySanityTests
+from tuq import QueryTests
+from tuq_join import JoinTests
+from tuq_sanity import QuerySanityTests
 
 
 class QueriesViewsTests(QuerySanityTests):

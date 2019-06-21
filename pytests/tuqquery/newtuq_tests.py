@@ -1,6 +1,6 @@
 import logging
 import threading
-from .tuq import QueryTests
+from tuq import QueryTests
 
 class QueryNewTuqTests(QueryTests):
 

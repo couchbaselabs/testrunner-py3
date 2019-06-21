@@ -1,4 +1,4 @@
-from .base_query_helper import BaseRQGQueryHelper
+from base_query_helper import BaseRQGQueryHelper
 
 
 class RQGQueryHelper(BaseRQGQueryHelper):

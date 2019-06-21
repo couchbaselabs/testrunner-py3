@@ -1,5 +1,5 @@
-from .fts_base import FTSBaseTest, FTSException
-from .fts_base import NodeHelper
+from fts_base import FTSBaseTest, FTSException
+from fts_base import NodeHelper
 from TestInput import TestInputSingleton
 from threading import Thread
 from lib.remote.remote_util import RemoteMachineShellConnection

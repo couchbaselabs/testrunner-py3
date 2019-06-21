@@ -5,7 +5,7 @@ import queue
 from datetime import datetime
 from membase.api.rest_client import RestConnection, Bucket
 from newupgradebasetest import NewUpgradeBaseTest
-from .xdcrnewbasetests import XDCRNewBaseTest, NodeHelper
+from xdcrnewbasetests import XDCRNewBaseTest, NodeHelper
 from TestInput import TestInputSingleton
 from remote.remote_util import RemoteMachineShellConnection
 from membase.api.rest_client import RestConnection, RestHelper

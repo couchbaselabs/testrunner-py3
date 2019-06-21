@@ -1,4 +1,4 @@
-from .gsi_index_partitioning import GSIIndexPartitioningTests
+from gsi_index_partitioning import GSIIndexPartitioningTests
 from lib.remote.remote_util import RemoteMachineShellConnection
 from membase.api.rest_client import RestConnection, RestHelper
 from lib.memcached.helper.data_helper import MemcachedClientHelper

@@ -6,7 +6,7 @@ import datetime
 import time
 from membase.api.rest_client import RestConnection
 from membase.helper.bucket_helper import BucketOperationHelper
-from .security.rbac_base import RbacBase
+from security.rbac_base import RbacBase
 
 
 

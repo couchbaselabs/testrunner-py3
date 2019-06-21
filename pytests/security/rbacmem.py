@@ -13,8 +13,8 @@ import sys
 from subprocess import Popen, PIPE
 from security.rbac_base import RbacBase
 from basetestcase import BaseTestCase
-from .testmemcached import TestMemcachedClient
-from .testmemcached import TestSDK
+from testmemcached import TestMemcachedClient
+from testmemcached import TestSDK
 from membase.api.rest_client import RestConnection, RestHelper
 from couchbase_helper.documentgenerator import BlobGenerator
 

@@ -9,8 +9,8 @@ from membase.api.exception import XDCRCheckpointException
 from memcached.helper.data_helper import MemcachedClientHelper, VBucketAwareMemcached
 from remote.remote_util import RemoteMachineShellConnection
 
-from .xdcrnewbasetests import NodeHelper
-from .xdcrnewbasetests import XDCRNewBaseTest, REPLICATION_TYPE
+from xdcrnewbasetests import NodeHelper
+from xdcrnewbasetests import XDCRNewBaseTest, REPLICATION_TYPE
 
 
 class XDCRCheckpointUnitTest(XDCRNewBaseTest):

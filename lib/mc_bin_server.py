@@ -15,10 +15,10 @@ import hmac
 import heapq
 import sys
 
-from . import memcacheConstants
-from .memcacheConstants import MIN_RECV_PACKET, REQ_PKT_FMT, RES_PKT_FMT
-from .memcacheConstants import INCRDECR_RES_FMT
-from .memcacheConstants import REQ_MAGIC_BYTE, RES_MAGIC_BYTE, EXTRA_HDR_FMTS
+import memcacheConstants
+from memcacheConstants import MIN_RECV_PACKET, REQ_PKT_FMT, RES_PKT_FMT
+from memcacheConstants import INCRDECR_RES_FMT
+from memcacheConstants import REQ_MAGIC_BYTE, RES_MAGIC_BYTE, EXTRA_HDR_FMTS
 
 VERSION = "1.0"
 

@@ -1,7 +1,7 @@
 import queue
 from datetime import datetime
 
-from .base_2i import BaseSecondaryIndexingTests, log
+from base_2i import BaseSecondaryIndexingTests, log
 from membase.api.rest_client import RestConnection, RestHelper
 import random
 import threading

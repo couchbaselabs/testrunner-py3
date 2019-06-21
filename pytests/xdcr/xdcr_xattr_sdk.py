@@ -9,7 +9,7 @@ from sdk_client import SDKClient
 
 from lib.membase.api.exception import XDCRException
 from remote.remote_util import RemoteMachineShellConnection, RemoteUtilHelper
-from .xdcrnewbasetests import XDCRNewBaseTest, REPLICATION_DIRECTION, TOPOLOGY
+from xdcrnewbasetests import XDCRNewBaseTest, REPLICATION_DIRECTION, TOPOLOGY
 
 
 # Assumption that at least 2 nodes on every cluster

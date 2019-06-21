@@ -1,5 +1,5 @@
 import copy
-from .hostnamemgmt_base import HostnameBaseTests
+from hostnamemgmt_base import HostnameBaseTests
 from membase.api.rest_client import RestConnection
 from remote.remote_util import RemoteMachineShellConnection
 from membase.api.exception import ServerAlreadyJoinedException

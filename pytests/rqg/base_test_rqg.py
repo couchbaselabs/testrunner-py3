@@ -6,10 +6,10 @@ import queue
 import json
 import threading
 from memcached.helper.data_helper import VBucketAwareMemcached
-from .rqg_mysql_client import RQGMySQLClient
+from rqg_mysql_client import RQGMySQLClient
 from membase.api.rest_client import RestConnection, Bucket
 from couchbase_helper.tuq_helper import N1QLHelper
-from .rqg_query_helper import RQGQueryHelper
+from rqg_query_helper import RQGQueryHelper
 from remote.remote_util import RemoteMachineShellConnection
 import random
 from itertools import combinations
@@ -17,7 +17,7 @@ import shutil
 from os import listdir
 from os.path import isfile, join
 import traceback
-from .rqg_postgres_client import RQGPostgresClient
+from rqg_postgres_client import RQGPostgresClient
 
 class BaseRQGTests(BaseTestCase):
     def setUp(self):

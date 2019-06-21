@@ -3,7 +3,7 @@ import copy
 import random
 import json
 import sys
-from .random_gen import RandomDataGenerator
+from random_gen import RandomDataGenerator
 
 class SubdocHelper():
     def __init__(self):

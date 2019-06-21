@@ -2,12 +2,12 @@ import threading
 import time
 import fractions
 import uuid
-from . import logger
+import logger
 from TestInput import TestInputServer
 
-from . import mc_bin_client
-from .membase.api.rest_client import RestConnection
-from .memcached.helper.data_helper import VBucketAwareMemcached
+import mc_bin_client
+from membase.api.rest_client import RestConnection
+from memcached.helper.data_helper import VBucketAwareMemcached
 
 
 class FakeMemcachedClient(object):

@@ -1,4 +1,4 @@
-from .subdoc_base import SubdocBaseTest
+from subdoc_base import SubdocBaseTest
 from lib.mc_bin_client import MemcachedClient, MemcachedError
 from lib.memcacheConstants import *
 import copy, json

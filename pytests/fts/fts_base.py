@@ -27,7 +27,7 @@ from couchbase_helper.documentgenerator import *
 
 from couchbase_helper.documentgenerator import JsonDocGenerator
 from lib.membase.api.exception import FTSException
-from .es_base import ElasticSearchBase
+from es_base import ElasticSearchBase
 from security.rbac_base import RbacBase
 from lib.couchbase_helper.tuq_helper import N1QLHelper
 
@@ -644,7 +644,7 @@ class FTSIndex:
             return None
 
     def generate_new_custom_map(self, seed):
-        from .custom_map_generator.map_generator import CustomMapGenerator
+        from custom_map_generator.map_generator import CustomMapGenerator
         cm_gen = CustomMapGenerator(seed=seed, dataset=self.dataset,
                                 num_custom_analyzers=self.num_custom_analyzers,
                                 multiple_filters=self.multiple_filters)
@@ -685,7 +685,7 @@ class FTSIndex:
                     del self.index_definition['params']['mapping']['analysis'] \
                         ['token_filters'][custom_filter]
             else:
-                from .custom_map_generator.map_generator import CustomMapGenerator
+                from custom_map_generator.map_generator import CustomMapGenerator
                 cm_gen = CustomMapGenerator(seed=seed, dataset=self.dataset,
                                     num_custom_analyzers=self.num_custom_analyzers,
                                     multiple_filters=self.multiple_filters)
@@ -3834,7 +3834,7 @@ class FTSBaseTest(unittest.TestCase):
                       like: query_type=["match", "match_phrase","bool",
                                         "conjunction", "disjunction"]
         """
-        from .random_query_generator.rand_query_gen import FTSESQueryGenerator
+        from random_query_generator.rand_query_gen import FTSESQueryGenerator
         query_gen = FTSESQueryGenerator(num_queries, query_type=query_type,
                                         seed=seed, dataset=self.dataset,
                                         fields=index.smart_query_fields)
@@ -3862,7 +3862,7 @@ class FTSBaseTest(unittest.TestCase):
         :return: fts or fts and es queries
         """
         import random
-        from .random_query_generator.rand_query_gen import FTSESQueryGenerator
+        from random_query_generator.rand_query_gen import FTSESQueryGenerator
         gen_queries = 0
 
         while gen_queries < num_queries:
@@ -4030,7 +4030,7 @@ class FTSBaseTest(unittest.TestCase):
             self.create_es_index_mapping(es_mapping=es_mapping)
 
         self.log.info("Creating geo-index ...")
-        from .fts_base import FTSIndex
+        from fts_base import FTSIndex
         geo_index = FTSIndex(
             cluster=self._cb_cluster,
             name="geo-index",

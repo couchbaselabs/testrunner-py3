@@ -3,14 +3,14 @@
 Python based SDK client interface
 
 """
-from . import crc32
+import crc32
 import time
 from couchbase import FMT_AUTO
-from .memcached.helper.old_kvstore import ClientKeyValueStore
+from memcached.helper.old_kvstore import ClientKeyValueStore
 from couchbase.bucket import Bucket as CouchbaseBucket
 from couchbase.cluster import Cluster, ClassicAuthenticator, PasswordAuthenticator
 from couchbase.exceptions import CouchbaseError, BucketNotFoundError, AuthError
-from .mc_bin_client import MemcachedError
+from mc_bin_client import MemcachedError
 from couchbase.n1ql import N1QLQuery, N1QLRequest
 
 import couchbase

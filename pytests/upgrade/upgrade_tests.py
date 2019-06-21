@@ -1,4 +1,4 @@
-from .newupgradebasetest import NewUpgradeBaseTest
+from newupgradebasetest import NewUpgradeBaseTest
 import queue
 import copy
 from membase.helper.cluster_helper import ClusterOperationHelper

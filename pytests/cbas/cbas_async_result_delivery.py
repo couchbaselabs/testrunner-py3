@@ -1,4 +1,4 @@
-from .cbas_base import *
+from cbas_base import *
 import datetime
 
 class CBASAsyncResultDeliveryTests(CBASBaseTest):

@@ -1,4 +1,4 @@
-from .xdcrnewbasetests import XDCRNewBaseTest, TOPOLOGY
+from xdcrnewbasetests import XDCRNewBaseTest, TOPOLOGY
 from remote.remote_util import RemoteMachineShellConnection, RestConnection
 from couchbase_helper.documentgenerator import BlobGenerator
 from couchbase_helper.cluster import Cluster

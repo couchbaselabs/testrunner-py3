@@ -1,6 +1,6 @@
 import random
-from .mc_bin_client import MemcachedClient, decodeCollectionID
-from .memcacheConstants import *
+from mc_bin_client import MemcachedClient, decodeCollectionID
+from memcacheConstants import *
 import queue
 import time
 
@@ -276,7 +276,7 @@ class DcpClient(MemcachedClient):
         self._opcode_dump = control
 
     def opcode_lookup(self, opcode):
-        from .memcacheConstants import DCP_Opcode_Dictionary
+        from memcacheConstants import DCP_Opcode_Dictionary
         return DCP_Opcode_Dictionary.get(opcode, 'Unknown Opcode')
 
 

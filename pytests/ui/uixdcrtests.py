@@ -1,6 +1,6 @@
 from membase.api.rest_client import RestConnection
-from .uibasetest import *
-from .uisampletests import Bucket, NavigationHelper
+from uibasetest import *
+from uisampletests import Bucket, NavigationHelper
 from selenium.common.exceptions import StaleElementReferenceException
 from membase.helper.bucket_helper import BucketOperationHelper
 from membase.helper.cluster_helper import ClusterOperationHelper

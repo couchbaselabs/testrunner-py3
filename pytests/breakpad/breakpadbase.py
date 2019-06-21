@@ -6,8 +6,8 @@ from basetestcase import BaseTestCase
 from membase.api.rest_client import RestConnection
 from TestInput import TestInputSingleton
 from lib.cluster_run_manager  import CRManager
-from .logpoll import NSLogPoller
-from .constants import MD_PATH, NS_NUM_NODES
+from logpoll import NSLogPoller
+from constants import MD_PATH, NS_NUM_NODES
 from memcached.helper.data_helper import VBucketAwareMemcached
 
 class BreakpadBase(BaseTestCase):

@@ -10,7 +10,7 @@ from memcached.helper.data_helper import VBucketAwareMemcached
 
 from lib.couchbase_helper.random_gen import RandomDataGenerator
 from lib.couchbase_helper.subdoc_helper import SubdocHelper
-from .subdoc_base import SubdocBaseTest
+from subdoc_base import SubdocBaseTest
 
 
 class SubdocAutoTestGenerator(SubdocBaseTest):

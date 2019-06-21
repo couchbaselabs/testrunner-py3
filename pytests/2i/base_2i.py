@@ -4,7 +4,7 @@ import time
 
 from lib.membase.helper.cluster_helper import ClusterOperationHelper
 from lib.remote.remote_util import RemoteMachineShellConnection
-from .newtuq import QueryTests
+from newtuq import QueryTests
 from couchbase_helper.cluster import Cluster
 from couchbase_helper.tuq_generators import TuqGenerators
 from couchbase_helper.query_definitions import SQLDefinitionGenerator

@@ -15,7 +15,7 @@ from builds.build_query import BuildQuery
 import testconstants
 import copy
 
-from .basetestcase import BaseTestCase
+from basetestcase import BaseTestCase
 
 class BackupRestoreTests(BaseTestCase):
     input = None

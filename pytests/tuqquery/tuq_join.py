@@ -1,6 +1,6 @@
 import copy
 from tuqquery.tuq import QueryTests
-from .tuq_sanity import QuerySanityTests
+from tuq_sanity import QuerySanityTests
 import time
 
 JOIN_INNER = "INNER"

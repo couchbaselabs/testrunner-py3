@@ -1,4 +1,4 @@
-from .tuq import QueryTests
+from tuq import QueryTests
 from membase.api.rest_client import RestHelper
 from couchbase.cluster import Cluster
 from couchbase.cluster import PasswordAuthenticator
