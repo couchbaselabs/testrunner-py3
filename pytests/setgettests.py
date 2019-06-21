@@ -9,7 +9,7 @@ from membase.api.rest_client import RestConnection
 from membase.helper.bucket_helper import BucketOperationHelper
 from membase.helper.cluster_helper import ClusterOperationHelper
 from memcached.helper.data_helper import MemcachedClientHelper
-from .security.rbac_base import RbacBase
+from security.rbac_base import RbacBase
 
 class SimpleSetGetTestBase(object):
     log = None

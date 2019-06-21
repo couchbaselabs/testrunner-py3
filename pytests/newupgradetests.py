@@ -18,7 +18,7 @@ from testconstants import SHERLOCK_VERSION, COUCHBASE_FROM_SHERLOCK,\
                           COUCHBASE_FROM_VULCAN
 from couchbase.cluster import Cluster, PasswordAuthenticator
 from couchbase.exceptions import CouchbaseError, CouchbaseNetworkError, CouchbaseTransientError
-from .security.rbac_base import RbacBase
+from security.rbac_base import RbacBase
 from threading import Thread
 
 

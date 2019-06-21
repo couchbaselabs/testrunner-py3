@@ -1088,7 +1088,7 @@ class InstallerJob(object):
         uninstall_threads = []
         install_threads = []
         initializer_threads = []
-        queue = queue.Queue()
+        queue1 = queue.Queue()
         success = True
         for server in servers:
             if params.get('enable_ipv6', 0):
@@ -1103,7 +1103,7 @@ class InstallerJob(object):
                        args=(_params,))
             i_t = Thread(target=installer_factory(params).install,
                        name="installer-thread-{0}".format(server.ip),
-                       args=(_params, queue))
+                       args=(_params, queue1))
             init_t = Thread(target=installer_factory(params).initialize,
                        name="initializer-thread-{0}".format(server.ip),
                        args=(_params,))
@@ -1129,8 +1129,8 @@ class InstallerJob(object):
         for t in install_threads:
             t.join()
             print("thread {0} finished".format(t.name))
-        while not queue.empty():
-            success &= queue.get()
+        while not queue1.empty():
+            success &= queue1.get()
         if not success:
             print("installation failed. initializer threads were skipped")
             return success

@@ -15,8 +15,8 @@ from membase.helper.bucket_helper import BucketOperationHelper
 from membase.helper.cluster_helper import ClusterOperationHelper
 from memcached.helper.data_helper import MemcachedClientHelper, VBucketAwareMemcached
 from remote.remote_util import RemoteMachineShellConnection, RemoteMachineHelper
-from .basetestcase import BaseTestCase
-from .security.rbac_base import RbacBase
+from basetestcase import BaseTestCase
+from security.rbac_base import RbacBase
 
 
 class MemcapableTestBase(object):
