@@ -1896,7 +1896,7 @@ class RemoteMachineShellConnection:
             raise Exception("its not a membase or couchbase?")
         self.extract_remote_info()
 
-        log.info('deliverable_type : {0}'.format(self.info.deliverable_type))
+        log.info('-->deliverable_type : {0}'.format(self.info.deliverable_type))
         if self.info.type.lower() == 'windows':
             log.info('***** Doing the windows install')
             self.terminate_processes(self.info, [s for s in WIN_PROCESSES_KILLED])
@@ -1945,12 +1945,17 @@ class RemoteMachineShellConnection:
                               "/sbin/sysctl vm.swappiness=0 "\
                               "enable coredump cbenable_core_dumps.sh /tmp")
             else:
+                log.info("--> execute_command: start...")
                 output, error = self.execute_command('/sbin/sysctl vm.swappiness={0}'\
                                                      .format(swappiness), debug=debug_logs)
+                log.info("--> execute_command: end...")
+                log.info("--> log_command_output: start...")
                 success &= self.log_command_output(output, error, track_words,
                                                    debug=debug_logs)
+                log.info("--> log_command_output: end...")
 
             if self.info.deliverable_type == 'rpm':
+                print("--> inside rpm check...")
                 if self.nonroot:
                     op, er = self.execute_command('cd {0}; rpm2cpio {1} ' \
                         '|  cpio --extract --make-directories --no-absolute-filenames ' \
@@ -1972,7 +1977,8 @@ class RemoteMachineShellConnection:
                                                               % (self.nr_home_path,
                                                                  LINUX_COUCHBASE_BIN_PATH))
                 else:
-                    self.check_pkgconfig(self.info.deliverable_type, openssl)
+                    log.info("--> check_pkconfig: start TB...")
+                    #self.check_pkgconfig(self.info.deliverable_type, openssl)
                     if "SUSE" in self.info.distribution_type:
                         if environment:
                             output, error = self.execute_command("export {0};zypper -n install /tmp/{1}".format(environment.strip(), build.name))
@@ -1981,7 +1987,9 @@ class RemoteMachineShellConnection:
                             output, error = self.execute_command("zypper -n install /tmp/{0}".format(build.name))
                             self.log_command_output(output, error)
                     else:
+                        log.info("--> Running rpm_cmd...")
                         rpm_cmd = "yes | {0}yum localinstall -y /tmp/{1}"
+                        log.info("-->cmd={}".format(rpm_cmd))
                         if force:
                             # temporary fix for bzip2 - need to be redone
                             # output, error = self.execute_command('{0}rpm -Uvh --force /tmp/{1}'\
@@ -3025,6 +3033,7 @@ class RemoteMachineShellConnection:
         # success means that there are no track_words in the output
         # and there are no errors at all, if track_words is not empty
         # if track_words=(), the result is not important, and we return True
+        #log.info("--> in log_command_output...")
         success = True
         for line in error:
             if debug:
@@ -3065,9 +3074,10 @@ class RemoteMachineShellConnection:
                               "\nGo to log_command_output to add error mesg to bypass it.")
                     success = False
         for line in output:
+            line=line.decode("utf-8")
             if debug:
                 log.info(line)
-            if any(s.lower() in line.lower() for s in track_words):
+            if any(s.encode("utf-8").lower() in line.encode("utf-8").lower() for s in track_words):
                 if "Warning" in line and "hugepages" in line:
                     log.info("There is a warning about transparent_hugepage may be in used when install cb server.\
                               So we will disable transparent_hugepage in this vm")
@@ -3499,7 +3509,8 @@ class RemoteMachineShellConnection:
                 text, err = p.communicate()
                 os_arch = ''
             for line in text:
-                os_arch += str(line)
+                #print("os_arch={},line={}".format(os_arch,line))
+                os_arch += line.decode("utf-8")
                 # at this point we should know if its a linux or windows ditro
             ext = { 'Ubuntu' : "deb",
                    'CentOS'  : "rpm",
@@ -3510,8 +3521,8 @@ class RemoteMachineShellConnection:
                    "SUSE"    : "rpm",
                    "Oracle Linux": "rpm",
                     "Amazon Linux 2": "rpm"}.get(os_distro, '')
-            arch = {'i686': 'x86',
-                    'i386': 'x86'}.get(os_arch, os_arch)
+            arch = {'i686': "x86",
+                    'i386': "x86"}.get(os_arch, os_arch)
 
             info = RemoteMachineInfo()
             info.type = "Linux"

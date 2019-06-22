@@ -252,6 +252,7 @@ class Installer(object):
 
         remote_client = RemoteMachineShellConnection(server)
         info = remote_client.extract_remote_info()
+        print("--> remote server architecture_type..{}".format(info.architecture_type))
         server_os_type = info.distribution_version
         if info.distribution_type.lower() == "mac":
             macOS_name = info.distribution_version[:5]
@@ -338,6 +339,7 @@ class Installer(object):
                                             os_version = info.distribution_version,
                                             direct_build_url=direct_build_url)
                 else:
+                    #print("--> Getting all builds..{}".format(info.architecture_type))
                     builds, changes = BuildQuery().get_all_builds(version=version,
                                       timeout=timeout,
                                       direct_build_url=direct_build_url,
@@ -373,6 +375,7 @@ class Installer(object):
                     """ check if URL is live """
                     url_valid = False
                     remote_client = RemoteMachineShellConnection(server)
+                    print("check if {} is live".format(build.url))
                     url_valid = remote_client.is_url_live(build.url)
                     remote_client.disconnect()
                     if url_valid:
@@ -756,6 +759,7 @@ class CouchbaseServerInstaller(Installer):
                                        enable_ipv6=enable_ipv6,
                                        windows_msi=self.msi )
             else:
+                print("Downloading the build...{}".format(build))
                 downloaded = remote_client.download_build(build)
 
                 if not downloaded:
@@ -779,7 +783,7 @@ class CouchbaseServerInstaller(Installer):
                         ClusterOperationHelper.set_vbuckets(server, rest_vbuckets)
                 except BaseException as e:
                     success = False
-                    log.error("installation failed: {0}".format(e))
+                    log.error("------->installation failed: {0}".format(e))
             remote_client.disconnect()
             if queue:
                 queue.put(success)
