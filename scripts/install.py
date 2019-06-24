@@ -11,6 +11,7 @@ from threading import Thread
 from datetime import datetime
 import socket
 import queue
+import traceback
 
 sys.path = [".", "lib"] + sys.path
 import testconstants
@@ -784,6 +785,11 @@ class CouchbaseServerInstaller(Installer):
                 except BaseException as e:
                     success = False
                     log.error("------->installation failed: {0}".format(e))
+                    traceback.print_exec()
+                    exc_type, exc_obj, exc_tb = sys.exc_info()
+                    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                    print(exc_type, fname, exc_tb.tb_lineno)
+
             remote_client.disconnect()
             if queue:
                 queue.put(success)

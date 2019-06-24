@@ -1945,14 +1945,11 @@ class RemoteMachineShellConnection:
                               "/sbin/sysctl vm.swappiness=0 "\
                               "enable coredump cbenable_core_dumps.sh /tmp")
             else:
-                log.info("--> execute_command: start...")
                 output, error = self.execute_command('/sbin/sysctl vm.swappiness={0}'\
                                                      .format(swappiness), debug=debug_logs)
                 log.info("--> execute_command: end...")
-                log.info("--> log_command_output: start...")
                 success &= self.log_command_output(output, error, track_words,
                                                    debug=debug_logs)
-                log.info("--> log_command_output: end...")
 
             if self.info.deliverable_type == 'rpm':
                 print("--> inside rpm check...")
@@ -1977,8 +1974,7 @@ class RemoteMachineShellConnection:
                                                               % (self.nr_home_path,
                                                                  LINUX_COUCHBASE_BIN_PATH))
                 else:
-                    log.info("--> check_pkconfig: start TB...")
-                    #self.check_pkgconfig(self.info.deliverable_type, openssl)
+                    self.check_pkgconfig(self.info.deliverable_type, openssl)
                     if "SUSE" in self.info.distribution_type:
                         if environment:
                             output, error = self.execute_command("export {0};zypper -n install /tmp/{1}".format(environment.strip(), build.name))
@@ -3033,9 +3029,13 @@ class RemoteMachineShellConnection:
         # success means that there are no track_words in the output
         # and there are no errors at all, if track_words is not empty
         # if track_words=(), the result is not important, and we return True
-        #log.info("--> in log_command_output...")
+        #log.info("--> log_command_output: start ...")
         success = True
         for line in error:
+            try:
+              line=line.decode()
+            except AttributeError:
+              pass     
             if debug:
                 log.error(line)
             if track_words:
@@ -3074,7 +3074,10 @@ class RemoteMachineShellConnection:
                               "\nGo to log_command_output to add error mesg to bypass it.")
                     success = False
         for line in output:
-            line=line.decode("utf-8")
+            try:
+              line=line.decode()
+            except AttributeError:
+              pass     
             if debug:
                 log.info(line)
             if any(s.encode("utf-8").lower() in line.encode("utf-8").lower() for s in track_words):
@@ -3088,6 +3091,7 @@ class RemoteMachineShellConnection:
                     success = False
                     log.error('something wrong happened on {0}!!! output:{1}, error:{2}, track_words:{3}'
                               .format(self.ip, output, error, track_words))
+        #log.info("--> log_command_output: end ...")
         return success
 
     def execute_commands_inside(self, main_command,query, queries,bucket1,password,bucket2,source,subcommands=[], min_output_size=0,
@@ -3226,6 +3230,7 @@ class RemoteMachineShellConnection:
         return (output)
 
     def execute_command(self, command, info=None, debug=True, use_channel=False):
+        #log.info("--> execute_command: start...")
         if getattr(self, "info", None) is None and info is not None :
             self.info = info
         else:
@@ -4615,6 +4620,7 @@ class RemoteMachineShellConnection:
                                     self.log_command_output(o, r)
 
     def check_pkgconfig(self, deliverable_type, openssl):
+        log.info("check_pkgconfig : start")
         if "SUSE" in self.info.distribution_type:
             o, r = self.execute_command("zypper -n if pkg-config 2>/dev/null| grep -i \"Installed: Yes\"")
             self.log_command_output(o, r)
@@ -4633,12 +4639,13 @@ class RemoteMachineShellConnection:
                 o, r = self.execute_command("cat /etc/redhat-release")
                 self.log_command_output(o, r)
 
-                if o is None:
+                try:
+                  if o is None:
                     # This must be opensuse, hack for now....
                     o, r = self.execute_command("cat /etc/SuSE-release")
                     self.log_command_output(o, r)
-                if o[0] != "":
-                    o = o[0].split(" ")
+                  if o[0] != b"":
+                    o = o[0].split(b" ")
                     if o[2] in centos_version:
                         o, r = self.execute_command("rpm -qa | grep pkgconfig")
                         self.log_command_output(o, r)
@@ -4658,6 +4665,13 @@ class RemoteMachineShellConnection:
                                     self.log_command_output(o, r)
                     else:
                         log.info("no need to install pkgconfig")
+                except Exception as e:
+                    log.info("{}".format(e))
+                    exc_type, exc_obj, exc_tb = sys.exc_info()
+                    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+                    print(exc_type, fname, exc_tb.tb_lineno)
+                  
+        log.info("check_pkgconfig : end")
 
     def check_man_page(self):
         log.info("check if man installed on vm?")
