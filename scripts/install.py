@@ -512,6 +512,7 @@ class CouchbaseServerInstaller(Installer):
             sys.exit(mesg)
         while time.time() < start_time + 5 * 60:
             try:
+                log.info("creating RestConnection(server) and the server type is {}".format(type(server)))
                 rest = RestConnection(server)
 
                 # Optionally change node name and restart server

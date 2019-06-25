@@ -11,6 +11,7 @@ import uuid
 from copy import deepcopy
 from threading import Thread
 from TestInput import TestInputSingleton
+from TestInput import TestInputServer
 from testconstants import MIN_KV_QUOTA, INDEX_QUOTA, FTS_QUOTA, CBAS_QUOTA
 from testconstants import COUCHBASE_FROM_VERSION_4, IS_CONTAINER, CLUSTER_QUOTA_RATIO
 
@@ -220,10 +221,7 @@ class RestHelper(object):
         return vbuckets_servers
 
 class RestConnection(object):
-
-    def __new__(self, serverInfo={}):
-
-
+    def __new__(cls, serverInfo={}):
         # allow port to determine
         # behavior of restconnection
         port = None
@@ -236,13 +234,19 @@ class RestConnection(object):
         if not port:
             port = 8091
 
+        log.info("port is {} and serverInfo object type is {}".format(port,type(serverInfo)))
+        #log.info("serverInfo={}".format(vars(serverInfo)))
         if int(port) in range(9091, 9100):
             # return elastic search rest connection
             from membase.api.esrest_client import EsRestConnection
-            obj = object.__new__(EsRestConnection, serverInfo)
+            log.info("--> calling object.__new__(EsRestConnection,serverInfo)")
+            obj = super(EsRestConnection,cls).__new__(cls)
         else:
             # default
-            obj = object.__new__(self, serverInfo)
+            log.info("-->default")
+            obj = object.__new__(cls)
+              
+        log.info("obj={}".format(vars(obj)))
         return obj
 
     def __init__(self, serverInfo):
@@ -333,7 +337,8 @@ class RestConnection(object):
 
         # for Node is unknown to this cluster error
         for iteration in range(5):
-            http_res, success = self.init_http_request(self.baseUrl + 'nodes/self')
+            #log.info("--> api baseurl is {},{},{}".format(type(self.baseUrl),type('nodes/selfr'),self.baseUrl + 'nodes/self'))
+            http_res, success = self.init_http_request(str(self.baseUrl + "nodes/self"))
             if not success and isinstance(http_res, str) and\
                (http_res.find('Node is unknown to this cluster') > -1 or \
                 http_res.find('Unexpected server error, request logged') > -1):
@@ -437,8 +442,10 @@ class RestConnection(object):
     def init_http_request(self, api):
         content = None
         try:
-            status, content, header = self._http_request(api, 'GET',
-                                                         headers=self._create_capi_headers())
+            #log.info("--> api: {}".format(api))
+            headers = self._create_capi_headers()
+            #log.info("--> headers: {}".format(headers))
+            status, content, header = self._http_request(api, 'GET', headers)
             json_parsed = json.loads(content)
             if status:
                 return json_parsed, True
@@ -774,32 +781,37 @@ class RestConnection(object):
         return status, json_parsed
 
     def _create_capi_headers(self):
-        authorization = base64.encodestring('%s:%s' % (self.username, self.password))
+        authorization = base64.encodestring(('%s:%s' % (self.username, self.password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
+        #log.info("-->authorization:{}:{}".format(type(authorization),authorization))
         return {'Content-Type': 'application/json',
                 'Authorization': 'Basic %s' % authorization,
                 'Accept': '*/*'}
 
     def _create_capi_headers_with_auth(self, username, password):
-        authorization = base64.encodestring(
-            '%s:%s' % (username, password))
+        authorization = base64.encodestring(('%s:%s' % (username, password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         return {'Content-Type': 'application/json',
                 'Authorization': 'Basic %s' % authorization,
                 'Accept': '*/*'}
 
     def _create_headers_with_auth(self, username, password):
-        authorization = base64.encodestring('%s:%s' % (username, password))
+        authorization = base64.encodestring(('%s:%s' % (username, password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         return {'Authorization': 'Basic %s' % authorization}
 
     # authorization must be a base64 string of username:password
     def _create_headers(self):
-        authorization = base64.encodestring('%s:%s' % (self.username, self.password))
+        authorization = base64.encodestring(('%s:%s' % (self.username, self.password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         return {'Content-Type': 'application/x-www-form-urlencoded',
                 'Authorization': 'Basic %s' % authorization,
                 'Accept': '*/*'}
 
     # authorization must be a base64 string of username:password
     def _create_headers_encoded_prepared(self):
-        authorization = base64.encodestring('%s:%s' % (self.username, self.password))
+        authorization = base64.encodestring(('%s:%s' % (self.username, self.password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         return {'Content-Type': 'application/json',
                 'Authorization': 'Basic %s' % authorization}
 
@@ -808,7 +820,7 @@ class RestConnection(object):
         if key in headers:
             val = headers[key]
             if val.startswith("Basic "):
-                return "auth: " + base64.decodestring(val[6:])
+                return str("auth: " + base64.decodestring(val[6:]))
         return ""
 
     def _http_request(self, api, method='GET', params='', headers=None, timeout=120):
@@ -820,6 +832,7 @@ class RestConnection(object):
         count = 1
         while True:
             try:
+                #log.info("--->{}:{},{}:{},{}:{},{}:{}".format(type(api),api,type(headers),headers,type(method),method,type(params),params))
                 response, content = httplib2.Http(timeout=timeout).request(api, method,
                                                                            params, headers)
                 if response['status'] in ['200', '201', '202']:
@@ -834,9 +847,12 @@ class RestConnection(object):
                     reason = "unknown"
                     if "error" in json_parsed:
                         reason = json_parsed["error"]
-                    message = '{0} {1} body: {2} headers: {3} error: {4} reason: {5} {6} {7}'.\
-                              format(method, api, params, headers, response['status'], reason,
-                                     content.rstrip('\n'), self._get_auth(headers))
+                    #log.info("--->content {}:{}".format(type(content),content))
+                    #message = '{0} {1} body: {2} headers: {3} error: {4} reason: {5} {6} {7}'.\
+                    #          format(method, api, params, headers, response['status'], reason,
+                    #                 str(content.rstrip('\n')), self._get_auth(headers))
+                    message = '{0} {1} body: {2} headers: {3} error: {4} reason: {5}'.\
+                              format(method, api, params, headers, response['status'], reason)
                     log.error(message)
                     log.debug(''.join(traceback.format_stack()))
                     return False, content, response
@@ -924,7 +940,8 @@ class RestConnection(object):
         log.info('/node/controller/setupServices params on {0}: {1}:{2}'.format(self.ip, self.port, params))
         status, content, header = self._http_request(api, 'POST', params)
         error_message = "cannot change node services after cluster is provisioned"
-        if not status and error_message in content:
+        #log.info("--->{}:{},{}:{},{}:{}".format(type(status),status,type(error_message),error_message,type(content),content))
+        if not status and error_message in str(content):
             status = True
             log.info("This node is already provisioned with services, we do not consider this as failure for test case")
         return status
@@ -3962,7 +3979,8 @@ class RestConnection(object):
 
     def set_downgrade_storage_mode_with_rest(self, downgrade=True, username="Administrator",
                                                                    password="password"):
-        authorization = base64.encodestring('%s:%s' % (username, password))
+        authorization = base64.encodestring(('%s:%s' % (username, password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         if downgrade:
             api = self.index_baseUrl + 'settings/storageMode?downgrade=true'
         else:
@@ -3976,7 +3994,8 @@ class RestConnection(object):
 
     def create_index_with_rest(self, create_info, username="Administrator", password="password"):
         log.info("CREATE INDEX USING REST WITH PARAMETERS: " + str(create_info))
-        authorization = base64.encodestring('%s:%s' % (username, password))
+        authorization = base64.encodestring(('%s:%s' % (username, password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         api = self.index_baseUrl + 'internal/indexes?create=true'
         headers = {'Content-type': 'application/json','Authorization': 'Basic %s' % authorization}
         params = json.loads("{0}".format(create_info).replace('\'', '"').replace('True', 'true').replace('False', 'false'))
@@ -3987,7 +4006,8 @@ class RestConnection(object):
         return json.loads(content)
 
     def build_index_with_rest(self, id, username="Administrator", password="password"):
-        authorization = base64.encodestring('%s:%s' % (username, password))
+        authorization = base64.encodestring(('%s:%s' % (username, password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         api = self.index_baseUrl + 'internal/indexes?build=true'
         build_info = {'ids': [id]}
         headers = {'Content-type': 'application/json','Authorization': 'Basic %s' % authorization}
@@ -3998,7 +4018,8 @@ class RestConnection(object):
         return json.loads(content)
 
     def drop_index_with_rest(self, id, username="Administrator", password="password"):
-        authorization = base64.encodestring('%s:%s' % (username, password))
+        authorization = base64.encodestring(('%s:%s' % (username, password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         url = 'internal/index/{0}'.format(id)
         api = self.index_baseUrl + url
         headers = {'Content-type': 'application/json','Authorization': 'Basic %s' % authorization}
@@ -4007,7 +4028,8 @@ class RestConnection(object):
             raise Exception(content)
 
     def get_all_indexes_with_rest(self, username="Administrator", password="password"):
-        authorization = base64.encodestring('%s:%s' % (username, password))
+        authorization = base64.encodestring(('%s:%s' % (username, password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         url = 'internal/indexes'
         api = self.index_baseUrl + url
         headers = {'Content-type': 'application/json','Authorization': 'Basic %s' % authorization}
@@ -4017,7 +4039,8 @@ class RestConnection(object):
         return json.loads(content)
 
     def lookup_gsi_index_with_rest(self, id, body, username="Administrator", password="password"):
-        authorization = base64.encodestring('%s:%s' % (username, password))
+        authorization = base64.encodestring(('%s:%s' % (username, password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         url = 'internal/index/{0}?lookup=true'.format(id)
         api = self.index_baseUrl + url
         headers = {'Content-type': 'application/json','Authorization': 'Basic %s' % authorization}
@@ -4031,7 +4054,8 @@ class RestConnection(object):
     def full_table_scan_gsi_index_with_rest(self, id, body, username="Administrator", password="password"):
         if "limit" not in list(body.keys()):
             body["limit"] = 900000
-        authorization = base64.encodestring('%s:%s' % (username, password))
+        authorization = base64.encodestring(('%s:%s' % (username, password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         url = 'internal/index/{0}?scanall=true'.format(id)
         api = self.index_baseUrl + url
         headers = {'Content-type': 'application/json','Authorization': 'Basic %s' % authorization}
@@ -4048,7 +4072,8 @@ class RestConnection(object):
     def range_scan_gsi_index_with_rest(self, id, body, username="Administrator", password="password"):
         if "limit" not in list(body.keys()):
             body["limit"] = 300000
-        authorization = base64.encodestring('%s:%s' % (username, password))
+        authorization = base64.encodestring(('%s:%s' % (username, password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         url = 'internal/index/{0}?range=true'.format(id)
         api = self.index_baseUrl + url
         headers = {'Content-type': 'application/json',
@@ -4067,7 +4092,8 @@ class RestConnection(object):
         return json.loads(chunkless_content)
 
     def multiscan_for_gsi_index_with_rest(self, id, body, username="Administrator", password="password"):
-        authorization = base64.encodestring('%s:%s' % (username, password))
+        authorization = base64.encodestring(('%s:%s' % (username, password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         url = 'internal/index/{0}?multiscan=true'.format(id)
         api = self.index_baseUrl + url
         headers = {'Accept': 'application/json','Authorization': 'Basic %s' % authorization}
@@ -4090,7 +4116,8 @@ class RestConnection(object):
             return content
 
     def multiscan_count_for_gsi_index_with_rest(self, id, body, username="Administrator", password="password"):
-        authorization = base64.encodestring('%s:%s' % (username, password))
+        authorization = base64.encodestring(('%s:%s' % (username, password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         url = 'internal/index/{0}?multiscancount=true'.format(id)
         api = self.index_baseUrl + url
         headers = {'Accept': 'application/json','Authorization': 'Basic %s' % authorization}
@@ -4162,7 +4189,8 @@ class RestConnection(object):
     def check_user_permission(self, user_id, password, permission_set):
         url = "pools/default/checkPermissions/"
         api = self.baseUrl + url
-        authorization = base64.encodestring('%s:%s' % (user_id, password))
+        authorization = base64.encodestring(('%s:%s' % (user_id, password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         header = {'Content-Type': 'application/x-www-form-urlencoded',
               'Authorization': 'Basic %s' % authorization,
               'Accept': '*/*'}
@@ -4212,7 +4240,8 @@ class RestConnection(object):
         Save the Function so that it is visible in UI
     '''
     def save_function(self, name, body):
-        authorization = base64.encodestring('%s:%s' % (self.username, self.password))
+        authorization = base64.encodestring(('%s:%s' % (self.username, self.password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         url = "_p/event/saveAppTempStore/?name=" + name
         api = self.baseUrl + url
         headers = {'Content-type': 'application/json', 'Authorization': 'Basic %s' % authorization}
@@ -4226,7 +4255,8 @@ class RestConnection(object):
             Deploy the Function
     '''
     def deploy_function(self, name, body):
-        authorization = base64.encodestring('%s:%s' % (self.username, self.password))
+        authorization = base64.encodestring(('%s:%s' % (self.username, self.password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         url = "_p/event/setApplication/?name=" + name
         api = self.baseUrl + url
         headers = {'Content-type': 'application/json', 'Authorization': 'Basic %s' % authorization}
@@ -4240,7 +4270,8 @@ class RestConnection(object):
             GET all the Functions
     '''
     def get_all_functions(self):
-        authorization = base64.encodestring('%s:%s' % (self.username, self.password))
+        authorization = base64.encodestring(('%s:%s' % (self.username, self.password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         url = "api/v1/functions"
         api = self.eventing_baseUrl + url
         headers = {'Content-type': 'application/json', 'Authorization': 'Basic %s' % authorization}
@@ -4253,7 +4284,8 @@ class RestConnection(object):
             Undeploy the Function
     '''
     def set_settings_for_function(self, name, body):
-        authorization = base64.encodestring('%s:%s' % (self.username, self.password))
+        authorization = base64.encodestring(('%s:%s' % (self.username, self.password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         url = "api/v1/functions/" + name +"/settings"
         api = self.eventing_baseUrl + url
         headers = {'Content-type': 'application/json', 'Authorization': 'Basic %s' % authorization}
@@ -4268,7 +4300,8 @@ class RestConnection(object):
         undeploy the Function 
     '''
     def undeploy_function(self, name):
-        authorization = base64.encodestring('%s:%s' % (self.username, self.password))
+        authorization = base64.encodestring(('%s:%s' % (self.username, self.password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         url = "api/v1/functions/" + name +"/settings"
         body= {"deployment_status": False, "processing_status": False}
         api = self.eventing_baseUrl + url
@@ -4283,7 +4316,8 @@ class RestConnection(object):
         Delete all the functions 
     '''
     def delete_all_function(self):
-        authorization = base64.encodestring('%s:%s' % (self.username, self.password))
+        authorization = base64.encodestring(('%s:%s' % (self.username, self.password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         url = "api/v1/functions"
         api = self.eventing_baseUrl + url
         headers = {'Content-type': 'application/json', 'Authorization': 'Basic %s' % authorization}
@@ -4296,7 +4330,8 @@ class RestConnection(object):
             Delete single function
     '''
     def delete_single_function(self, name):
-        authorization = base64.encodestring('%s:%s' % (self.username, self.password))
+        authorization = base64.encodestring(('%s:%s' % (self.username, self.password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         url = "api/v1/functions/" + name
         api = self.eventing_baseUrl + url
         headers = {'Content-type': 'application/json', 'Authorization': 'Basic %s' % authorization}
@@ -4309,7 +4344,8 @@ class RestConnection(object):
             Delete the Function from UI
     '''
     def delete_function_from_temp_store(self, name):
-        authorization = base64.encodestring('%s:%s' % (self.username, self.password))
+        authorization = base64.encodestring(('%s:%s' % (self.username, self.password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         url = "_p/event/deleteAppTempStore/?name=" + name
         api = self.baseUrl + url
         headers = {'Content-type': 'application/json', 'Authorization': 'Basic %s' % authorization}
@@ -4322,7 +4358,8 @@ class RestConnection(object):
             Delete the Function
     '''
     def delete_function(self, name):
-        authorization = base64.encodestring('%s:%s' % (self.username, self.password))
+        authorization = base64.encodestring(('%s:%s' % (self.username, self.password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         url = "_p/event/deleteApplication/?name=" + name
         api = self.baseUrl + url
         headers = {'Content-type': 'application/json', 'Authorization': 'Basic %s' % authorization}
@@ -4336,7 +4373,8 @@ class RestConnection(object):
     '''
     def export_function(self, name):
         export_map = {}
-        authorization = base64.encodestring('%s:%s' % (self.username, self.password))
+        authorization = base64.encodestring(('%s:%s' % (self.username, self.password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         url = "api/v1/export/" + name
         api = self.eventing_baseUrl + url
         headers = {'Content-type': 'application/json', 'Authorization': 'Basic %s' % authorization}
@@ -4357,7 +4395,8 @@ class RestConnection(object):
              Ensure that the eventing node is out of bootstrap node
     '''
     def get_deployed_eventing_apps(self):
-        authorization = base64.encodestring('%s:%s' % (self.username, self.password))
+        authorization = base64.encodestring(('%s:%s' % (self.username, self.password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         url = "getDeployedApps"
         api = self.eventing_baseUrl + url
         headers = {'Content-type': 'application/json', 'Authorization': 'Basic %s' % authorization}
@@ -4371,7 +4410,8 @@ class RestConnection(object):
     '''
 
     def get_running_eventing_apps(self):
-        authorization = base64.encodestring('%s:%s' % (self.username, self.password))
+        authorization = base64.encodestring(('%s:%s' % (self.username, self.password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         url = "getRunningApps"
         api = self.eventing_baseUrl + url
         headers = {'Content-type': 'application/json', 'Authorization': 'Basic %s' % authorization}
@@ -4384,7 +4424,8 @@ class RestConnection(object):
             composite status of a handler
     '''
     def get_composite_eventing_status(self):
-        authorization = base64.encodestring('%s:%s' % (self.username, self.password))
+        authorization = base64.encodestring(('%s:%s' % (self.username, self.password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         url = "/api/v1/status"
         api = self.eventing_baseUrl + url
         headers = {'Content-type': 'application/json', 'Authorization': 'Basic %s' % authorization}
@@ -4399,7 +4440,8 @@ class RestConnection(object):
     def get_event_processing_stats(self, name, eventing_map=None):
         if eventing_map is None:
             eventing_map = {}
-        authorization = base64.encodestring('%s:%s' % (self.username, self.password))
+        authorization = base64.encodestring(('%s:%s' % (self.username, self.password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         url = "getEventProcessingStats?name=" + name
         api = self.eventing_baseUrl + url
         headers = {'Content-type': 'application/json', 'Authorization': 'Basic %s' % authorization}
@@ -4420,7 +4462,8 @@ class RestConnection(object):
     def get_aggregate_event_processing_stats(self, name, eventing_map=None):
         if eventing_map is None:
             eventing_map = {}
-        authorization = base64.encodestring('%s:%s' % (self.username, self.password))
+        authorization = base64.encodestring(('%s:%s' % (self.username, self.password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         url = "getAggEventProcessingStats?name=" + name
         api = self.eventing_baseUrl + url
         headers = {'Content-type': 'application/json', 'Authorization': 'Basic %s' % authorization}
@@ -4441,7 +4484,8 @@ class RestConnection(object):
     def get_event_execution_stats(self, name, eventing_map=None):
         if eventing_map is None:
             eventing_map = {}
-        authorization = base64.encodestring('%s:%s' % (self.username, self.password))
+        authorization = base64.encodestring(('%s:%s' % (self.username, self.password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         url = "getExecutionStats?name=" + name
         api = self.eventing_baseUrl + url
         headers = {'Content-type': 'application/json', 'Authorization': 'Basic %s' % authorization}
@@ -4462,7 +4506,8 @@ class RestConnection(object):
     def get_event_failure_stats(self, name, eventing_map=None):
         if eventing_map is None:
             eventing_map = {}
-        authorization = base64.encodestring('%s:%s' % (self.username, self.password))
+        authorization = base64.encodestring(('%s:%s' % (self.username, self.password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         url = "getFailureStats?name=" + name
         api = self.eventing_baseUrl + url
         headers = {'Content-type': 'application/json', 'Authorization': 'Basic %s' % authorization}
@@ -4483,7 +4528,8 @@ class RestConnection(object):
     def get_all_eventing_stats(self, seqs_processed=False, eventing_map=None):
         if eventing_map is None:
             eventing_map = {}
-        authorization = base64.encodestring('%s:%s' % (self.username, self.password))
+        authorization = base64.encodestring(('%s:%s' % (self.username, self.password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         if seqs_processed:
             url = "api/v1/stats?type=full"
         else:
@@ -4499,7 +4545,8 @@ class RestConnection(object):
             Cleanup eventing 
     '''
     def cleanup_eventing(self):
-        authorization = base64.encodestring('%s:%s' % (self.username, self.password))
+        authorization = base64.encodestring(('%s:%s' % (self.username, self.password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         url = "cleanupEventing"
         api = self.eventing_baseUrl + url
         headers = {'Content-type': 'application/json', 'Authorization': 'Basic %s' % authorization}
@@ -4512,7 +4559,8 @@ class RestConnection(object):
                enable debugger
     '''
     def enable_eventing_debugger(self):
-        authorization = base64.encodestring('%s:%s' % (self.username, self.password))
+        authorization = base64.encodestring(('%s:%s' % (self.username, self.password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         url = "_p/event/api/v1/config"
         api = self.baseUrl + url
         headers = {'Content-type': 'application/json', 'Authorization': 'Basic %s' % authorization}
@@ -4527,7 +4575,8 @@ class RestConnection(object):
     '''
 
     def disable_eventing_debugger(self):
-        authorization = base64.encodestring('%s:%s' % (self.username, self.password))
+        authorization = base64.encodestring(('%s:%s' % (self.username, self.password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         url = "_p/event/api/v1/config"
         api = self.baseUrl + url
         headers = {'Content-type': 'application/json', 'Authorization': 'Basic %s' % authorization}
@@ -4541,7 +4590,8 @@ class RestConnection(object):
             Start debugger
     '''
     def start_eventing_debugger(self, name):
-        authorization = base64.encodestring('%s:%s' % (self.username, self.password))
+        authorization = base64.encodestring(('%s:%s' % (self.username, self.password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         url="/pools/default"
         api = self.baseUrl + url
         headers = {'Content-type': 'application/json', 'Authorization': 'Basic %s' % authorization}
@@ -4558,7 +4608,8 @@ class RestConnection(object):
             Stop debugger
     '''
     def stop_eventing_debugger(self, name):
-        authorization = base64.encodestring('%s:%s' % (self.username, self.password))
+        authorization = base64.encodestring(('%s:%s' % (self.username, self.password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         url = "_p/event/stopDebugger/?name=" + name
         api = self.baseUrl + url
         headers = {'Content-type': 'application/json', 'Authorization': 'Basic %s' % authorization}
@@ -4571,7 +4622,8 @@ class RestConnection(object):
             Get debugger url
     '''
     def get_eventing_debugger_url(self, name):
-        authorization = base64.encodestring('%s:%s' % (self.username, self.password))
+        authorization = base64.encodestring(('%s:%s' % (self.username, self.password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         url = "_p/event/getDebuggerUrl/?name=" + name
         api = self.baseUrl + url
         headers = {'Content-type': 'application/json', 'Authorization': 'Basic %s' % authorization}
@@ -4581,7 +4633,8 @@ class RestConnection(object):
         return content
 
     def create_function(self, name, body):
-        authorization = base64.encodestring('%s:%s' % (self.username, self.password))
+        authorization = base64.encodestring(('%s:%s' % (self.username, self.password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         url = "api/v1/functions/" + name
         api = self.eventing_baseUrl + url
         headers = {'Content-type': 'application/json', 'Authorization': 'Basic %s' % authorization}
@@ -4592,7 +4645,8 @@ class RestConnection(object):
         return content
 
     def update_function(self, name, body):
-        authorization = base64.encodestring('%s:%s' % (self.username, self.password))
+        authorization = base64.encodestring(('%s:%s' % (self.username, self.password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         url = "api/v1/functions/" + name
         api = self.eventing_baseUrl + url
         headers = {'Content-type': 'application/json', 'Authorization': 'Basic %s' % authorization}
@@ -4604,7 +4658,8 @@ class RestConnection(object):
         return content
 
     def get_function_details(self, name):
-        authorization = base64.encodestring('%s:%s' % (self.username, self.password))
+        authorization = base64.encodestring(('%s:%s' % (self.username, self.password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         url = "api/v1/functions/" + name
         api = self.eventing_baseUrl + url
         headers = {'Content-type': 'application/json', 'Authorization': 'Basic %s' % authorization}
@@ -4614,7 +4669,8 @@ class RestConnection(object):
         return content
 
     def get_eventing_go_routine_dumps(self):
-        authorization = base64.encodestring('%s:%s' % (self.username, self.password))
+        authorization = base64.encodestring(('%s:%s' % (self.username, self.password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         url = "debug/pprof/goroutine?debug=1"
         api = self.eventing_baseUrl + url
         headers = {'Content-type': 'application/json', 'Authorization': 'Basic %s' % authorization}
@@ -4624,7 +4680,8 @@ class RestConnection(object):
         return content
 
     def set_eventing_retry(self, name, body):
-        authorization = base64.encodestring('%s:%s' % (self.username, self.password))
+        authorization = base64.encodestring(('%s:%s' % (self.username, self.password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         url = "api/v1/functions/" + name + "/retry"
         api = self.eventing_baseUrl + url
         headers = {'Content-type': 'application/json', 'Authorization': 'Basic %s' % authorization}
@@ -4671,7 +4728,8 @@ class RestConnection(object):
         return content
 
     def get_retry_rebalance_settings(self):
-        authorization = base64.encodestring('%s:%s' % (self.username, self.password))
+        authorization = base64.encodestring(('%s:%s' % (self.username, self.password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         url = "settings/retryRebalance"
         api = self.baseUrl + url
         headers = {'Content-type': 'application/json', 'Authorization': 'Basic %s' % authorization}
@@ -4682,7 +4740,8 @@ class RestConnection(object):
         return content
 
     def get_pending_rebalance_info(self):
-        authorization = base64.encodestring('%s:%s' % (self.username, self.password))
+        authorization = base64.encodestring(('%s:%s' % (self.username, self.password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         url = "pools/default/pendingRetryRebalance"
         api = self.baseUrl + url
         headers = {'Content-type': 'application/json', 'Authorization': 'Basic %s' % authorization}
@@ -4693,7 +4752,8 @@ class RestConnection(object):
         return content
 
     def cancel_pending_rebalance(self, id):
-        authorization = base64.encodestring('%s:%s' % (self.username, self.password))
+        authorization = base64.encodestring(('%s:%s' % (self.username, self.password)).encode()).decode()
+        authorization=authorization.rstrip('\n')
         url = "controller/cancelRebalanceRetry/" + str(id)
         api = self.baseUrl + url
         headers = {'Content-type': 'application/json', 'Authorization': 'Basic %s' % authorization}

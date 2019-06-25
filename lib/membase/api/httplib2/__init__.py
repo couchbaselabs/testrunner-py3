@@ -383,7 +383,7 @@ def _updateCache(request_headers, response_headers, content, cache, cachekey):
         if 'no-store' in cc or 'no-store' in cc_response:
             cache.delete(cachekey)
         else:
-            info = email.Message.Message()
+            info = email.message.EmailMessage()
             for key, value in response_headers.items():
                 if key not in ['status', 'content-encoding', 'transfer-encoding']:
                     info[key] = value
@@ -752,6 +752,7 @@ class HTTPConnectionWithTimeout(http.client.HTTPConnection):
         """Connect to the host and port specified in __init__."""
         # Mostly verbatim from httplib.py.
         msg = "getaddrinfo returns an empty list"
+       
         for res in socket.getaddrinfo(self.host, self.port, 0,
                                       socket.SOCK_STREAM):
             af, socktype, proto, canonname, sa = res
@@ -775,9 +776,9 @@ class HTTPConnectionWithTimeout(http.client.HTTPConnection):
                     self.sock.close()
                 self.sock = None
                 continue
+            if not self.sock:
+              raise socket.error(msg)
             break
-        if not self.sock:
-            raise socket.error(msg)
 
 
 class HTTPSConnectionWithTimeout(http.client.HTTPSConnection):
@@ -1013,7 +1014,8 @@ a string that contains the response entity body.
 
             if 'user-agent' not in headers:
                 headers['user-agent'] = "Python-httplib2/%s" % __version__
-
+            
+            print("-->uri:{}".format(uri))
             uri = iri2uri(uri)
 
             (scheme, authority, request_uri, defrag_uri) = urlnorm(uri)
@@ -1037,7 +1039,7 @@ a string that contains the response entity body.
             if method in ["GET", "HEAD"] and 'range' not in headers:
                 headers['accept-encoding'] = 'compress, gzip'
 
-            info = email.Message.Message()
+            info = email.message.EmailMessage()
             cached_value = None
             if self.cache:
                 cachekey = defrag_uri
@@ -1179,7 +1181,7 @@ class Response(dict):
             self['status'] = str(self.status)
             self.reason = info.reason
             self.version = info.version
-        elif isinstance(info, email.Message.Message):
+        elif isinstance(info, email.message.EmailMessage):
             for key, value in list(info.items()):
                 self[key] = value
             self.status = int(self['status'])
