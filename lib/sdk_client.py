@@ -3,7 +3,7 @@
 Python based SDK client interface
 
 """
-from . import crc32
+import crc32
 import time
 from couchbase import FMT_AUTO
 from .memcached.helper.old_kvstore import ClientKeyValueStore
