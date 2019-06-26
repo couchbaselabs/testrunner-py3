@@ -123,7 +123,7 @@ class MemcachedClient(object):
         _, w, _ = select.select([], [self.s], [], self.timeout)
         if w:
             self.log.info("--->_sendMsg:{},{},{},{},{}".format(type(msg),type(extraHeader),type(key),type(val),type(extended_meta_data)))
-            self.s.send(msg + extraHeader + key + val + extended_meta_data)
+            self.s.send((str(msg) + extraHeader + key + val + extended_meta_data).encode())
         else:
             raise exceptions.EOFError("Timeout waiting for socket send. from {0}".format(self.host))
 
@@ -138,14 +138,14 @@ class MemcachedClient(object):
                 data = self.s.recv(MIN_RECV_PACKET - len(response))
                 if data == '':
                     raise exceptions.EOFError("Got empty data (remote died?). from {0}".format(self.host))
-                response += data
+                response += str(data)
             else:
                 raise exceptions.EOFError("Timeout waiting for socket recv. from {0}".format(self.host))
 
         assert len(response) == MIN_RECV_PACKET
 
         # Peek at the magic so we can support alternative-framing
-        magic = struct.unpack(">B", response[0:1])[0]
+        magic = struct.unpack(">B".encode(), response.encode()[0:1])[0]
         assert (magic in (RES_MAGIC_BYTE, REQ_MAGIC_BYTE, ALT_RES_MAGIC_BYTE, ALT_REQ_MAGIC_BYTE)), "Got magic: 0x%x" % magic
 
         cmd = 0
