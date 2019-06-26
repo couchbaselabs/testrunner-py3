@@ -53,7 +53,7 @@ class SimpleRequests(BaseTestCase):
         self.assertTrue(passed, msg="some GET requests failed. See logs above")
 
         _, content, _ = rest._http_request(rest.baseUrl + "sasl_logs")
-        occurrences = [m.start() for m in re.finditer('web request failed', content)]
+        occurrences = [m.start() for m in re.finditer('web request failed', str(content))]
         for occurrence in occurrences:
             subcontent = content[occurrence - 1000: occurrence + 1000]
             if 'path,"/diag"' in subcontent:

@@ -271,7 +271,7 @@ class MemcachedClientHelper(object):
 
     @staticmethod
     def create_value(pattern, size):
-        return (pattern * (size / len(pattern))) + pattern[0:(size % len(pattern))]
+        return (pattern * (size // len(pattern))) + pattern[0:(size % len(pattern))]
 
     @staticmethod
     def random_pick(list):

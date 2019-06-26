@@ -939,18 +939,19 @@ the same interface as FileCache."""
             if self.follow_redirects and response.status in [300, 301, 302, 303, 307]:
                 # Pick out the location header and basically start from the beginning
                 # remembering first to strip the ETag header and decrement our 'depth'
+                print("-->redirections: {}:{},{}:{}".format(type(response),response,type(content),content))
                 if redirections:
-                    if 'location' not in response and response.status != 300:
+                    if 'Location' not in response and response.status != 300:
                         raise RedirectMissingLocation(_("Redirected but the response is missing a Location: header."),
                                                       response, content)
                         # Fix-up relative redirects (which violate an RFC 2616 MUST)
-                    if 'location' in response:
-                        location = response['location']
+                    if 'Location' in response:
+                        location = response['Location']
                         (scheme, authority, path, query, fragment) = parse_uri(location)
                         if authority == None:
                             response['location'] = urllib.parse.urljoin(absolute_uri, location)
                     if response.status == 301 and method in ["GET", "HEAD"]:
-                        response['-x-permanent-redirect-url'] = response['location']
+                        response['-x-permanent-redirect-url'] = response['Location']
                         if 'content-location' not in response:
                             response['content-location'] = absolute_uri
                         _updateCache(headers, response, content, self.cache, cachekey)
@@ -958,8 +959,8 @@ the same interface as FileCache."""
                         del headers['if-none-match']
                     if 'if-modified-since' in headers:
                         del headers['if-modified-since']
-                    if 'location' in response:
-                        location = response['location']
+                    if 'Location' in response:
+                        location = response['Location']
                         old_response = copy.deepcopy(response)
                         if 'content-location' not in old_response:
                             old_response['content-location'] = absolute_uri

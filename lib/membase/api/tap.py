@@ -4,7 +4,7 @@ tap protocol client.
 
 Copyright (c) 2010  Dustin Sallings <dustin@spy.net>
 """
-import exceptions
+import builtins as exceptions
 
 import sys
 import socket
