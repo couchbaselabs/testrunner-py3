@@ -29,6 +29,7 @@ from scripts.measure_sched_delays import SchedDelays
 from scripts.getcoredumps import Getcoredumps, Clearcoredumps
 import signal
 import shutil
+import traceback
 
 
 def usage(err=None):
@@ -405,14 +406,14 @@ def main():
                                              " Check testrunner logs folder.")]
                             print("FAIL: New core dump(s) was found and collected")
             except AttributeError as ex:
-                traceback.print_exec()
+                traceback.format_exc()
                 pass
         try:
             suite = unittest.TestLoader().loadTestsFromName(name)
         except AttributeError as e:
             print("Test {0} was not found: {1}".format(name, e))
             result = unittest.TextTestRunner(verbosity=2)._makeResult()
-            result.errors = [(name, e.message)]
+            result.errors = [(name, str(e))]
         except SyntaxError as e:
             print("SyntaxError in {0}: {1}".format(name, e))
             result = unittest.TextTestRunner(verbosity=2)._makeResult()
@@ -520,12 +521,12 @@ def main():
 
     # terminate any non main thread - these were causing hangs
     for t in threading.enumerate():
-        if t.name != 'MainThread':
+        if t.name != 'MainThread' and t.isAlive():
             print('Thread', t.name, 'was not properly terminated, will be terminated now.')
             if hasattr(t, 'shutdown'):
                 t.shutdown(True)
             else:
-                t._Thread__stop()
+                t._stop()
 
 
 def watcher():

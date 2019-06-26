@@ -123,7 +123,7 @@ class auditTest(BaseTestCase):
 
         elif (ops in ['flush']):
             expectedResults = {'bucket_name':'TestBucket', 'ram_quota':100, 'num_replicas':1, 'replica_index':True, 'eviction_policy':'value_only', 'type':'membase', \
-			    'auth_type':'sasl', "autocompaction":'false', "purge_interval":"undefined", "flush_enabled":True, "num_threads":3, "source":source, \
+           'auth_type':'sasl', "autocompaction":'false', "purge_interval":"undefined", "flush_enabled":True, "num_threads":3, "source":source, \
                                "user":user, "ip":self.ipAddress, "port":57457,'storage_mode':'couchstore'}
             rest.create_bucket(expectedResults['bucket_name'], expectedResults['ram_quota'], expectedResults['auth_type'], 'password', expectedResults['num_replicas'], \
                                '11211', 'membase', 1, expectedResults['num_threads'], 1, 'valueOnly')
@@ -393,14 +393,14 @@ class auditTest(BaseTestCase):
         source = 'ns_server'
         user = self.master.rest_username
         rest = RestConnection(self.master)
-	shell = RemoteMachineShellConnection(self.master)
-	os_type = shell.extract_remote_info().distribution_type
-	if (os_type == 'Windows'):
-            currentPath = "c:/Program Files/Couchbase/Server/var/lib/couchbase/data"
-            newPath = "C:/tmp"
+        shell = RemoteMachineShellConnection(self.master)
+        os_type = shell.extract_remote_info().distribution_type
+        if (os_type == 'Windows'):
+          currentPath = "c:/Program Files/Couchbase/Server/var/lib/couchbase/data"
+          newPath = "C:/tmp"
         else:
-	    currentPath = '/opt/couchbase/var/lib/couchbase/data'
-	    newPath = "/tmp"
+          currentPath = '/opt/couchbase/var/lib/couchbase/data'
+          newPath = "/tmp"
 
         if (ops == 'indexPath'):
             try:
@@ -464,8 +464,8 @@ class auditTest(BaseTestCase):
     def test_checkCreateBucketCluster(self):
         ops = self.input.param("ops", None)
         source = 'ns_server'
-	#auditTemp = audit(host=self.master)
-	#auditTemp.setAuditEnable('true')
+        #auditTemp = audit(host=self.master)
+        #auditTemp.setAuditEnable('true')
         for server in self.servers:
             user = server.rest_username
             rest = RestConnection(server)
@@ -484,13 +484,13 @@ class auditTest(BaseTestCase):
         ops = self.input.param("ops", None)
         nodesOut = self.input.param("nodes_out", 1)
         source = 'ns_server'
-	user = self.master.rest_username
+        user = self.master.rest_username
 
         firstNode = self.servers[0]
         secondNode = self.servers[1]
         auditFirstNode = audit(host=firstNode)
         auditFirstNode.setAuditEnable('true')
-	auditSecondNode = audit(host=secondNode)
+        auditSecondNode = audit(host=secondNode)
 
         origState = auditFirstNode.getAuditStatus()
         origLogPath = auditFirstNode.getAuditLogPath()
@@ -586,7 +586,7 @@ class auditTest(BaseTestCase):
         os_type = shell.extract_remote_info().distribution_type
         log.info ("OS type is {0}".format(os_type))
         if os_type == 'windows':
-     	     command = "%smcstat.exe" % (testconstants.WIN_COUCHBASE_BIN_PATH_RAW)
+          command = "%smcstat.exe" % (testconstants.WIN_COUCHBASE_BIN_PATH_RAW)
         else:
              command = "%smcstat" % (testconstants.LINUX_COUCHBASE_BIN_PATH)
 
