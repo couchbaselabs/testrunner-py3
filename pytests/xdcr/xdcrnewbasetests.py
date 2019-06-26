@@ -3612,7 +3612,7 @@ class XDCRNewBaseTest(unittest.TestCase):
                 return 0
         except Exception as e:
             self.fail(
-                "Errors encountered while executing query {0} on {1} : {2}".format(query, server, e.message))
+                "Errors encountered while executing query {0} on {1} : {2}".format(query, server, str(e)))
 
     def _create_index(self, server, bucket):
         query_check_index_exists = "SELECT COUNT(*) FROM system:indexes " \

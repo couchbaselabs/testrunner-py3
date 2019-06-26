@@ -233,7 +233,7 @@ class BaseUITestCase(unittest.TestCase):
             try:
                 reb_status = rest._rebalance_progress_status()
             except ValueError as e:
-                if e.message == 'No JSON object could be decoded':
+                if str(e) == 'No JSON object could be decoded':
                     print("cluster not initialized!!!")
                     return
             if reb_status == 'running':

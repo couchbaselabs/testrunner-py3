@@ -417,7 +417,7 @@ def main():
         except SyntaxError as e:
             print("SyntaxError in {0}: {1}".format(name, e))
             result = unittest.TextTestRunner(verbosity=2)._makeResult()
-            result.errors = [(name, e.message)]
+            result.errors = [(name, str(e))]
         else:
             test_timeout = TestInputSingleton.input.param("test_timeout", None)
             t = StoppableThreadWithResult(target=unittest.TextTestRunner(verbosity=2).run,

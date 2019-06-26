@@ -1,7 +1,7 @@
 import json
 from memcached.helper.data_helper import MemcachedClientHelper
 from membase.api.rest_client import RestConnection
-from .basetestcase import BaseTestCase
+from basetestcase import BaseTestCase
 from couchbase_helper.document import View
 from couchbase_helper.documentgenerator import BlobGenerator
 from remote.remote_util import RemoteMachineShellConnection

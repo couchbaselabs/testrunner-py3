@@ -80,7 +80,7 @@ class DCPRollBack(DCPBase):
                 except MemcachedError as e:
                     if self.bucket_type == 'ephemeral':
                         self.assertTrue(
-                            "Memcached error #4 'Invalid':  Flusher not running. for vbucket :0 to mc " in e.message)
+                            "Memcached error #4 'Invalid':  Flusher not running. for vbucket :0 to mc " in str(e))
                         return
                     else:
                         raise
@@ -158,7 +158,7 @@ class DCPRollBack(DCPBase):
                     client.stop_persistence()
                 except MemcachedError as e:
                     if self.bucket_type == 'ephemeral':
-                        self.assertTrue("Memcached error #4 'Invalid':  Flusher not running. for vbucket :0 to mc " in e.message)
+                        self.assertTrue("Memcached error #4 'Invalid':  Flusher not running. for vbucket :0 to mc " in str(e))
                         return
                     else:
                         raise

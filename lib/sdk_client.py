@@ -690,7 +690,7 @@ class SDKBasedKVStoreAwareSmartClient(SDKSmartClient):
                 raise MemcachedError(7, "Invalid cas value")
         except Exception as e:
             self._rlock.release()
-            raise MemcachedError(7, e.message)
+            raise MemcachedError(7, str(e))
 
     def get_valid_key(self, key):
         return self.get_key_check_status(key, "valid")

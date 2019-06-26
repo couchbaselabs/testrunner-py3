@@ -487,7 +487,7 @@ class CBASBaseTest(BaseTestCase):
             else:
                 self.log.info("********* No buckets to drop *********")
         except Exception as e:
-            self.log.info(e.message)
+            self.log.info(str(e))
 
     def perform_doc_ops_in_all_cb_buckets(self, num_items, operation, start_key=0, end_key=1000):
         """
@@ -508,7 +508,7 @@ class CBASBaseTest(BaseTestCase):
             self._load_all_buckets(self.master, gen_load, operation, 0)
             self._verify_stats_all_buckets(self.input.servers)
         except Exception as e:
-            self.log.info(e.message)
+            self.log.info(str(e))
 
     def get_num_items_in_cbas_dataset(self, dataset_name):
         """

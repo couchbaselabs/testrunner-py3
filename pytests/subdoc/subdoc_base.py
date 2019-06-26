@@ -127,7 +127,7 @@ class SubdocBaseTest(BaseTestCase):
             "1_d_a": ["abcdefghijklmnoprestuvxyz", 1, 1.1, ""],
             "2_d_a": [[1, 2, 3], ["", -1, 1, 1.1, -1.1]]
         }
-    	return json
+        return json
 
     def generate_path(self, level, key):
         path = key

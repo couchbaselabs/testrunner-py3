@@ -2340,7 +2340,7 @@ class ViewCreateTask(Task):
                 self._check_ddoc_replication_on_nodes()
 
         except QueryViewException as e:
-            if e.message.find('not_found') or e.message.find('view_undefined') > -1:
+            if str(e).find('not_found') or str(e).find('view_undefined') > -1:
                 task_manager.schedule(self, 2)
             else:
                 self.state = FINISHED
@@ -3315,7 +3315,7 @@ class MonitorViewFragmentationTask(Task):
                 print((str(e)))
                 if "Error occured reading set_view _info" in str(e) and with_rebalance:
                     print(("node {0} {1} is not ready yet?: {2}".format(
-                                    node.id, node.port, e.message)))
+                                    node.id, node.port, str(e))))
                 else:
                     raise e
             if status:

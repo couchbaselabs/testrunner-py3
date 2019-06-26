@@ -1476,7 +1476,7 @@ class KVStoreAwareSmartClient(VBucketAwareMemcached):
                 raise MemcachedError(7, "Invalid cas value")
         except Exception as e:
             self._rlock.release()
-            raise MemcachedError(7, e.message)
+            raise MemcachedError(7, str(e))
 
     def get_valid_key(self, key, collection=None):
         return self.get_key_check_status(key, "valid", collection=collection)

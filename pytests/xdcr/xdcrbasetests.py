@@ -128,7 +128,7 @@ class XDCRBaseTest(unittest.TestCase):
                 [st_thread.start() for st_thread in self.__stats_threads]
                 self._log_start(self)
         except Exception as e:
-            self.log.error(e.message)
+            self.log.error(str(e))
             self.log.error("Error while setting up clusters: %s", sys.exc_info())
             self._cleanup_broken_setup()
             raise

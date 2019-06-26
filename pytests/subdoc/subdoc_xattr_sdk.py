@@ -168,7 +168,7 @@ class SubdocXattrSdkTest(SubdocBaseTest):
             self.client.mutate_in(k, SD.upsert('f' * 16, 2, create_parents=True, xattr=True))
             self.fail("xattr with the key in 16 chars should not be able to create")
         except Exception as e:
-            self.assertEqual("Operational Error", e.message)
+            self.assertEqual("Operational Error", str(e))
             self.assertEqual("The server replied with an unrecognized status code. "
                               "A newer version of this library may be able to decode it",
                               e.result.errstr)
@@ -211,7 +211,7 @@ class SubdocXattrSdkTest(SubdocBaseTest):
                 self.log.error("xattr %s value: %s" % (key, rv[key]))
                 self.fail("key shouldn't start from " + ch)
             except Exception as e:
-                self.assertEqual("Operational Error", e.message)
+                self.assertEqual("Operational Error", str(e))
 
     def test_key_inside_characters_negative(self):
         k = 'xattrs'
@@ -227,8 +227,8 @@ class SubdocXattrSdkTest(SubdocBaseTest):
                 self.log.error("xattr %s value: %s" % (key, rv[key]))
                 self.fail("key must not contain a character: " + ch)
             except Exception as e:
-                print(e.message)
-                self.assertTrue(e.message in ['Subcommand failure',
+                print(str(e))
+                self.assertTrue(str(e) in ['Subcommand failure',
                                               'key must not contain a character: ;'])
 
     def test_key_inside_characters_positive(self):
@@ -322,7 +322,7 @@ class SubdocXattrSdkTest(SubdocBaseTest):
                                                     xattr=True,
                                                     create_parents=True), _access_deleted=True)
         except Exception as e:
-            self.assertEqual("couldn't parse arguments", e.message)
+            self.assertEqual("couldn't parse arguments", str(e))
 
     def test_delete_doc_without_xattr(self):
         k = 'xattrs'
@@ -988,7 +988,7 @@ class SubdocXattrSdkTest(SubdocBaseTest):
             try:
                 self.client.lookup_in(k, SD.exists(vxattr, xattr=True))
             except Exception as e:
-                self.assertEqual(e.message, 'Operational Error')
+                self.assertEqual(str(e), 'Operational Error')
                 self.assertEqual(e.result.errstr,
                                  'The server replied with an unrecognized status code. '
                                  'A newer version of this library may be able to decode it')
@@ -1005,7 +1005,7 @@ class SubdocXattrSdkTest(SubdocBaseTest):
         try:
             self.client.mutate_in(k, SD.upsert('$document', {'value': 1}, xattr=True))
         except Exception as e:
-            self.assertEqual(e.message, 'Operational Error')
+            self.assertEqual(str(e), 'Operational Error')
             self.assertEqual(e.result.errstr,
                              'The server replied with an unrecognized status code. '
                              'A newer version of this library may be able to decode it')
@@ -1022,7 +1022,7 @@ class SubdocXattrSdkTest(SubdocBaseTest):
         try:
             self.client.lookup_in(k, SD.remove('$document', xattr=True))
         except Exception as e:
-            self.assertEqual(e.message, 'Operational Error')
+            self.assertEqual(str(e), 'Operational Error')
             self.assertEqual(e.result.errstr,
                              'The server replied with an unrecognized status code. '
                              'A newer version of this library may be able to decode it')
@@ -1784,7 +1784,7 @@ class XattrUpgradeTests(NewUpgradeBaseTest, SubdocBaseTest):
         try:
             self._check_insert()
         except Exception as e:
-            self.assertEqual('Operational Error', e.message)
+            self.assertEqual('Operational Error', str(e))
             self.assertEqual(61, e.rc)
 
         self.initial_version = self.upgrade_versions[0]
@@ -1806,7 +1806,7 @@ class XattrUpgradeTests(NewUpgradeBaseTest, SubdocBaseTest):
         try:
             self._check_insert()
         except Exception as e:
-            self.assertEqual('Operational Error', e.message)
+            self.assertEqual('Operational Error', str(e))
             self.assertEqual(19, e.rc)
 
         servers_result = list((set(self.servers[:self.nodes_init]) | set(servs_in)) - set(servs_out))

@@ -51,7 +51,7 @@ class XDCRAdvFilterTests(XDCRNewBaseTest):
             self.sleep(30, "Waiting for docs to be loaded")
         except Exception as e:
             self.fail(
-                "Errors encountered while loading data: {0}".format(e.message))
+                "Errors encountered while loading data: {0}".format(str(e)))
 
     def verify_results(self):
         rdirection = self._input.param("rdirection", "unidirection")
