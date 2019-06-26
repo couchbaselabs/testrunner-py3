@@ -239,14 +239,14 @@ class RestConnection(object):
         if int(port) in range(9091, 9100):
             # return elastic search rest connection
             from membase.api.esrest_client import EsRestConnection
-            log.info("--> calling object.__new__(EsRestConnection,serverInfo)")
+            #log.info("--> calling object.__new__(EsRestConnection,serverInfo)")
             obj = super(EsRestConnection,cls).__new__(cls)
         else:
             # default
-            log.info("-->default")
+            #log.info("-->default")
             obj = object.__new__(cls)
               
-        log.info("obj={}".format(vars(obj)))
+        #log.info("obj={}".format(vars(obj)))
         return obj
 
     def __init__(self, serverInfo):

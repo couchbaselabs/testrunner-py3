@@ -43,6 +43,15 @@ from scripts.collect_server_info import cbcollectRunner
 
 
 class BaseTestCase(unittest.TestCase):
+    def suite_setUp(self):
+        self.log.info("==============  BaseTestCase suite_setup has started ==============")
+        self.log.info("==============  BaseTestCase suite_setup has completed ==============")
+
+    def suite_tearDown(self):
+        self.log.info("==============  BaseTestCase suite_teardown has started ==============")
+        self.log.info("==============  BaseTestCase suite_teardown has completed ==============")
+
+
     def setUp(self):
         self.log = logger.Logger.get_logger()
         self.input = TestInputSingleton.input
@@ -2731,7 +2740,7 @@ class BaseTestCase(unittest.TestCase):
         remote = RemoteMachineShellConnection(self.master)
         output, error = remote.enable_diag_eval_on_non_local_hosts()
         if output is not None:
-            if "ok" not in output:
+            if "ok" not in str(output):
                 self.log.error("Error in enabling diag/eval on non-local hosts on {}: Error: {}".format(self.master.ip, error))
                 raise Exception("Error in enabling diag/eval on non-local hosts on {}: Error: {}".format(self.master.ip, error))
             else:

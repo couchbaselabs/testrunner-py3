@@ -239,9 +239,10 @@ def get_cbcollect_info(input, path):
         print("grabbing cbcollect from {0}".format(server.ip))
         path = path or "."
         try:
+            print("-->get_cbcollect_info: {}:{},{}:{}".format(type(server),server,type(path),path))
             cbcollectRunner(server, path).run()
         except Exception as e:
-            print("NOT POSSIBLE TO GRAB CBCOLLECT FROM {0}: {1}".format(server.ip, e))
+            print("NOT POSSIBLE TO GRAB CBCOLLECT FROM {0}: {1}".format(str(server.ip), e))
 
 def get_couch_dbinfo(input, path):
     for server in input.servers:
@@ -392,7 +393,9 @@ def main():
             try:
                 print("Run before suite setup for %s" % name)
                 suite = unittest.TestLoader().loadTestsFromName(before_suite_name)
+                print("-->before_suite_name:{},suite: {}".format(before_suite_name,suite))
                 result = unittest.TextTestRunner(verbosity=2).run(suite)
+                print("-->result: {}".format(result))
                 if "get-coredumps" in TestInputSingleton.input.test_params:
                     if TestInputSingleton.input.param("get-coredumps", True):
                         if get_core_dumps(TestInputSingleton.input, logs_folder):
@@ -402,6 +405,7 @@ def main():
                                              " Check testrunner logs folder.")]
                             print("FAIL: New core dump(s) was found and collected")
             except AttributeError as ex:
+                traceback.print_exec()
                 pass
         try:
             suite = unittest.TestLoader().loadTestsFromName(name)

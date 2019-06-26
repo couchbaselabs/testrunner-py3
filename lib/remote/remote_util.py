@@ -4864,7 +4864,9 @@ class RemoteMachineShellConnection:
         if (not is_cluster_compatible):
             log.info("Enabling diag/eval on non-local hosts is available only post 5.5.2 or 6.0 releases")
             return None, "Enabling diag/eval on non-local hosts is available only post 5.5.2 or 6.0 releases"
+        log.info("-->command start: {}".format(command))
         output, error = self.execute_command(command)
+        log.info("-->command end: {}, {}, {}".format(command,output,error))
         return output, error
 
 
