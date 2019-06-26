@@ -1,6 +1,6 @@
 import logger
 
-from .basetestcase import BaseTestCase
+from basetestcase import BaseTestCase
 from remote.remote_util import RemoteUtilHelper
 from couchbase_helper.document import View
 

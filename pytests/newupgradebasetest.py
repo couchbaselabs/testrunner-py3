@@ -6,7 +6,7 @@ import sys
 import traceback
 import queue
 from threading import Thread
-from .basetestcase import BaseTestCase
+from basetestcase import BaseTestCase
 from mc_bin_client import MemcachedError
 from memcached.helper.data_helper import VBucketAwareMemcached, MemcachedClientHelper
 from membase.helper.bucket_helper import BucketOperationHelper
