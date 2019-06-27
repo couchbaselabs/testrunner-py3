@@ -221,10 +221,13 @@ def get_server_logs(input, path):
             print("downloaded and zipped diags @ : {0}".format("{0}.gz".format(filename)))
         except urllib.error.URLError:
             print("unable to obtain diags from %s" % diag_url)
+            traceback.print_exc()
         except BadStatusLine:
             print("unable to obtain diags from %s" % diag_url)
+            traceback.print_exc()
         except Exception as e:
             print("unable to obtain diags from %s %s" % (diag_url, e))
+            traceback.print_exc()
 
 def get_logs_cluster_run(input, path, ns_server_path):
     print("grabbing logs (cluster-run)")
@@ -243,7 +246,8 @@ def get_cbcollect_info(input, path):
             print("-->get_cbcollect_info: {}:{},{}:{}".format(type(server),server,type(path),path))
             cbcollectRunner(server, path).run()
         except Exception as e:
-            print("NOT POSSIBLE TO GRAB CBCOLLECT FROM {0}: {1}".format(str(server.ip), e))
+            print("NOT POSSIBLE TO GRAB CBCOLLECT FROM {0}: {1}".format(server.ip, str(e)))
+            traceback.print_exc()
 
 def get_couch_dbinfo(input, path):
     for server in input.servers:
@@ -406,7 +410,7 @@ def main():
                                              " Check testrunner logs folder.")]
                             print("FAIL: New core dump(s) was found and collected")
             except AttributeError as ex:
-                traceback.format_exc()
+                traceback.print_exc()
                 pass
         try:
             suite = unittest.TestLoader().loadTestsFromName(name)

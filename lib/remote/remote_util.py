@@ -3260,7 +3260,7 @@ class RemoteMachineShellConnection:
             channel.exec_command(command)
             data = channel.recv(1024)
             while data:
-                temp += data
+                temp += str(data)
                 data = channel.recv(1024)
             channel.close()
             stdin.close()
