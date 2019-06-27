@@ -206,7 +206,7 @@ def get_server_logs(input, path):
             filename = "{0}/{1}-diag.txt".format(path, server.ip)
             page = urllib.request.urlopen(req)
             with open(filename, 'wb') as output:
-                os.write(1, "downloading {0} ...".format(str(server.ip)))
+                os.write(1, "downloading {0} ...".format(str(server.ip)).encode())
                 while True:
                     buffer = page.read(65536)
                     if not buffer:
