@@ -816,11 +816,15 @@ class RestConnection(object):
                 'Authorization': 'Basic %s' % authorization}
 
     def _get_auth(self, headers):
+        log.info("-->_get_auth {}:{}".format(type(headers),headers))
         key = 'Authorization'
-        if key in headers:
+        try:
+          if key in headers:
             val = headers[key]
             if val.startswith("Basic "):
                 return str("auth: " + base64.decodestring(val[6:]))
+        except Exception as e:
+            print(e)
         return ""
 
     def _http_request(self, api, method='GET', params='', headers=None, timeout=120):
@@ -848,11 +852,9 @@ class RestConnection(object):
                     if "error" in json_parsed:
                         reason = json_parsed["error"]
                     #log.info("--->content {}:{}".format(type(content),content))
-                    #message = '{0} {1} body: {2} headers: {3} error: {4} reason: {5} {6} {7}'.\
-                    #          format(method, api, params, headers, response['status'], reason,
-                    #                 str(content.rstrip('\n')), self._get_auth(headers))
-                    message = '{0} {1} body: {2} headers: {3} error: {4} reason: {5}'.\
-                              format(method, api, params, headers, response['status'], reason)
+                    message = '{0} {1} body: {2} headers: {3} error: {4} reason: {5} {6} {7}'.\
+                              format(method, api, params, headers, response['status'], reason,
+                                     str(content).rstrip('\n'), self._get_auth(headers))
                     log.error(message)
                     log.debug(''.join(traceback.format_stack()))
                     return False, content, response
