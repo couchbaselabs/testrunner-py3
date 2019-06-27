@@ -50,6 +50,7 @@ class MemcachedError(exceptions.Exception):
     def __init__(self, status, msg=None):
         error_msg = error_to_str(status)
         supermsg = 'Memcached error #' + repr(status) + ' ' + repr(error_msg)
+        msg = str(msg)
         if msg: supermsg += ":  " + msg
         exceptions.Exception.__init__(self, supermsg)
 
@@ -932,7 +933,7 @@ class MemcachedClient(object):
 
     def _set_vbucket(self, key, vbucket= -1, collection=None):
         if vbucket < 0:
-            self.vbucketId = (((zlib.crc32(key)) >> 16) & 0x7fff) & (self.vbucket_count - 1)
+            self.vbucketId = (((zlib.crc32(key.encode())) >> 16) & 0x7fff) & (self.vbucket_count - 1)
         else:
             self.vbucketId = vbucket
 

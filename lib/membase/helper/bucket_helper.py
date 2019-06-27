@@ -369,7 +369,7 @@ class BucketOperationHelper():
                 client.vbucketId = vbucketId
                 flag, keyx, value = client.get(key=key, collection=collection)
                 if value_equal_to_key:
-                    test.assertEqual(value, key, msg='values dont match')
+                    test.assertEqual(value.decode(), key, msg='values dont match')
                 if verify_flags:
                     actual_flag = socket.ntohl(flag)
                     expected_flag = ctypes.c_uint32(zlib.adler32(value)).value
@@ -510,7 +510,7 @@ class BucketOperationHelper():
         log.info("fill_space {0}".format(fill_space))
         # each packet can be 10 KB
         packetSize = int(10 * 1024)
-        number_of_buckets = int(fill_space) / packetSize
+        number_of_buckets = int(fill_space) // packetSize
         log.info('packetSize: {0}'.format(packetSize))
         log.info('memory usage before key insertion : {0}'.format(info.stats.memUsed))
         log.info('inserting {0} new keys to memcached @ {0}'.format(number_of_buckets, serverInfo.ip))

@@ -939,7 +939,7 @@ the same interface as FileCache."""
             if self.follow_redirects and response.status in [300, 301, 302, 303, 307]:
                 # Pick out the location header and basically start from the beginning
                 # remembering first to strip the ETag header and decrement our 'depth'
-                print("-->redirections: {}:{},{}:{}".format(type(response),response,type(content),content))
+                #print("-->redirections: {}:{},{}:{}".format(type(response),response,type(content),content))
                 if redirections:
                     if 'Location' not in response and response.status != 300:
                         raise RedirectMissingLocation(_("Redirected but the response is missing a Location: header."),
@@ -1016,7 +1016,7 @@ a string that contains the response entity body.
             if 'user-agent' not in headers:
                 headers['user-agent'] = "Python-httplib2/%s" % __version__
             
-            print("-->uri:{}".format(uri))
+            #print("-->uri:{}".format(uri))
             uri = iri2uri(uri)
 
             (scheme, authority, request_uri, defrag_uri) = urlnorm(uri)

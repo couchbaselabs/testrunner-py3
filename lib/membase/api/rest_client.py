@@ -234,7 +234,7 @@ class RestConnection(object):
         if not port:
             port = 8091
 
-        log.info("port is {} and serverInfo object type is {}".format(port,type(serverInfo)))
+        #log.info("port is {} and serverInfo object type is {}".format(port,type(serverInfo)))
         #log.info("serverInfo={}".format(vars(serverInfo)))
         if int(port) in range(9091, 9100):
             # return elastic search rest connection
