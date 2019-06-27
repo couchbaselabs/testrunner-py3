@@ -56,7 +56,7 @@ class SimpleRequests(BaseTestCase):
         occurrences = [m.start() for m in re.finditer('web request failed', str(content))]
         for occurrence in occurrences:
             subcontent = content[occurrence - 1000: occurrence + 1000]
-            if 'path,"/diag"' in subcontent:
+            if 'path,"/diag"' in str(subcontent):
                 break
             else:
                 passed = False

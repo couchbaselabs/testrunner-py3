@@ -300,7 +300,11 @@ class BucketOperationHelper():
                     bucket_info.saslPassword.encode('ascii'))
                 else:
                     client.sasl_auth_plain(admin_user, admin_pass)
-                    bucket = bucket.encode('ascii')
+                    try:
+                       bucket = bucket.encode('ascii')
+                    except AttributeError:
+                      pass
+
                     client.bucket_select(bucket)
                 for i in server_dict[every_ip_port]:
                     try:
@@ -327,7 +331,7 @@ class BucketOperationHelper():
                                                bucket_info.saslPassword.encode('ascii'))
                         continue
 
-                    if c.find("\x01") > 0 or c.find("\x02") > 0:
+                    if c.find(b"\x01") > 0 or c.find(b"\x02") > 0:
                         ready_vbuckets[i] = True
                     elif i in ready_vbuckets:
                         log.warning("vbucket state changed from active to {0}".format(c))

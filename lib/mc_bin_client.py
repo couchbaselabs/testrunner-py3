@@ -120,11 +120,32 @@ class MemcachedClient(object):
         msg = struct.pack(fmt, magic,
             cmd, len(key), extraHeaderLength, dtype, vbucketId,
                 len(key) + len(extraHeader) + len(val) + len(extended_meta_data), opaque, cas)
+        #self.log.info("--->unpack msg:magic,cmd,keylen,extralen/valelen/extlen,opaque,cas={}".format(struct.unpack(fmt,msg)))
         _, w, _ = select.select([], [self.s], [], self.timeout)
         if w:
-            #self.log.info("--->_sendMsg:{},{},{},{},{}".format(type(msg),type(extraHeader),type(key),type(val),type(extended_meta_data)))
-            self.log.info("--->_sendMsg:msg={},extraheader={},key={},val={},extended_meta_data={}".format(msg,extraHeader,key,val,extended_meta_data))
-            self.s.send((str(msg) + extraHeader + key + val + extended_meta_data).encode())
+            #self.log.info("--->_send:{},{},{},{},{}".format(type(msg),type(extraHeader),type(key),type(val),type(extended_meta_data)))
+            try:
+              key = key.encode()
+            except AttributeError:
+              pass
+
+            try:
+              extraHeader = extraHeader.encode()
+            except AttributeError:
+              pass
+
+            try:
+              val = val.encode()
+            except AttributeError:
+              pass
+
+            try:
+              extended_meta_data = extended_meta_data.encode()
+            except AttributeError:
+              pass
+
+            #self.log.info("--->sending..{}".format(msg+extraHeader+key+val+extended_meta_data))
+            self.s.send(msg+extraHeader+key+val+extended_meta_data)
         else:
             raise exceptions.EOFError("Timeout waiting for socket send. from {0}".format(self.host))
 
@@ -132,22 +153,23 @@ class MemcachedClient(object):
 
 
     def _recvMsg(self):
-        response = ""
+        response = b""
         while len(response) < MIN_RECV_PACKET:
             r, _, _ = select.select([self.s], [], [], self.timeout)
             if r:
                 data = self.s.recv(MIN_RECV_PACKET - len(response))
                 if data == '':
                     raise exceptions.EOFError("Got empty data (remote died?). from {0}".format(self.host))
-                response += str(data)
+                response += data
             else:
                 raise exceptions.EOFError("Timeout waiting for socket recv. from {0}".format(self.host))
 
+        #self.log.info("-->_recvMsg response={}".format(response))
+        #self.log.info("-->_recvMsg response={},{},MIN_RECV_PACKET={}".format(str(response),len(response),MIN_RECV_PACKET))
         assert len(response) == MIN_RECV_PACKET
 
-        self.log.info("-->_recvMsg {}".format(response))
         # Peek at the magic so we can support alternative-framing
-        magic = struct.unpack(">B".encode(), response.encode()[0:1])[0]
+        magic = struct.unpack(b">B", response[0:1])[0]
         assert (magic in (RES_MAGIC_BYTE, REQ_MAGIC_BYTE, ALT_RES_MAGIC_BYTE, ALT_REQ_MAGIC_BYTE)), "Got magic: 0x%x" % magic
 
         cmd = 0
@@ -164,9 +186,9 @@ class MemcachedClient(object):
                 struct.unpack(ALT_RES_PKT_FMT, response)
         else:
             magic, cmd, keylen, extralen, dtype, errcode, remaining, opaque, cas = \
-                struct.unpack(RES_PKT_FMT, response)
+                struct.unpack(RES_PKT_FMT, response[0:MIN_RECV_PACKET])
 
-        rv = ""
+        rv = b""
         while remaining > 0:
             r, _, _ = select.select([self.s], [], [], self.timeout)
             if r:
@@ -622,6 +644,7 @@ class MemcachedClient(object):
 
     def sasl_auth_plain(self, user, password, foruser=''):
         """Perform plain auth."""
+        #self.log.info("-->sasl_auth_start: foruser={},user={},password={},join={}".format(foruser,user,password,'\0'.join([foruser, user, password])))
         return self.sasl_auth_start('PLAIN', '\0'.join([foruser, user, password]))
 
     def sasl_auth_cram_md5(self, user, password):
