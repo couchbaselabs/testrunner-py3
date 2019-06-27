@@ -185,7 +185,9 @@ def parse_conf_file(filename, tests, params):
 
 
 def create_headers(username, password):
-    authorization = base64.encodestring('%s:%s' % (username, password))
+    #authorization = base64.encodestring('%s:%s' % (username, password))
+    authorization = base64.encodestring(('%s:%s' % (username, password)).encode()).decode()
+    authorization=authorization.rstrip('\n')
     return {'Content-Type': 'application/x-www-form-urlencoded',
             'Authorization': 'Basic %s' % authorization,
             'Accept': '*/*'}
@@ -204,7 +206,7 @@ def get_server_logs(input, path):
             filename = "{0}/{1}-diag.txt".format(path, server.ip)
             page = urllib.request.urlopen(req)
             with open(filename, 'wb') as output:
-                os.write(1, "downloading {0} ...".format(server.ip))
+                os.write(1, "downloading {0} ...".format(str(server.ip)))
                 while True:
                     buffer = page.read(65536)
                     if not buffer:
