@@ -212,7 +212,7 @@ def get_server_logs(input, path):
                     if not buffer:
                         break
                     output.write(buffer)
-                    os.write(1, ".")
+                    os.write(1, ".".encode())
             file_input = open('{0}'.format(filename), 'rb')
             zipped = gzip.open("{0}.gz".format(filename), 'wb')
             zipped.writelines(file_input)
