@@ -82,7 +82,7 @@ class MemcachedClientHelper(object):
                          "size": size, "seed": str(uuid.uuid4())})
                 list.append({'size': size, 'value': payload_generator, 'how_many': how_many})
         else:
-            for size, probability in list(value_size_distribution.items()):
+            for size, probability in value_size_distribution.items():
                 how_many = ((number_of_items / number_of_threads) * probability)
                 payload_generator = DocumentGenerator.make_docs(number_of_items,
                         {"name": "user-${prefix}", "payload": "memcached-json-${prefix}-${padding}",

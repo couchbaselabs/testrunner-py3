@@ -25,6 +25,12 @@ class ExpiryTests(unittest.TestCase):
     _bucket_port = None
     _bucket_name = None
 
+    def suite_setUp(self):
+        self.log.info("suite_setUp...")
+
+    def suite_tearDown(self):
+        self.log.info("suite_tearDown...")
+
     def setUp(self):
         self.log = logger.Logger.get_logger()
         self.master = TestInputSingleton.input.servers[0]
