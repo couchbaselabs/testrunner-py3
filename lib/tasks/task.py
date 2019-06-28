@@ -1113,8 +1113,11 @@ class LoadDocumentsGeneratorsTask(LoadDocumentsTask):
                 self.op_type = self.op_types[iterator]
             if self.buckets:
                 self.bucket = self.buckets[iterator]
-            while self.has_next() and not self.done():
+            try:
+              while self.has_next() and not self.done():
                 next(self)
+            except Exception as e:
+              traceback.print_exc()
             iterator += 1
 
     def run_high_throughput_mode(self):

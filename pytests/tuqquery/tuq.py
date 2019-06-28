@@ -86,6 +86,7 @@ class QueryTests(BaseTestCase):
         self.array_indexing = self.input.param("array_indexing", False)
         self.load_sample = self.input.param("load_sample", False)
         self.gens_load = self.gen_docs(self.docs_per_day)
+        self.log.info("--->gens_load is done...")
         self.skip_load = self.input.param("skip_load", False)
         self.skip_index = self.input.param("skip_index", False)
         self.plasma_dgm = self.input.param("plasma_dgm", False)
@@ -93,6 +94,7 @@ class QueryTests(BaseTestCase):
         self.covering_index = self.input.param("covering_index", False)
         self.cluster_ops = self.input.param("cluster_ops", False)
         self.server = self.master
+        self.log.info("-->starting rest connection...")
         self.rest = RestConnection(self.server)
         self.username = self.rest.username
         self.password = self.rest.password
@@ -108,6 +110,7 @@ class QueryTests(BaseTestCase):
         if self.primary_indx_type.lower() == "gsi":
             self.gsi_type = self.input.param("gsi_type", 'plasma')
         if self.input.param("reload_data", False):
+            self.log.info("--> reload_data: false")
             if self.analytics:
                 self.cluster.rebalance([self.master, self.cbas_node], [], [self.cbas_node], services=['cbas'])
             for bucket in self.buckets:
@@ -121,10 +124,14 @@ class QueryTests(BaseTestCase):
         if self.input.param("gomaxprocs", None):
             self.configure_gomaxprocs()
         if self.docs_per_day > 0:
+            self.log.info("--> docs_per_day>0..generating TuqGenerators...")
             self.gen_results = TuqGenerators(self.log, self.generate_full_docs_list(self.gens_load))
+            self.log.info("--> End: docs_per_day>0..generating TuqGenerators...")
         if str(self.__class__).find('QueriesUpgradeTests') == -1:
             if not self.analytics:
+                self.log.info("--> start: create_primary_index_for_3_0_and_greater...")
                 self.create_primary_index_for_3_0_and_greater()
+                self.log.info("--> End: create_primary_index_for_3_0_and_greater...")
         self.log.info('-'*100)
         self.log.info('Temp fix for MB-16888')
         if self.cluster_ops == False:
@@ -154,8 +161,10 @@ class QueryTests(BaseTestCase):
                 self.sleep(10, 'sleep before load')
             if not self.skip_load:
                 if self.flat_json:
+                    self.log.info("-->gens_load flat_json")
                     self.load_directory(self.gens_load)
                 else:
+                    self.log.info("-->gens_load flat_json, batch_size=1000")
                     self.load(self.gens_load, batch_size=1000, flag=self.item_flag)
             if not self.input.param("skip_build_tuq", True):
                 self._build_tuq(self.master)
@@ -429,6 +438,7 @@ class QueryTests(BaseTestCase):
 
                 # INDEX STAGE
                 
+                self.log.info("--> index stage")
                 current_indexes = self.get_parsed_indexes()
                 desired_indexes = self.parse_desired_indexes(index_list)
                 desired_index_set = self.make_hashable_index_set(desired_indexes)
@@ -436,10 +446,12 @@ class QueryTests(BaseTestCase):
 
                 # drop all undesired indexes
 
+                self.log.info("--> drop all undesired indexes...")
                 self.drop_undesired_indexes(desired_index_set, current_index_set, current_indexes)
 
                 # create desired indexes
 
+                self.log.info("--> create desired indexes...")
                 current_indexes = self.get_parsed_indexes()
                 current_index_set = self.make_hashable_index_set(current_indexes)
                 self.create_desired_indexes(desired_index_set, current_index_set, desired_indexes)
@@ -683,6 +695,7 @@ class QueryTests(BaseTestCase):
                     self.wait_for_index_drop(keyspace, name, fields, using)
 
     def create_desired_indexes(self, desired_index_set, current_index_set, desired_indexes):
+        self.log.info("-->Create desired indexes..desiredset={},currentset={},desiredindexes={}".format(desired_index_set,current_index_set,desired_indexes))
         if desired_index_set != current_index_set:
             for desired_index in desired_indexes:
                 if frozenset(list(desired_index.items())) not in current_index_set:
@@ -726,7 +739,9 @@ class QueryTests(BaseTestCase):
                 generators = json_generator.generate_docs_employee_array(docs_per_day, start)
             elif self.dataset == 'default':
                 #not working
+                self.log.info("-->start:generate_docs_employee for default...")
                 generators = json_generator.generate_docs_employee(docs_per_day, start)
+                self.log.info("-->end:generate_docs_employee for default...")
             elif self.dataset == 'sabre':
                 #works
                 generators = json_generator.generate_docs_sabre(docs_per_day, start)
@@ -819,6 +834,7 @@ class QueryTests(BaseTestCase):
             jira_tickets = ['[{"Number": 1, "project": "cb", "description": "test"},' + \
                             '{"Number": 2, "project": "mb"}]',]
             generators.append(DocumentGenerator(name, template, names, jira_tickets, start=index + index, end=end))
+        self.log.info('Completed Generating %s:%s data...' % (type, self.dataset))
         return generators
 
     def buckets_docs_ready(self, bucket_docs_map):
@@ -1305,14 +1321,17 @@ class QueryTests(BaseTestCase):
             return
         for bucket in self.buckets:
             try:
-                self.with_retry(lambda: self.ensure_primary_indexes_exist(), eval=None, delay=1, tries=30)
+                self.with_retry(lambda: self.ensure_primary_indexes_exist(), eval=None, delay=1, tries=10)
                 self.primary_index_created = True
+                self.log.info("-->waiting for indexes online, bucket:{}".format(bucket.name))
                 self._wait_for_index_online(bucket.name, '#primary')
             except Exception as ex:
                 self.log.info(str(ex))
 
     def ensure_primary_indexes_exist(self):
+        self.log.info("--> start: ensure_primary_indexes_exist..")
         query_response = self.run_cbq_query("SELECT * FROM system:keyspaces")
+        self.log.info("-->query_response:{}".format(query_response))
         buckets = [i['keyspaces']['name'] for i in query_response['results']]
         current_indexes = self.get_parsed_indexes()
         index_list = [{'name': '#primary',
@@ -1324,9 +1343,11 @@ class QueryTests(BaseTestCase):
         desired_indexes = self.parse_desired_indexes(index_list)
         desired_index_set = self.make_hashable_index_set(desired_indexes)
         current_index_set = self.make_hashable_index_set(current_indexes)
+        self.log.info("-->before create indexes: {},{},{}".format(index_list,desired_indexes,current_indexes))
         self.create_desired_indexes(desired_index_set, current_index_set, desired_indexes)
+        self.log.info("--> end: ensure_primary_indexes_exist..")
 
-    def _wait_for_index_online(self, bucket, index_name, timeout=12000):
+    def _wait_for_index_online(self, bucket, index_name, timeout=60):
         end_time = time.time() + timeout
         while time.time() < end_time:
             query = "SELECT * FROM system:indexes where name='%s'" % index_name

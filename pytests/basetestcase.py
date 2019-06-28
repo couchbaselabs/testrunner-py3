@@ -2527,9 +2527,12 @@ class BaseTestCase(unittest.TestCase):
                                                           bucket.kvs[kv_store], op_type, exp, flag,
                                                           only_store_hash, batch_size, pause_secs,
                                                           timeout_secs, compression=self.sdk_compression, collection=collection))
-        for task in tasks:
+        try: 
+          for task in tasks:
             task.result()
-        self.num_items = items + start_items
+          self.num_items = items + start_items
+        except Exception as e:
+          traceback.print_exc()
 
         if verify_data:
             self.verify_cluster_stats(self.servers[:self.nodes_init])
