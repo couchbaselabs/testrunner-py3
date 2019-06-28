@@ -188,7 +188,7 @@ class Lww(XDCRNewBaseTest):
         return int(max_cas)
 
     def _get_vbucket_id(self, key, num_vbuckets=1024):
-        vbucket_id = ((zlib.crc32(key) >> 16) & 0x7FFF) % num_vbuckets
+        vbucket_id = ((zlib.crc32(key.encode()) >> 16) & 0x7FFF) % num_vbuckets
         return vbucket_id
 
     def test_lww_enable(self):

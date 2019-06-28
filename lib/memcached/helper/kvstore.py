@@ -120,8 +120,8 @@ class KVStore(object):
     def _hash(self, key, bucket="default",collection=None):
         if collection:
             name= str(bucket) + "." + str(collection)
-            return zlib.crc32(name) % self.num_locks
-        return zlib.crc32(key) % self.num_locks
+            return zlib.crc32(name.encode()) % self.num_locks
+        return zlib.crc32(key.encode()) % self.num_locks
 
 class Partition(object):
     def __init__(self, part_id):

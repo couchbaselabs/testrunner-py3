@@ -211,7 +211,7 @@ def getDirectMC(key, ip, port = 8091, bucket = "default", password = ""):
     # get vbucket map
     rest = create_rest(ip, port)
     vbuckets = rest.get_vbuckets(bucket)
-    vbId = (((zlib.crc32(key)) >> 16) & 0x7fff) & (len(vbuckets) - 1)
+    vbId = (((zlib.crc32(key.encode())) >> 16) & 0x7fff) & (len(vbuckets) - 1)
 
     # find vbucket responsible to this key and mapping host
     if vbuckets is not None:

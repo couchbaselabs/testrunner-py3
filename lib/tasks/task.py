@@ -1126,6 +1126,7 @@ class LoadDocumentsGeneratorsTask(LoadDocumentsTask):
             gen_end = max(int(gen.end), 1)
             gen_range = max(int(gen.end/self.process_concurrency), 1)
             for pos in range(gen_start, gen_end, gen_range):
+              try:
                 partition_gen = copy.deepcopy(gen)
                 partition_gen.start = pos
                 partition_gen.itr = pos
@@ -1136,6 +1137,8 @@ class LoadDocumentsGeneratorsTask(LoadDocumentsTask):
                         partition_gen,
                         self.batch_size)
                 self.generators.append(batch_gen)
+              except Exception as e:
+                traceback.print_exc()
 
 
         iterator = 0
@@ -1164,7 +1167,7 @@ class LoadDocumentsGeneratorsTask(LoadDocumentsTask):
             # get partitions created by child process
             rv =  self.shared_kvstore_queue.get()
             if rv["err"] is not None:
-                raise Exception(rv.encode()["err"])
+                raise Exception(rv["err"])
 
             # merge child partitions with parent
             generator_partitions = rv["partitions"]
@@ -1189,12 +1192,13 @@ class LoadDocumentsGeneratorsTask(LoadDocumentsTask):
                 client = VBucketAwareMemcached(
                     RestConnection(self.server),
                     self.bucket, compression=self.compression)
-            if self.op_types:
+            try:
+              if self.op_types:
                 self.op_type = self.op_types[iterator]
-            if self.buckets:
+              if self.buckets:
                 self.bucket = self.buckets[iterator]
 
-            while generator.has_next() and not self.done():
+              while generator.has_next() and not self.done():
 
                 # generate
                 key_value = generator.next_batch()
@@ -1203,6 +1207,8 @@ class LoadDocumentsGeneratorsTask(LoadDocumentsTask):
 
                 # cache
                 self.cache_items(tmp_kv_store, key_value)
+            except Exception as e:
+                traceback.print_exc()
 
         except Exception as ex:
             rv["err"] = ex

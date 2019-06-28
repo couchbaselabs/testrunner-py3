@@ -76,7 +76,7 @@ class VBucketToolTests(CliBaseTest):
             self.keys_per_vbuckets_dict[vb_id].append(key)
 
     def _get_vBucket_id(self, key):
-        return (zlib.crc32(key) >> 16) & (len(self.vBucketMap) - 1)
+        return (zlib.crc32(key.encode()) >> 16) & (len(self.vBucketMap) - 1)
 
     def _get_clients(self, bucket):
         for vbucket in bucket.vbuckets:

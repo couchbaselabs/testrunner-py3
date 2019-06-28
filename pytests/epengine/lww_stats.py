@@ -221,7 +221,7 @@ class LWWStatsTests(BaseTestCase):
         current_time_cas = rc.cas
 
         test_key = 'test-set-with-metaxxxx'
-        vbId = (((zlib.crc32(test_key)) >> 16) & 0x7fff) & (self.vbuckets- 1)
+        vbId = (((zlib.crc32(test_key.encode())) >> 16) & 0x7fff) & (self.vbuckets- 1)
 
         #import pdb;pdb.set_trace()
         # verifying the case where we are within the threshold, do a set and del, neither should trigger

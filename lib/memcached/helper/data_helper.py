@@ -1293,7 +1293,7 @@ class VBucketAwareMemcached(object):
 
 
     def _get_vBucket_id(self, key, collection=None):
-        return (zlib.crc32(key) >> 16) & (len(self.vBucketMap) - 1)
+        return (zlib.crc32(key.encode()) >> 16) & (len(self.vBucketMap) - 1)
 
 
     def delete(self, key, collection=None):
