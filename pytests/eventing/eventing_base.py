@@ -211,7 +211,7 @@ class EventingBaseTest(QueryHelperTests, BaseTestCase):
                 # wait for eventing node to process dcp mutations
                 log.info("Number of {0} processed till now : {1}".format(mutation_type, actual_dcp_mutations))
                 while actual_dcp_mutations != expected_dcp_mutations and count < 20:
-                    self.sleep(timeout/20, message="Waiting for eventing to process all dcp mutations...")
+                    self.sleep(timeout//20, message="Waiting for eventing to process all dcp mutations...")
                     count += 1
                     if num_nodes <= 1:
                         stats = self.rest.get_event_processing_stats(name)
@@ -231,7 +231,7 @@ class EventingBaseTest(QueryHelperTests, BaseTestCase):
         while stats_dst["curr_items"] != expected_dcp_mutations and count < 20:
             message = "Waiting for handler code {2} to complete bucket operations... Current : {0} Expected : {1}".\
                       format(stats_dst["curr_items"], expected_dcp_mutations, name)
-            self.sleep(timeout/20, message=message)
+            self.sleep(timeout//20, message=message)
             curr_items=stats_dst["curr_items"]
             stats_dst = self.rest.get_bucket_stats(bucket)
             if curr_items == stats_dst["curr_items"]:

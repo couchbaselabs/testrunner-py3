@@ -883,7 +883,7 @@ class MovingTopFTS(FTSBaseTest):
             self.log.info("Index count for %s: %s"
                           %(index.name, index.get_indexed_doc_count()))
         # wait till indexing is midway...
-        self.wait_for_indexing_complete(self._num_items/2)
+        self.wait_for_indexing_complete(self._num_items//2)
         reb_thread = Thread(target=self._cb_cluster.rebalance_out_master,
                                    name="rebalance",
                                    args=())
@@ -927,7 +927,7 @@ class MovingTopFTS(FTSBaseTest):
             self.log.info("Index count for %s: %s"
                           %(index.name, index.get_indexed_doc_count()))
         # wait till indexing is midway...
-        self.wait_for_indexing_complete(self._num_items/2)
+        self.wait_for_indexing_complete(self._num_items//2)
         reb_thread = Thread(target=self._cb_cluster.rebalance_out,
                                    name="rebalance",
                                    args=())
@@ -996,7 +996,7 @@ class MovingTopFTS(FTSBaseTest):
             self.log.info("Index count for %s: %s"
                           %(index.name, index.get_indexed_doc_count()))
         # wait till indexing is midway...
-        self.wait_for_indexing_complete(self._num_items/2)
+        self.wait_for_indexing_complete(self._num_items//2)
         fail_thread = Thread(target=self._cb_cluster.failover(),
                                    name="failover",
                                    args=())
@@ -1037,7 +1037,7 @@ class MovingTopFTS(FTSBaseTest):
             self.log.info("Index count for %s: %s"
                           %(index.name, index.get_indexed_doc_count()))
         # wait till indexing is midway...
-        self.wait_for_indexing_complete(self._num_items/2)
+        self.wait_for_indexing_complete(self._num_items//2)
         fail_thread = Thread(
             target=self._cb_cluster.failover_and_rebalance_nodes(),
             name="failover",

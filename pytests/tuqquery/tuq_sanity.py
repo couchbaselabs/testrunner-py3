@@ -2843,7 +2843,7 @@ class QuerySanityTests(QueryTests):
         now_time = datetime.datetime.fromtimestamp(now_millis)
         now_millis = now_millis * 1000
         try:
-            now_time_zone = round((round((datetime.datetime.now()-datetime.datetime.utcnow()).total_seconds())/1800)/2)
+            now_time_zone = round((round((datetime.datetime.now()-datetime.datetime.utcnow()).total_seconds())//1800)//2)
         except AttributeError as ex:
             raise Exception("Test requires python 2.7 : SKIPPING TEST")
         now_time_str = "%s-%02d-%02d" % (now_time.year, now_time.month, now_time.day)
@@ -4075,7 +4075,7 @@ class QuerySanityTests(QueryTests):
     def test_let_nums(self):
         self.fail_if_no_buckets()
         for bucket in self.buckets:
-            self.query = "select test_r, test_r > 2 compare from %s let test_r = (test_rate // 2)" % (bucket.name)
+            self.query = "select test_r, test_r > 2 compare from %s let test_r = (test_rate / 2)" % (bucket.name)
 
             actual_list = self.run_cbq_query()
             actual_result = sorted(actual_list['results'])
@@ -4088,7 +4088,7 @@ class QuerySanityTests(QueryTests):
     def test_prepared_let_nums(self):
         self.fail_if_no_buckets()
         for bucket in self.buckets:
-            self.query = "select test_r, test_r > 2 compare from %s let test_r = (test_rate // 2)" % (bucket.name)
+            self.query = "select test_r, test_r > 2 compare from %s let test_r = (test_rate / 2)" % (bucket.name)
             self.prepared_common_body()
 
     def test_let_string(self):

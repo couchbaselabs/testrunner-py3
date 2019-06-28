@@ -64,7 +64,7 @@ class DCPRollBack(DCPBase):
         modified_kvs_active_on_node1 = {}
         vbucket_client = VBucketAwareMemcached(RestConnection(self.master), 'default')
         client = MemcachedClientHelper.direct_client(self.servers[0], 'default')
-        for i in range(NUMBER_OF_DOCS/100):
+        for i in range(NUMBER_OF_DOCS//100):
             keyname = 'keyname-' + str(i)
             vbId = ((zlib.crc32(keyname) >> 16) & 0x7fff) & (self.vbuckets- 1)
             if vbucket_client.vBucketMap[vbId].split(':')[0] == self.servers[0].ip:
@@ -86,10 +86,10 @@ class DCPRollBack(DCPBase):
                         raise
 
         # modify less than 1/2 of the keys
-        vals = ['modified-serial-vals-' + str(i) for i in range(NUMBER_OF_DOCS/100)]
+        vals = ['modified-serial-vals-' + str(i) for i in range(NUMBER_OF_DOCS//100)]
         template = '{{ "val-field-name": "{0}"  }}'
         gen_load = DocumentGenerator('keyname', template, vals, start=0,
-                                     end=NUMBER_OF_DOCS/100)
+                                     end=NUMBER_OF_DOCS//100)
         rc = self.cluster.load_gen_docs(self.servers[0], self.buckets[0].name, gen_load,
                                    self.buckets[0].kvs[1], "create", exp=0, flag=0, batch_size=1000,
                                         compression=self.sdk_compression)

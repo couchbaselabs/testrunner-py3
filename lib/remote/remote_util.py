@@ -336,11 +336,11 @@ class RemoteMachineShellConnection:
                     process.pid = words[0]
                     process.name = words[1]
                     if words[2].isdigit():
-                        process.vsz = int(words[2])/1024
+                        process.vsz = int(words[2])//1024
                     else:
                         process.vsz = words[2]
                     if words[3].isdigit():
-                        process.rss = int(words[3])/1024
+                        process.rss = int(words[3])//1024
                     else:
                         process.rss = words[3]
                     process.args = " ".join(words[4:])

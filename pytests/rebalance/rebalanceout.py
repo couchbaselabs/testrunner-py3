@@ -316,8 +316,8 @@ class RebalanceOutTests(RebalanceBaseTest):
                     # 1/2th of initial data will be added in each iteration
                     gen_create = BlobGenerator(
                         'mike', 'mike-', self.value_size,
-                        start=self.num_items * (self.num_servers - i) / 2.0,
-                        end=self.num_items * (self.num_servers - i + 1) / 2.0)
+                        start=self.num_items * (self.num_servers - i) // 2.0,
+                        end=self.num_items * (self.num_servers - i + 1) // 2.0)
                     tasks += self._async_load_all_buckets(
                         self.master, gen_create, "create", 0,
                         batch_size=batch_size)
@@ -326,8 +326,8 @@ class RebalanceOutTests(RebalanceBaseTest):
                     # at the end we should get empty base( or couple items)
                     gen_delete = BlobGenerator(
                         'mike', 'mike-', self.value_size,
-                        start=int(self.num_items * (1 - i / (self.num_servers - 1.0))) + 1,
-                        end=int(self.num_items * (1 - (i - 1) / (self.num_servers - 1.0))))
+                        start=int(self.num_items * (1 - i // (self.num_servers - 1.0))) + 1,
+                        end=int(self.num_items * (1 - (i - 1) // (self.num_servers - 1.0))))
                     tasks += self._async_load_all_buckets(
                         self.master, gen_delete, "delete", 0,
                         batch_size=batch_size)

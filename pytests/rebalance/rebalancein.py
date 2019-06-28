@@ -202,7 +202,7 @@ class RebalanceInTests(RebalanceBaseTest):
     def rebalance_in_with_ops(self):
         tasks = list()
         gen_delete = BlobGenerator('mike', 'mike-', self.value_size, start=self.num_items // 2, end=self.num_items)
-        gen_create = BlobGenerator('mike', 'mike-', self.value_size, start=self.num_items + 1, end=self.num_items * 3/2)
+        gen_create = BlobGenerator('mike', 'mike-', self.value_size, start=self.num_items + 1, end=self.num_items * 3//2)
         servs_in = [self.servers[i + self.nodes_init] for i in range(self.nodes_in)]
         if self.doc_ops is not None:
             # define which doc's ops will be performed during rebalancing
@@ -252,8 +252,8 @@ class RebalanceInTests(RebalanceBaseTest):
                 # 1/2th of initial data will be added in each iteration
                 gen_create = BlobGenerator(
                     'mike', 'mike-', self.value_size,
-                    start=self.num_items * (1 + i) / 2.0,
-                    end=self.num_items * (1 + i / 2.0))
+                    start=self.num_items * (1 + i) // 2.0,
+                    end=self.num_items * (1 + i // 2.0))
                 tasks += self._async_load_all_buckets(
                     self.master, gen_create, "create", 0,
                     batch_size=20000, pause_secs=5, timeout_secs=180)
@@ -261,8 +261,8 @@ class RebalanceInTests(RebalanceBaseTest):
                  # 1/(num_servers) of initial data will be removed after each iteration
                 # at the end we should get empty base( or couple items)
                 gen_delete = BlobGenerator('mike', 'mike-', self.value_size,
-                                           start=int(self.num_items * (1 - i / (self.num_servers - 1.0))) + 1,
-                                           end=int(self.num_items * (1 - (i - 1) / (self.num_servers - 1.0))))
+                                           start=int(self.num_items * (1 - i // (self.num_servers - 1.0))) + 1,
+                                           end=int(self.num_items * (1 - (i - 1) // (self.num_servers - 1.0))))
                 tasks += self._async_load_all_buckets(
                     self.master, gen_delete, "delete", 0,
                     batch_size=20000, pause_secs=5, timeout_secs=180)
@@ -427,12 +427,12 @@ class RebalanceInTests(RebalanceBaseTest):
                     tasks += self._async_load_all_buckets(self.master, self.gen_update, "update", 0, batch_size=20000, pause_secs=5, timeout_secs=180)
                 elif "create" in self.doc_ops:
                     # 1/2th of initial data will be added in each iteration
-                    gen_create = BlobGenerator('mike', 'mike-', self.value_size, start=self.num_items * (1 + i) / 2.0, end=self.num_items * (1 + i / 2.0))
+                    gen_create = BlobGenerator('mike', 'mike-', self.value_size, start=self.num_items * (1 + i) // 2.0, end=self.num_items * (1 + i / 2.0))
                     tasks += self._async_load_all_buckets(self.master, gen_create, "create", 0, batch_size=20000, pause_secs=5, timeout_secs=180)
                 elif "delete" in self.doc_ops:
                     # 1/(num_servers) of initial data will be removed after each iteration
                     # at the end we should get empty base( or couple items)
-                    gen_delete = BlobGenerator('mike', 'mike-', self.value_size, start=int(self.num_items * (1 - i / (self.num_servers - 1.0))) + 1, end=int(self.num_items * (1 - (i - 1) / (self.num_servers - 1.0))))
+                    gen_delete = BlobGenerator('mike', 'mike-', self.value_size, start=int(self.num_items * (1 - i // (self.num_servers - 1.0))) + 1, end=int(self.num_items * (1 - (i - 1) // (self.num_servers - 1.0))))
                     tasks += self._async_load_all_buckets(self.master, gen_delete, "delete", 0, batch_size=20000, pause_secs=5, timeout_secs=180)
 
             rebalance_task = self.cluster.async_rebalance(

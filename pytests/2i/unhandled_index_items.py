@@ -159,9 +159,9 @@ class GSIUnhandledIndexItems(BaseSecondaryIndexingTests):
 
     def test_max_limits_increase_item_size(self):
         self.set_allow_large_keys(self.allow_large_keys)
-        self.change_max_item_size(self.max_item_size/4)
+        self.change_max_item_size(self.max_item_size//4)
         self.change_max_array_size(self.max_array_size)
-        self._upload_documents(num_items=self.num_docs, item_size=self.max_item_size/4,
+        self._upload_documents(num_items=self.num_docs, item_size=self.max_item_size//4,
                                             array_size=self.max_array_size)
         query_definitions = self._create_indexes()
         self.sleep(30)
@@ -216,7 +216,7 @@ class GSIUnhandledIndexItems(BaseSecondaryIndexingTests):
                 self.assertEqual(sorted(actual_result), sorted(expected_result),
                                  msg.format(query_definition.index_name,
                                             actual_result, expected_result))
-        self._upload_documents(num_items=self.num_docs, item_size=self.max_item_size/4,
+        self._upload_documents(num_items=self.num_docs, item_size=self.max_item_size//4,
                                             array_size=self.max_array_size, update_docs=True)
         self.sleep(10)
         for bucket in self.buckets:
@@ -298,9 +298,9 @@ class GSIUnhandledIndexItems(BaseSecondaryIndexingTests):
     def test_max_limits_increase_array_size(self):
         self.set_allow_large_keys(self.allow_large_keys)
         self.change_max_item_size(self.max_item_size)
-        self.change_max_array_size(self.max_array_size/4)
+        self.change_max_array_size(self.max_array_size//4)
         self._upload_documents(num_items=self.num_docs, item_size=self.max_item_size,
-                                            array_size=self.max_array_size/4)
+                                            array_size=self.max_array_size//4)
         query_definitions = self._create_indexes()
         self.sleep(30)
         rest = RestConnection(self.master)
@@ -354,7 +354,7 @@ class GSIUnhandledIndexItems(BaseSecondaryIndexingTests):
                                  msg.format(query_definition.index_name,
                                             actual_result, expected_result))
         self._upload_documents(num_items=self.num_docs, item_size=self.max_item_size,
-                                            array_size=self.max_array_size/4, update_docs=True)
+                                            array_size=self.max_array_size//4, update_docs=True)
         for bucket in self.buckets:
             for query_definition in query_definitions:
                 index_id = str(index_map[bucket.name][query_definition.index_name]["id"])
@@ -492,7 +492,7 @@ class GSIUnhandledIndexItems(BaseSecondaryIndexingTests):
         generators = []
         template = '{{"name":"{0}", "age":{1}, "encoded_array": {2}, "encoded_big_value_array": {3}}}'
         max_item_length = self.max_item_size * 4
-        max_array_element_size = (self.max_array_size * 4)/ 10
+        max_array_element_size = (self.max_array_size * 4)// 10
         for i in range(self.num_docs):
             index_id = "".join(random.choice(lowercase) for k in range(random.randint(1, 255)))
             encoded_array = []
@@ -561,7 +561,7 @@ class GSIUnhandledIndexItems(BaseSecondaryIndexingTests):
         generators = []
         template = '{{"name":"{0}", "age":{1}, "encoded_array": {2}, "encoded_big_value_array": {3}}}'
         item_length = item_size * 4
-        array_element_size = (array_size * 4)/array_elements
+        array_element_size = (array_size * 4)//array_elements
         if update_docs:
             num_items = len(self.full_docs_list)
         for i in range(num_items):

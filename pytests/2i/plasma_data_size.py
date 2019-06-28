@@ -398,7 +398,7 @@ class SecondaryIndexDatasizeTests(BaseSecondaryIndexingTests):
         generators = []
         template = '{{"name":"{0}", "age":{1}, "encoded_array": {2}, "encoded_big_value_array": {3}}}'
         item_length = item_size * 4
-        array_element_size = (array_size * 4)/array_elements
+        array_element_size = (array_size * 4)//array_elements
         if update_docs:
             num_items = len(self.full_docs_list)
         for i in range(num_items):

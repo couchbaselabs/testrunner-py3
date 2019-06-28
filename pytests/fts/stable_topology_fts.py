@@ -33,7 +33,7 @@ class StableTopFTS(FTSBaseTest):
     def create_simple_default_index(self):
         plan_params = self.construct_plan_params()
         self.load_data()
-        self.wait_till_items_in_bucket_equal(self._num_items/2)
+        self.wait_till_items_in_bucket_equal(self._num_items//2)
         self.create_fts_indexes_all_buckets(plan_params=plan_params)
         if self._update or self._delete:
             self.wait_for_indexing_complete()
@@ -444,7 +444,7 @@ class StableTopFTS(FTSBaseTest):
         bucket = self._cb_cluster.get_bucket_by_name('default')
         index = self.create_index(bucket, 'sample_index')
         # wait till half the keys are indexed
-        self.wait_for_indexing_complete(self._num_items/2)
+        self.wait_for_indexing_complete(self._num_items//2)
         status, stat_value = rest.get_fts_stats(index_name=index.name,
                                                 bucket_name=bucket.name,
                                                 stat_name='num_recs_to_persist')
@@ -474,7 +474,7 @@ class StableTopFTS(FTSBaseTest):
         bucket = self._cb_cluster.get_bucket_by_name('default')
         index = self.create_index(bucket, 'sample_index')
         # wait till half the keys are indexed
-        self.wait_for_indexing_complete(self._num_items/2)
+        self.wait_for_indexing_complete(self._num_items//2)
         index.delete()
         self.sleep(5)
         try:
@@ -970,7 +970,7 @@ class StableTopFTS(FTSBaseTest):
     def test_boost_query_type(self):
         # Create bucket, create index
         self.load_data()
-        self.wait_till_items_in_bucket_equal(items=self._num_items/2)
+        self.wait_till_items_in_bucket_equal(items=self._num_items//2)
         index = self.create_index(
             self._cb_cluster.get_bucket_by_name('default'),
             "default_index")
@@ -1124,7 +1124,7 @@ class StableTopFTS(FTSBaseTest):
 
     def test_sorting_of_results(self):
         self.load_data()
-        self.wait_till_items_in_bucket_equal(self._num_items/2)
+        self.wait_till_items_in_bucket_equal(self._num_items//2)
         index = self.create_index(
             self._cb_cluster.get_bucket_by_name('default'),
             "default_index")
@@ -1163,7 +1163,7 @@ class StableTopFTS(FTSBaseTest):
 
     def test_sorting_of_results_during_indexing(self):
         self.load_data()
-        self.wait_till_items_in_bucket_equal(self._num_items/2)
+        self.wait_till_items_in_bucket_equal(self._num_items//2)
         index = self.create_index(
             self._cb_cluster.get_bucket_by_name('default'),
             "default_index")
@@ -1586,7 +1586,7 @@ class StableTopFTS(FTSBaseTest):
         max_matches = self._input.param("query_max_matches", 10000000)
         show_results_from_item = self._input.param("show_results_from_item", 0)
         self.load_data()
-        self.wait_till_items_in_bucket_equal(items = self._num_items/2)
+        self.wait_till_items_in_bucket_equal(items = self._num_items//2)
         index = self.create_index(
             self._cb_cluster.get_bucket_by_name('default'),
             "default_index")

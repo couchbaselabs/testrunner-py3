@@ -53,7 +53,7 @@ class SimpleSetGetTestBase(object):
                 ("set-get-bucket-replica-3", 3)]
         serverInfo = self.master
         rest = RestConnection(serverInfo)
-        bucket_ram = int(rest.get_nodes_self().memoryQuota / 4)
+        bucket_ram = int(rest.get_nodes_self().memoryQuota // 4)
 
         mcport = rest.get_nodes_self().memcached
         for name, replica in specs:

@@ -465,9 +465,9 @@ class UpgradeSecondaryIndex(BaseSecondaryIndexingTests, NewUpgradeBaseTest):
             servers = self.get_nodes_from_services_map(service_type="index", get_all_nodes=True)
             rest = RestConnection(servers[0])
             date = datetime.now()
-            dayOfWeek = (date.weekday() + (date.hour+((date.minute+5)/60))/24)%7
+            dayOfWeek = (date.weekday() + (date.hour+((date.minute+5)//60))//24)%7
             status, content, header = rest.set_indexer_compaction(indexDayOfWeek=DAYS[dayOfWeek],
-                                              indexFromHour=date.hour+((date.minute+1)/60),
+                                              indexFromHour=date.hour+((date.minute+1)//60),
                                               indexFromMinute=(date.minute+1)%60)
             self.assertTrue(status, "Error in setting Circular Compaction... {0}".format(content))
         self.multi_create_index(self.buckets, self.query_definitions)

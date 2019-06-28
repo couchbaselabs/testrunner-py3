@@ -286,7 +286,7 @@ class SecondaryIndexMemdbOomTests(BaseSecondaryIndexingTests):
         while count < 5:
             used_memory = self.get_indexer_mem_quota()
             #Setting memory to 90 % of used memory.
-            set_memory = int(used_memory) * 90/100
+            set_memory = int(used_memory) * 90//100
             rest.set_service_memoryQuota(service='indexMemoryQuota', memoryQuota=set_memory)
             self.sleep(120)
             check = self._validate_indexer_status_oom()

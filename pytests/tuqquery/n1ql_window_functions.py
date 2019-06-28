@@ -1298,7 +1298,7 @@ class WindowFunctionsTest(QueryTests):
     def test_tcpds_4(self):
         query = "SELECT * FROM (SELECT char_field,SUM(decimal_field) sum_sales,AVG(SUM(decimal_field)) OVER ( PARTITION BY char_field) avg_quarterly_sales " \
                 "FROM test_bucket WHERE char_field IN ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'] " \
-                "GROUP BY char_field) tmp1 WHERE CASE WHEN avg_quarterly_sales > 0 THEN ABS (sum_sales - avg_quarterly_sales) // avg_quarterly_sales ELSE NULL END > 0.1 " \
+                "GROUP BY char_field) tmp1 WHERE CASE WHEN avg_quarterly_sales > 0 THEN ABS (sum_sales - avg_quarterly_sales) / avg_quarterly_sales ELSE NULL END > 0.1 " \
                 "ORDER BY avg_quarterly_sales,sum_sales,char_field LIMIT 100"
         result = self.run_cbq_query(query)
         self.assertEqual(result['status'], 'success')
@@ -1310,7 +1310,7 @@ class WindowFunctionsTest(QueryTests):
     '''
     def test_tcpds_5(self):
         query = "SELECT * FROM (SELECT char_field,SUM(decimal_field) sum_sales,AVG(SUM(int_field)) OVER ( PARTITION BY char_field) avg_monthly_sales " \
-                "FROM test_bucket GROUP BY char_field) tmp1 WHERE CASE WHEN avg_monthly_sales > 0 THEN ABS (sum_sales - avg_monthly_sales) // avg_monthly_sales ELSE NULL END > 0.1 " \
+                "FROM test_bucket GROUP BY char_field) tmp1 WHERE CASE WHEN avg_monthly_sales > 0 THEN ABS (sum_sales - avg_monthly_sales) / avg_monthly_sales ELSE NULL END > 0.1 " \
                 "ORDER BY char_field,avg_monthly_sales,sum_sales LIMIT 100"
         result = self.run_cbq_query(query)
         self.assertEqual(result['status'], 'success')
@@ -1356,7 +1356,7 @@ class WindowFunctionsTest(QueryTests):
         Returned data set is not analyzed.
     '''
     def test_tcpds_9(self):
-        query = "SELECT char_field,SUM(decimal_field) AS itemrevenue,SUM(decimal_field) * 100 // SUM(SUM(decimal_field)) OVER ( PARTITION BY char_field) AS revenueratio " \
+        query = "SELECT char_field,SUM(decimal_field) AS itemrevenue,SUM(decimal_field) * 100 / SUM(SUM(decimal_field)) OVER ( PARTITION BY char_field) AS revenueratio " \
                 "FROM test_bucket WHERE char_field IN ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','Z','Y','Z'] " \
                 "GROUP BY char_field ORDER BY char_field, revenueratio;"
         result = self.run_cbq_query(query)

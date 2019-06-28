@@ -168,11 +168,11 @@ class ObserveTests(BaseTestCase):
             # check whether observe has to run with delete and delete parallel with observe or not
             if len (self.observe_with) > 0 :
                 if self.observe_with == "delete" :
-                    self.log.info("Deleting 0- %s number of items" % (self.num_items / 2))
+                    self.log.info("Deleting 0- %s number of items" % (self.num_items // 2))
                     self._load_doc_data_all_buckets('delete', 0, self.num_items // 2)
                     query_set = "true"
                 elif self.observe_with == "delete_parallel":
-                    self.log.info("Deleting Parallel 0- %s number of items" % (self.num_items / 2))
+                    self.log.info("Deleting Parallel 0- %s number of items" % (self.num_items // 2))
                     tasks = self._async_load_doc_data_all_buckets('delete', 0, self.num_items // 2)
                     query_set = "false"
                 for key in keys:
@@ -215,11 +215,11 @@ class ObserveTests(BaseTestCase):
     def test_observe_with_replication(self):
         self._load_doc_data_all_buckets('create', 0, self.num_items)
         if self.observe_with == "delete" :
-            self.log.info("Deleting 0- %s number of items" % (self.num_items / 2))
+            self.log.info("Deleting 0- %s number of items" % (self.num_items // 2))
             self._load_doc_data_all_buckets('delete', 0, self.num_items // 2)
             query_set = "true"
         elif self.observe_with == "delete_parallel":
-            self.log.info("Deleting Parallel 0- %s number of items" % (self.num_items / 2))
+            self.log.info("Deleting Parallel 0- %s number of items" % (self.num_items // 2))
             tasks = self._async_load_doc_data_all_buckets('delete', 0, self.num_items // 2)
             query_set = "false"
         keys = ["observe%s" % (i) for i in range(self.num_items)]

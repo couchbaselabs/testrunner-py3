@@ -233,7 +233,7 @@ class NodeHelper:
         if shell.extract_remote_info().type.lower() == OS.WINDOWS:
             time.sleep(wait_timeout * 5)
         else:
-            time.sleep(wait_timeout/6)
+            time.sleep(wait_timeout//6)
         while True:
             try:
                 # disable firewall on these nodes
@@ -1144,7 +1144,7 @@ class FTSIndex:
                 # force limit in 10 min in case timeout=0(no timeout)
                 rest_timeout = 600
             else:
-                rest_timeout = timeout/1000 + 10
+                rest_timeout = timeout//1000 + 10
             hits, matches, time_taken, status = \
                 self.__cluster.run_fts_query(self.name, query_dict, timeout=rest_timeout)
         except ServerUnavailableException:
@@ -4370,7 +4370,7 @@ class FTSBaseTest(unittest.TestCase):
         if not self._dgm_run:
             counter = 0
             if not items:
-                items = self._num_items/2
+                items = self._num_items//2
             while True:
                 try:
                     doc_count = self._cb_cluster.get_doc_count_in_bucket(

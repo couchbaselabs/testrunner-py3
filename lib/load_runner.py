@@ -219,7 +219,7 @@ class LoadThread(threading.Thread):
     def get_mutation_key(self, index=None):
         if index == None:
             index = self.mutation_index
-        return index-self.nocreate*(index/(self.create+self.nocreate))
+        return index-self.nocreate*(index//(self.create+self.nocreate))
 
     # get_index -> get_key : based on get_index % mutation_index
     def get_get_key(self):
@@ -228,7 +228,7 @@ class LoadThread(threading.Thread):
     # key -> mutation_indexes
     def get_mutation_indexes(self, key):
         # starting point to find an index
-        s=key*(self.nocreate+self.create)/self.create
+        s=key*(self.nocreate+self.create)//self.create
 
         mutation_indexes=[]
 
@@ -256,10 +256,10 @@ class LoadThread(threading.Thread):
         valuesize = self.valuesize_sequence[index % len(self.valuesize_sequence)]
         if self.cache_data:
             if not valuesize in self.data_cache:
-                self.data_cache[valuesize] = (str(uuid.uuid3(self.uuid, repr(index))) * (1+valuesize/36))[:valuesize]
+                self.data_cache[valuesize] = (str(uuid.uuid3(self.uuid, repr(index))) * (1+valuesize//36))[:valuesize]
             return repr(index) + self.data_cache[valuesize]
         else:
-            return (str(uuid.uuid3(self.uuid, repr(index))) * (1+valuesize/36))[:valuesize]
+            return (str(uuid.uuid3(self.uuid, repr(index))) * (1+valuesize//36))[:valuesize]
 
     # mutation_index -> mutation_data : based on create/nocreate
     # shortcut for getting the expected size of a mutation without generating the data

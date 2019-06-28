@@ -226,10 +226,10 @@ class DateTimeFunctionClass(QueryTests):
                                  "Query {0} Failed".format(query))
             else:
                 if not (8%interval):
-                    self.assertEqual(len(lst), (8/interval),
+                    self.assertEqual(len(lst), (8//interval),
                                      "Query {0} Failed".format(query))
                 else:
-                    self.assertEqual(len(lst), (8/interval)+1,
+                    self.assertEqual(len(lst), (8//interval)+1,
                                      "Query {0} Failed".format(query))
 
     def test_date_range_millis_for_intervals(self):
@@ -249,10 +249,10 @@ class DateTimeFunctionClass(QueryTests):
                 self.assertEqual(len(lst), 0, "Query {0} Failed".format(query))
             else:
                 if not (8%interval):
-                    self.assertEqual(len(lst), (8/interval),
+                    self.assertEqual(len(lst), (8//interval),
                                      "Query {0} Failed".format(query))
                 else:
-                    self.assertEqual(len(lst), (8/interval)+1,
+                    self.assertEqual(len(lst), (8//interval)+1,
                                      "Query {0} Failed".format(query))
 
     def test_new_functions(self):

@@ -374,7 +374,7 @@ def run_worker(ctl, cfg, cur, store, prefix, heartbeat=0, why=""):
         if heartbeat != 0 and heartbeat_duration > heartbeat:
             heartbeat_last += heartbeat_duration
             if cfg.get('max-ops', 0):
-                progress = 100.0 * num_ops / cfg['max-ops']
+                progress = 100.0 * num_ops // cfg['max-ops']
                 log.info("%s num ops = %s out of %s (%.2f %%)",
                          why, num_ops, cfg['max-ops'], progress)
             else:

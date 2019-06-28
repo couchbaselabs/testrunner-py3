@@ -917,7 +917,7 @@ class QueryHelper(object):
         uppercase = sorted(string.ascii_uppercase)
         lowercase = sorted(string.ascii_lowercase)
         value = []
-        for _ in range(0, limit/2):
+        for _ in range(0, limit//2):
             value.append(random.choice(uppercase))
             value.append(random.choice(lowercase))
         random.shuffle(value)
@@ -1715,7 +1715,7 @@ class QueryHelper(object):
                         list = self._convert_list(values[0:max], type="string")
                         new_sql += token.replace("LIST", list)+space
                     elif "STRING_VALUES" in token:
-                        mid_value_index = len(values)/2
+                        mid_value_index = len(values)//2
                         if "%" in token:
                             value = token.replace("STRING_VALUES",str(values[mid_value_index]))
                             new_sql += value+space
@@ -1746,7 +1746,7 @@ class QueryHelper(object):
                         list = self._convert_list(values[0:max], type="numeric")
                         new_sql += token.replace("LIST", list)+space
                     elif "NUMERIC_VALUE" in token:
-                        mid_value_index = len(values)/2
+                        mid_value_index = len(values)//2
                         numeric_check = False
                         add_token = False
                         new_sql += token.replace("NUMERIC_VALUE", str(values[mid_value_index]))+space
@@ -1833,7 +1833,7 @@ class QueryHelper(object):
                         list = self._convert_list(values[0:max], type="string")
                         new_sql += token.replace("LIST", list)+space
                     elif "STRING_VALUES" in token:
-                        mid_value_index = len(values)/2
+                        mid_value_index = len(values)//2
                         if "%" in token:
                             value = token.replace("STRING_VALUES", str(values[mid_value_index]))
                             new_sql += value+space
@@ -1864,7 +1864,7 @@ class QueryHelper(object):
                         list = self._convert_list(values[0:max], type="numeric")
                         new_sql += token.replace("LIST", list)+space
                     elif "NUMERIC_VALUE" in token:
-                        mid_value_index = len(values)/2
+                        mid_value_index = len(values)//2
                         numeric_check = False
                         add_token = False
                         new_sql += token.replace("NUMERIC_VALUE", str(values[mid_value_index]))+space
@@ -1949,7 +1949,7 @@ class QueryHelper(object):
                         else:
                             new_sql += token.replace("DATETIME_LIST", list)+space
                     elif "DATETIME_VALUE" in token:
-                        mid_value_index = len(values)/2
+                        mid_value_index = len(values)//2
                         datetime_check = False
                         add_token = False
                         if sql_type == "n1ql":

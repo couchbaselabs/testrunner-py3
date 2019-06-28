@@ -76,7 +76,7 @@ class SubdocSanityTests(unittest.TestCase):
 
         '''Intermediate element Dict.Array'''
         self.log.info('Testing Intermediate element Dict. Array')
-        data_set.get_all_docs(inserted_keys, path = self._get_path('child', levels/2)+'.array[0]')
+        data_set.get_all_docs(inserted_keys, path = self._get_path('child', levels//2)+'.array[0]')
 
     def test_deep_nested_dataset_get_array(self):
         num_docs = self.helper.input.param("num-docs")
@@ -106,7 +106,7 @@ class SubdocSanityTests(unittest.TestCase):
 
         '''Intermediate element Array'''
         last_path ='child'
-        for i in range(levels/2):
+        for i in range(levels//2):
             last_path +='.child'
         last_path +='.array[0][-1]'
         data_set.get_all_docs(inserted_keys, path = last_path)

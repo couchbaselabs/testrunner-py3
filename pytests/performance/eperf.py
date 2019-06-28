@@ -209,7 +209,7 @@ class EPerfMaster(perf.PerfBase):
             start_time = min(min(ops['startTime'] for ops in ops_array),
                              start_time)
         num_steps = max(len(base_ops), len(new_ops))
-        step = float(end_time - start_time) / num_steps
+        step = float(end_time - start_time) // num_steps
 
         # Merge (terrible time complexity)
         merged_ops = list()

@@ -218,7 +218,7 @@ class McsodaObserver(Observer, Thread):
 
             # TODO: error check
 
-            self.save_latency_stats(res.persist_stat/1000)
+            self.save_latency_stats(res.persist_stat//1000)
 
             print("res::<%s>" % server)
             print(res)

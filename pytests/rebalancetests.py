@@ -532,7 +532,7 @@ class IncrementalRebalanceWithMcsoda(unittest.TestCase):
         # start load, max_ops_per_second is the combined limit for all buckets
         buckets = rest.get_buckets()
         loaders = []
-        self.log.info("max-ops-per-second per bucket: {0}".format(self.max_ops_per_second / len(buckets)))
+        self.log.info("max-ops-per-second per bucket: {0}".format(self.max_ops_per_second // len(buckets)))
         for bucket in buckets:
             loader = {}
             loader["mcsoda"] = LoadWithMcsoda(master, self.keys_count, prefix='', bucket=bucket.name,

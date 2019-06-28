@@ -50,16 +50,16 @@ class GetrTests(BaseTestCase):
             return result
 
         gen_1 = DocumentGenerator('test_docs', '{{"age": {0}}}', range(5),
-                                      start=0, end=self.num_items/2)
+                                      start=0, end=self.num_items//2)
         gen_2 = DocumentGenerator('test_docs', '{{"age": {0}}}', range(5),
-                                      start=self.num_items/2, end=self.num_items)
+                                      start=self.num_items//2, end=self.num_items)
         if self.value_size:
             gen_1 = DocumentGenerator('test_docs', '{{"name": "{0}"}}',
                                       [self.value_size * 'a'],
-                                      start=0, end=self.num_items/2)
+                                      start=0, end=self.num_items//2)
             gen_2 = DocumentGenerator('test_docs', '{{"name": "{0}"}}',
                                       [self.value_size * 'a'],
-                                      start=self.num_items/2, end=self.num_items)
+                                      start=self.num_items//2, end=self.num_items)
         self.log.info("LOAD PHASE")
         if not self.skipload:
             self.perform_docs_ops(self.master, [gen_1, gen_2], self.data_ops)
@@ -116,9 +116,9 @@ class GetrTests(BaseTestCase):
 
     def getr_negative_test(self):
         gen_1 = DocumentGenerator('test_docs', '{{"age": {0}}}', range(5),
-                                      start=0, end=self.num_items/2)
+                                      start=0, end=self.num_items//2)
         gen_2 = DocumentGenerator('test_docs', '{{"age": {0}}}', range(5),
-                                      start=self.num_items/2, end=self.num_items)
+                                      start=self.num_items//2, end=self.num_items)
         self.log.info("LOAD PHASE")
         if not self.skipload:
             self.perform_docs_ops(self.master, [gen_1, gen_2], self.data_ops)

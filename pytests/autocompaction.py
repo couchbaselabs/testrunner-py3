@@ -73,7 +73,7 @@ class AutoCompactionTests(BaseTestCase):
         bucket_name = "default"
         MAX_RUN = 100
         item_size = 1024
-        update_item_size = item_size * ((float(100 - percent_threshold)) / 100)
+        update_item_size = item_size * ((float(100 - percent_threshold)) // 100)
         serverInfo = self.servers[0]
         self.log.info(serverInfo)
 
@@ -94,7 +94,7 @@ class AutoCompactionTests(BaseTestCase):
             node_ram_ratio = BucketOperationHelper.base_bucket_ratio(TestInputSingleton.input.servers)
             info = rest.get_nodes_self()
             available_ram = info.memoryQuota * (node_ram_ratio) // 2
-            items = (int(available_ram * 1000) / 2) / item_size
+            items = (int(available_ram * 1000) // 2) // item_size
             print("ITEMS =============%s" % items)
 
             rest.create_bucket(bucket=bucket_name, ramQuotaMB=int(available_ram), authType='sasl',

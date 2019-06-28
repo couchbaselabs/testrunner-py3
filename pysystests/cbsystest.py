@@ -206,7 +206,7 @@ def argsToTask(args):
     ops_sec = args.ops
     num_consumers = 1
 
-    ops_sec = int(ops_sec)/num_consumers
+    ops_sec = int(ops_sec)//num_consumers
     create_count = int(ops_sec *  args.create/100)
     update_count = int(ops_sec *  args.update/100)
     get_count = int(ops_sec *  args.get/100)

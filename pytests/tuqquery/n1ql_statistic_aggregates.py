@@ -303,14 +303,14 @@ class StatisticAggregatesTest(QueryTests):
             return sortedParams[0]
 
         if len(sortedParams) == 2:
-            return (sortedParams[0] + sortedParams[1])/2
+            return (sortedParams[0] + sortedParams[1])//2
 
         if len(sortedParams)%2 != 0:
-            retVal = sortedParams[len(sortedParams)/2]
+            retVal = sortedParams[len(sortedParams)//2]
         else:
-            valLeft = sortedParams[len(sortedParams)/2 -1]
-            valRight = sortedParams[len(sortedParams)/2]
-            retVal = (valLeft+valRight)/2
+            valLeft = sortedParams[len(sortedParams)//2 -1]
+            valRight = sortedParams[len(sortedParams)//2]
+            retVal = (valLeft+valRight)//2
 
         return retVal
 
@@ -321,7 +321,7 @@ class StatisticAggregatesTest(QueryTests):
         for i in range(len(filtered_params)):
             sum+=math.pow(filtered_params[i] - avg, 2)
 
-        return math.sqrt(sum/(len(filtered_params)-1))
+        return math.sqrt(sum//(len(filtered_params)-1))
 
     def _calculate_stddev_pop_value(self, params):
         filtered_params = self._filter_digit_params(params)
@@ -330,7 +330,7 @@ class StatisticAggregatesTest(QueryTests):
         for i in range(len(filtered_params)):
             sum+=math.pow(filtered_params[i] - avg, 2)
 
-        return math.sqrt(sum/len(filtered_params))
+        return math.sqrt(sum//len(filtered_params))
 
     def _calculate_stddev_samp_value(self, params):
         filtered_params = self._filter_digit_params(params)
@@ -346,7 +346,7 @@ class StatisticAggregatesTest(QueryTests):
         sum = 0
         for i in range(len(params)):
             sum += params[i]
-        return sum/len(params)
+        return sum//len(params)
 
 
     def _calculate_variance_value(self, params):
@@ -356,7 +356,7 @@ class StatisticAggregatesTest(QueryTests):
         for i in range(len(filtered_params)):
             sum+=math.pow(filtered_params[i] - avg, 2)
 
-        return sum/(len(filtered_params)-1)
+        return sum//(len(filtered_params)-1)
 
     def _calculate_variance_pop_value(self, params):
         filtered_params = self._filter_digit_params(params)
@@ -365,7 +365,7 @@ class StatisticAggregatesTest(QueryTests):
         for i in range(len(filtered_params)):
             sum += math.pow(filtered_params[i] - avg, 2)
 
-        return sum/len(params)
+        return sum//len(params)
 
 
     def _calculate_variance_samp_value(self, params):
@@ -375,7 +375,7 @@ class StatisticAggregatesTest(QueryTests):
         for i in range(len(filtered_params)):
             sum+=math.pow(filtered_params[i] - avg, 2)
 
-        return sum/(len(filtered_params)-1)
+        return sum//(len(filtered_params)-1)
 
     def _filter_digit_params(self, params):
         ret_val = list([x for x in params if isinstance(x, int) or isinstance(x, int) or isinstance(x, float)])

@@ -90,7 +90,7 @@ class MemcachedClientHelper(object):
                 list.append({'size': size, 'value': payload_generator, 'how_many': how_many})
 
         for item in list:
-            item['how_many'] /= int(number_of_threads)
+            item['how_many'] //= int(number_of_threads)
             # at least one element for each value size
             if item['how_many'] < 1:
                 item['how_many'] = 1
@@ -156,7 +156,7 @@ class MemcachedClientHelper(object):
                 list.append({'size': size, 'value': payload, 'how_many': how_many})
 
         for item in list:
-            item['how_many'] /= int(number_of_threads)
+            item['how_many'] //= int(number_of_threads)
             # at least one element for each value size
             if item['how_many'] < 1:
                 item['how_many'] = 1

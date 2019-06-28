@@ -35,7 +35,7 @@ class VolumeTests(BaseTestCase):
         import subprocess
         from lib.testconstants import COUCHBASE_FROM_SPOCK
         rest = RestConnection(server)
-        num_cycles = int((items / batch )) / 5
+        num_cycles = int((items // batch )) // 5
         cmd = "cbc-pillowfight -U couchbase://{0}/{3} -I {1} -m 10 -M 100 -B {2} --populate-only --start-at {4} --json".format(server.ip, items, batch, bucket, start_at)
         if rest.get_nodes_version()[:5] in COUCHBASE_FROM_SPOCK:
             cmd += " -u Administrator -P password"

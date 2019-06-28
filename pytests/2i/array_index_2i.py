@@ -57,7 +57,7 @@ class SecondaryIndexArrayIndexTests(BaseSecondaryIndexingTests):
                                            query_definitions=query_definitions)
         self.sleep(20)
         index_map = self.rest.get_index_id_map()
-        doc_list = self.full_docs_list[:len(self.full_docs_list)/2]
+        doc_list = self.full_docs_list[:len(self.full_docs_list)//2]
         for bucket in self.buckets:
             index_id = str(index_map[bucket.name][query_definition.index_name]["id"])
             for data in DATATYPES:
@@ -101,7 +101,7 @@ class SecondaryIndexArrayIndexTests(BaseSecondaryIndexingTests):
             index_map = self.rest.get_index_id_map()
             for query_definition in definitions_list:
                 for bucket in self.buckets:
-                    doc_list = self.full_docs_list[:len(self.full_docs_list)/2]
+                    doc_list = self.full_docs_list[:len(self.full_docs_list)//2]
                     index_id = str(index_map[bucket.name][query_definition.index_name]["id"])
                     for data in DATATYPES:
                         self.change_index_field_type(bucket.name, "travel_history",
@@ -120,7 +120,7 @@ class SecondaryIndexArrayIndexTests(BaseSecondaryIndexingTests):
     def test_create_query_drop_index_on_missing_empty_null_field(self):
         data_types = ["empty", "null"]
         index_field, data_type = self._find_datatype(self.query_definitions[0])
-        doc_list = self.full_docs_list[:len(self.full_docs_list)/2]
+        doc_list = self.full_docs_list[:len(self.full_docs_list)//2]
         for data_type in data_types:
             definitions_list = []
             query_definition =  QueryDefinition(index_name="index_name_{0}_duplicate".format(data_type),
@@ -158,7 +158,7 @@ class SecondaryIndexArrayIndexTests(BaseSecondaryIndexingTests):
         for bucket in self.buckets:
             for data in DATATYPES:
                 start = end
-                end = end + len(self.full_docs_list)/len(DATATYPES)
+                end = end + len(self.full_docs_list)//len(DATATYPES)
                 doc_list = self.full_docs_list[start:end]
                 self.change_index_field_type(bucket.name,
                                              "travel_history",
