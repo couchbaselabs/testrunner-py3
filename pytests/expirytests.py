@@ -47,7 +47,7 @@ class ExpiryTests(unittest.TestCase):
         rest.init_cluster(username=serverInfo.rest_username,
                           password=serverInfo.rest_password)
         rest.init_cluster_memoryQuota(memoryQuota=info.mcdMemoryReserved)
-        bucket_ram = info.memoryQuota * 2 / 3
+        bucket_ram = info.memoryQuota * 2 // 3
 
         # Add built-in user
         testuser = [{'id': 'cbadminbucket', 'name': 'cbadminbucket', 'password': 'password'}]
@@ -57,6 +57,7 @@ class ExpiryTests(unittest.TestCase):
         role_list = [{'id': 'cbadminbucket', 'name': 'cbadminbucket', 'roles': 'admin'}]
         RbacBase().add_user_role(role_list, RestConnection(self.master), 'builtin')
         
+        self.log.info("-->create_bucket: {},{},{}".format(self._bucket_name,bucket_ram,info.memcached))
         rest.create_bucket(bucket=self._bucket_name,
                            ramQuotaMB=bucket_ram,
                            proxyPort=info.memcached)
@@ -92,6 +93,7 @@ class ExpiryTests(unittest.TestCase):
     # test case to set 1000 keys and verify that those keys are stored
     #e1
     def test_expired_keys(self):
+        self.log.info("--> in test_expired_keys...")
         serverInfo = self.master
         client = self.client
         expirations = [2, 5, 10]
