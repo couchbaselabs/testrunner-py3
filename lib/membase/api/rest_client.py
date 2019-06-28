@@ -2422,6 +2422,7 @@ class RestConnection(object):
         maxwait = 60
         for numsleep in range(maxwait):
             status, content, header = self._http_request(api, 'POST', params)
+            log.info("-->status:{},content={}".format(status,content))
             if status:
                 break
             elif (int(header['status']) == 503 and
@@ -2429,6 +2430,7 @@ class RestConnection(object):
                 log.info("The bucket still exists, sleep 1 sec and retry")
                 time.sleep(1)
             else:
+                traceback.print_exc()
                 raise BucketCreationException(ip=self.ip, bucket_name=bucket)
 
         if (numsleep + 1) == maxwait:

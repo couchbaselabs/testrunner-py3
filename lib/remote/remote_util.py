@@ -4557,7 +4557,7 @@ class RemoteMachineShellConnection:
         elif self.info.distribution_type.lower() == 'centos':
             if cmd == "unzip":
                 command_output = "UnZip 6.00 of 20 April 2009"
-                if out and command_output in out[0]:
+                if out and command_output in out.encode()[0]:
                     log.info("unzip command is ready")
                     found_command = True
             if not found_command and err and "command not found" in err[0]:
