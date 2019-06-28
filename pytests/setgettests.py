@@ -86,8 +86,12 @@ class SimpleSetGetTestBase(object):
                 for key in remaining_items:
                     try:
                         flag, keyx, value = client.get(key=key)
+                        try:
+                          value = value.decode()
+                        except AttributeError:
+                          pass
                         if not value == fixed_value:
-                            self.test.fail("value mismatch for key {0}".format(key))
+                            self.test.fail("value {0},{1} mismatch for key {2}".format(value,fixed_value,key))
                         verified_keys.append(key)
                     except mc_bin_client.MemcachedError as error:
                         self.log.error(msg.format(error.status, key))
