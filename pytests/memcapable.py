@@ -279,7 +279,7 @@ class GetlTests(unittest.TestCase):
                 raise
         self.log.info("get key {0} which is locked now".format(key))
         flags_v, cas_v, get_v = mc.get(key)
-        self.assertEqual(get_v, key)
+        self.assertEqual(get_v.decode(), key)
         i = 0
         while i < 40:
             self.log.info("setting key {0} with new value {1}".format(key, '*'))
@@ -307,7 +307,7 @@ class GetlTests(unittest.TestCase):
         mc.set(key, 0, 0, new_value)
         self.log.info("get key {0}".format(key))
         flags_v, cas_v, get_v = mc.get(key)
-        self.assertEqual(get_v, "*")
+        self.assertEqual(get_v.decode(), "*")
 
     def test_getl_minus_one(self):
         self._getl_body("getl_-1", -1, 0)
@@ -354,7 +354,7 @@ class GetlTests(unittest.TestCase):
         mc.getl(key, getl_timeout)
         self.log.info("get key {0} which is locked now".format(key))
         flags_v, cas_v, get_v = mc.get(key)
-        self.assertEqual(get_v, key)
+        self.assertEqual(get_v.decode(), key)
         if getl_timeout > 30:
             self.log.info("sleep for {0} seconds".format(30))
             time.sleep(30)
@@ -376,7 +376,7 @@ class GetlTests(unittest.TestCase):
         mc.set(key, 0, 0, new_value)
         self.log.info("get key {0}".format(key))
         flags_v, cas_v, get_v = mc.get(key)
-        self.assertEqual(get_v, "*")
+        self.assertEqual(get_v.decode(), "*")
 
     def tearDown(self):
         self.memcapableTestBase.tearDown()
