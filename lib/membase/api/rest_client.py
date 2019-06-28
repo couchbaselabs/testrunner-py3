@@ -816,7 +816,7 @@ class RestConnection(object):
                 'Authorization': 'Basic %s' % authorization}
 
     def _get_auth(self, headers):
-        log.info("-->_get_auth {}:{}".format(type(headers),headers))
+        #log.info("-->_get_auth {}:{}".format(type(headers),headers))
         key = 'Authorization'
         if key in headers:
             val = headers[key]
@@ -877,12 +877,14 @@ class RestConnection(object):
             count += 1
 
     def init_cluster(self, username='Administrator', password='password', port='8091'):
+        log.info("--> in init_cluster...{},{},{}".format(username,password,port))
         api = self.baseUrl + 'settings/web'
         params = urllib.parse.urlencode({'port': port,
                                    'username': username,
                                    'password': password})
         log.info('settings/web params on {0}:{1}:{2}'.format(self.ip, self.port, params))
         status, content, header = self._http_request(api, 'POST', params)
+        log.info("--> status:{}".format(status))
         return status
 
     def init_node(self):
@@ -2290,7 +2292,12 @@ class RestConnection(object):
             return False
 
     def get_bucket(self, bucket='default', num_attempt=1, timeout=1):
+        #log.info("-->get_bucket...") 
         bucketInfo = None
+        try:
+          bucket = bucket.decode()
+        except AttributeError:
+          pass
         api = '%s%s%s?basic_stats=true' % (self.baseUrl, 'pools/default/buckets/', bucket)
         if isinstance(bucket, Bucket):
             api = '%s%s%s?basic_stats=true' % (self.baseUrl, 'pools/default/buckets/', bucket.name)
