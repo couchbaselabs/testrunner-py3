@@ -66,7 +66,7 @@ class unidirectional(XDCRNewBaseTest):
 
         self.sleep(self._wait_timeout)
         self.perform_update_delete()
-        self.sleep(self._wait_timeout / 2)
+        self.sleep(self._wait_timeout // 2)
 
         NodeHelper.wait_warmup_completed(warmupnodes)
 
@@ -82,7 +82,7 @@ class unidirectional(XDCRNewBaseTest):
 
         self.sleep(self._wait_timeout)
         self.perform_update_delete()
-        self.sleep(self._wait_timeout / 2)
+        self.sleep(self._wait_timeout // 2)
 
         NodeHelper.wait_warmup_completed(warmupnodes)
 
@@ -102,7 +102,7 @@ class unidirectional(XDCRNewBaseTest):
 
         self.sleep(self._wait_timeout)
         self.async_perform_update_delete()
-        self.sleep(self._wait_timeout / 2)
+        self.sleep(self._wait_timeout // 2)
 
         NodeHelper.wait_warmup_completed(warmupnodes)
 
@@ -122,7 +122,7 @@ class unidirectional(XDCRNewBaseTest):
 
         self.sleep(self._wait_timeout)
         self.async_perform_update_delete()
-        self.sleep(self._wait_timeout / 2)
+        self.sleep(self._wait_timeout // 2)
 
         NodeHelper.wait_warmup_completed(warmupnodes)
 
@@ -138,7 +138,7 @@ class unidirectional(XDCRNewBaseTest):
         if "C2" in self._failover:
             self.dest_cluster.failover_and_rebalance_nodes()
 
-        self.sleep(self._wait_timeout / 6)
+        self.sleep(self._wait_timeout // 6)
         self.perform_update_delete()
 
         self.verify_results()
@@ -170,7 +170,7 @@ class unidirectional(XDCRNewBaseTest):
         if "C2" in self._failover:
             self.dest_cluster.failover_and_rebalance_master()
 
-        self.sleep(self._wait_timeout / 6)
+        self.sleep(self._wait_timeout // 6)
         self.perform_update_delete()
 
         self.sleep(300)
@@ -191,7 +191,7 @@ class unidirectional(XDCRNewBaseTest):
             tasks.append(self.dest_cluster.async_failover())
 
         self.perform_update_delete()
-        self.sleep(self._wait_timeout / 4)
+        self.sleep(self._wait_timeout // 4)
 
         for task in tasks:
             task.result()
@@ -289,7 +289,7 @@ class unidirectional(XDCRNewBaseTest):
         self.setup_xdcr_and_load()
         self.src_cluster.set_xdcr_param("xdcrFailureRestartInterval", 1)
         self.perform_update_delete()
-        self.sleep(self._wait_timeout / 2)
+        self.sleep(self._wait_timeout // 2)
         rebooted_node = self.dest_cluster.reboot_one_node(self)
         NodeHelper.wait_node_restarted(rebooted_node, self, wait_time=self._wait_timeout * 4, wait_if_warmup=True)
 

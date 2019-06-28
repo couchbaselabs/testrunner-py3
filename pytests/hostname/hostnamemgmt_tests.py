@@ -141,7 +141,7 @@ class HostnameMgmtTests(HostnameBaseTests):
         reached = RestHelper(rest).rebalance_reached(expected_progress)
         self.assertTrue(reached, "rebalance failed or did not reach {0}%".format(expected_progress))
         if not RestHelper(rest).is_cluster_rebalanced():
-            stopped = rest.stop_rebalance(wait_timeout=self.wait_timeout / 3)
+            stopped = rest.stop_rebalance(wait_timeout=self.wait_timeout // 3)
             self.assertTrue(stopped, msg="unable to stop rebalance")
         self.verify_referenced_by_names(self.servers[:self.nodes_in + self.nodes_init], hostnames)
         self.cluster.rebalance(self.servers[:self.nodes_init + self.nodes_init],

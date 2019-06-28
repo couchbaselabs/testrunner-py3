@@ -356,7 +356,7 @@ class ViewMergingTests(BaseTestCase):
         # The keys view is there to test the `keys` query parameter. In order
         # to reproduce the ordering bug (MB-16618) there must be more than
         # one document with the same key, hence modulo is used
-        modulo = self.num_docs / 3
+        modulo = self.num_docs // 3
         keysview = View(self.keys_view_name, '''function(doc) {
              emit(doc.integer % ''' + str(modulo) + ''', doc.string);
           }''', '_count', dev_view=is_dev_view)
@@ -415,7 +415,7 @@ class ViewMergingTests(BaseTestCase):
             vbucket-2: doc-3, doc-4
             vbucket-3: doc-5, doc-5
         """
-        docs_per_vbucket = len(docs) / num_vbuckets
+        docs_per_vbucket = len(docs) // num_vbuckets
 
         for vbucket in range(num_vbuckets):
             start = vbucket * docs_per_vbucket

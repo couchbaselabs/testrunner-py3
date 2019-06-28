@@ -42,8 +42,8 @@ class XDCRViewTests(XDCRNewBaseTest, CreateDeleteViewTests):
         buckets = cluster.get_buckets();
         if view_ops in ["update", "delete"]:
             for bucket in buckets:
-                tasks.extend(self._async_execute_ddoc_ops(view_ops, self.test_with_view, self.num_ddocs / 2,
-                                                        self.num_views_per_ddoc / 2, "dev_test", "v1", bucket=bucket))
+                tasks.extend(self._async_execute_ddoc_ops(view_ops, self.test_with_view, self.num_ddocs // 2,
+                                                        self.num_views_per_ddoc // 2, "dev_test", "v1", bucket=bucket))
         elif view_ops == "query":
             if self.stale_param in ["false", "ok", "update_after"]:
                 query = {"stale" : self.stale_param, "full_set" : "true"}
@@ -72,7 +72,7 @@ class XDCRViewTests(XDCRNewBaseTest, CreateDeleteViewTests):
             for bucket in buckets:
                 self._execute_ddoc_ops("create", self.test_with_view, self.num_ddocs, self.num_views_per_ddoc, "dev_test", "v1", bucket=bucket)
             self._query_view()
-            self.sleep(self.wait_timeout / 2)
+            self.sleep(self.wait_timeout // 2)
 
         tasks = []
         if self.ddoc_ops is not None:
@@ -85,6 +85,6 @@ class XDCRViewTests(XDCRNewBaseTest, CreateDeleteViewTests):
         self.async_perform_update_delete()
 
         self.verify_results()
-        self.sleep(self.wait_timeout / 2)
+        self.sleep(self.wait_timeout // 2)
         
         self._verify_views(True)

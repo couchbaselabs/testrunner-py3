@@ -93,10 +93,10 @@ class DataAnalysisTests(BaseTestCase):
             This will be done cluster level comparison
         """
         create = BlobGenerator('loadOne', 'loadOne_', self.value_size, end=self.num_items)
-        update = BlobGenerator('loadOne', 'loadOne-', self.value_size, end=(self.num_items / 2 - 1))
+        update = BlobGenerator('loadOne', 'loadOne-', self.value_size, end=(self.num_items // 2 - 1))
         self._load_all_buckets(self.master, create, "create", 0,
                                batch_size=10000, pause_secs=10, timeout_secs=60)
-        self.num_items=self.num_items - self.num_items / 2
+        self.num_items=self.num_items - self.num_items // 2
         self._verify_stats_all_buckets(self.servers, timeout=120)
         self._wait_for_stats_all_buckets(self.servers)
         self._async_load_all_buckets(self.master, update, "update", 0)

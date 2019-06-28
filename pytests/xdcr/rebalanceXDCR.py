@@ -195,7 +195,7 @@ class Rebalance(XDCRNewBaseTest):
                 if "C2" in self.__rebalance:
                     tasks.append(self.dest_cluster.async_swap_rebalance())
 
-            self.sleep(self._wait_timeout / 2)
+            self.sleep(self._wait_timeout // 2)
             for task in tasks:
                 task.result(self._poll_timeout)
 

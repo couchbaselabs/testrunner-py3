@@ -334,7 +334,7 @@ class SecondaryIndexingOffsetTests(BaseSecondaryIndexingTests):
         scan_contents.append([{"Seek": None,
                                "Filter": [{"Low": "A", "High": "Z"},
                                           {"Low": 0, "High": 100}]}])
-        for i in range(0, self.docs_per_day / 10 + 1):
+        for i in range(0, self.docs_per_day // 10 + 1):
             for bucket in self.buckets:
                 if not id_map:
                     id_map = self.create_index_using_rest(bucket, query_definition)

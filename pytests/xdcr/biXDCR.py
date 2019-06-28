@@ -91,7 +91,7 @@ class bidirectional(XDCRNewBaseTest):
         self.sleep(self._wait_timeout)
         NodeHelper.wait_warmup_completed(warmupnodes)
         self.async_perform_update_delete()
-        self.sleep(self._wait_timeout / 2)
+        self.sleep(self._wait_timeout // 2)
         self.verify_results()
 
     def load_with_async_ops_with_warmup_master(self):
@@ -105,7 +105,7 @@ class bidirectional(XDCRNewBaseTest):
         self.sleep(self._wait_timeout)
         NodeHelper.wait_warmup_completed(warmupnodes)
         self.async_perform_update_delete()
-        self.sleep(self._wait_timeout / 2)
+        self.sleep(self._wait_timeout // 2)
         self.verify_results()
 
     def load_with_async_ops_and_joint_sets_with_warmup(self):
@@ -122,7 +122,7 @@ class bidirectional(XDCRNewBaseTest):
 
         self.sleep(self._wait_timeout)
         self.async_perform_update_delete()
-        self.sleep(self._wait_timeout / 2)
+        self.sleep(self._wait_timeout // 2)
 
         NodeHelper.wait_warmup_completed(warmupnodes)
 
@@ -138,7 +138,7 @@ class bidirectional(XDCRNewBaseTest):
 
         self.sleep(self._wait_timeout)
         self.async_perform_update_delete()
-        self.sleep(self._wait_timeout / 2)
+        self.sleep(self._wait_timeout // 2)
 
         NodeHelper.wait_warmup_completed(warmupnodes)
 
@@ -152,7 +152,7 @@ class bidirectional(XDCRNewBaseTest):
         if "C2" in self._failover:
             self.dest_cluster.failover_and_rebalance_nodes()
 
-        self.sleep(self._wait_timeout / 6)
+        self.sleep(self._wait_timeout // 6)
         self.perform_update_delete()
         self.sleep(300)
 
@@ -181,7 +181,7 @@ class bidirectional(XDCRNewBaseTest):
         if "C2" in self._failover:
             self.dest_cluster.failover_and_rebalance_master()
 
-        self.sleep(self._wait_timeout / 6)
+        self.sleep(self._wait_timeout // 6)
         self.perform_update_delete()
 
         self.verify_results()

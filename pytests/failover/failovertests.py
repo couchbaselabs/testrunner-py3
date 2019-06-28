@@ -122,7 +122,7 @@ class FailoverTests(FailoverBaseTest):
             # Validate seq_no snap_start/stop values
             self.check_snap_start_corruption()
 
-        # Add back + rebalance / only rebalance with verification
+        # Add back + rebalance // only rebalance with verification
         if not self.gracefulFailoverFail and self.runRebalanceAfterFailover:
             if self.add_back_flag:
                 self.run_add_back_operation_and_verify(
@@ -570,7 +570,7 @@ class FailoverTests(FailoverBaseTest):
             views += temp
             tasks += temp_tasks
 
-        timeout = max(self.wait_timeout * 4, len(self.buckets) * self.wait_timeout * self.num_items / 50000)
+        timeout = max(self.wait_timeout * 4, len(self.buckets) * self.wait_timeout * self.num_items // 50000)
 
         for task in tasks:
             task.result(self.wait_timeout * 20)
@@ -673,7 +673,7 @@ class FailoverTests(FailoverBaseTest):
     def victim_node_operations(self, node=None):
         if self.stopGracefulFailover:
             self.log.info(" Stopping Graceful Failover ")
-            stopped = self.rest.stop_rebalance(wait_timeout=self.wait_timeout / 3)
+            stopped = self.rest.stop_rebalance(wait_timeout=self.wait_timeout // 3)
             self.assertTrue(stopped, msg="unable to stop rebalance")
         if self.killNodes:
             self.log.info(" Killing Memcached ")

@@ -32,9 +32,9 @@ class OpsChangeCasTests(CasBaseTest):
         We also use MemcachedClient delete() to delete a quarter of the items"""
 
         gen_load_mysql = BlobGenerator('nosql', 'nosql-', self.value_size, end=self.num_items)
-        gen_update = BlobGenerator('nosql', 'nosql-', self.value_size, end=(self.num_items / 2 - 1))
-        gen_delete = BlobGenerator('nosql', 'nosql-', self.value_size, start=self.num_items / 2, end=(3*self.num_items / 4 - 1))
-        gen_expire = BlobGenerator('nosql', 'nosql-', self.value_size, start=3*self.num_items / 4, end=self.num_items)
+        gen_update = BlobGenerator('nosql', 'nosql-', self.value_size, end=(self.num_items // 2 - 1))
+        gen_delete = BlobGenerator('nosql', 'nosql-', self.value_size, start=self.num_items // 2, end=(3*self.num_items // 4 - 1))
+        gen_expire = BlobGenerator('nosql', 'nosql-', self.value_size, start=3*self.num_items // 4, end=self.num_items)
         self._load_all_buckets(self.master, gen_load_mysql, "create", 0, flag=self.item_flag)
 
         if self.doc_ops is not None:

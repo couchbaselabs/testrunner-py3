@@ -1417,7 +1417,7 @@ class BaseTestCase(unittest.TestCase):
             self.wait_service_started(server, wait_time)
             wait_time = now + wait_time - time.time()
         num = 0
-        while num < wait_time / 10:
+        while num < wait_time // 10:
             try:
                 ClusterOperationHelper.wait_for_ns_servers_or_assert(
                     [server], self, wait_time=wait_time - num * 10, wait_if_warmup=wait_if_warmup)

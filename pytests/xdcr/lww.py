@@ -1118,7 +1118,7 @@ class Lww(XDCRNewBaseTest):
         gen2 = BlobGenerator("lww-", "lww-", self._value_size, end=self._num_items)
         self.c1_cluster.async_load_all_buckets_from_generator(gen2)
 
-        self.sleep(self._wait_timeout / 2)
+        self.sleep(self._wait_timeout // 2)
 
         NodeHelper.wait_warmup_completed([self.c1_cluster.warmup_node(master=True)])
 
@@ -1146,7 +1146,7 @@ class Lww(XDCRNewBaseTest):
         gen2 = BlobGenerator("lww-", "lww-", self._value_size, end=self._num_items)
         self.c1_cluster.async_load_all_buckets_from_generator(gen2)
 
-        self.sleep(self._wait_timeout / 2)
+        self.sleep(self._wait_timeout // 2)
 
         conn = RemoteMachineShellConnection(self.c1_cluster.get_master_node())
         conn.stop_couchbase()
@@ -1179,7 +1179,7 @@ class Lww(XDCRNewBaseTest):
         gen2 = BlobGenerator("lww-", "lww-", self._value_size, end=self._num_items)
         self.c1_cluster.async_load_all_buckets_from_generator(gen2)
 
-        self.sleep(self._wait_timeout / 2)
+        self.sleep(self._wait_timeout // 2)
 
         conn = RemoteMachineShellConnection(self.c1_cluster.get_master_node())
         conn.kill_erlang()
@@ -1211,7 +1211,7 @@ class Lww(XDCRNewBaseTest):
         gen2 = BlobGenerator("lww-", "lww-", self._value_size, end=self._num_items)
         self.c1_cluster.async_load_all_buckets_from_generator(gen2)
 
-        self.sleep(self._wait_timeout / 2)
+        self.sleep(self._wait_timeout // 2)
 
         conn = RemoteMachineShellConnection(self.c1_cluster.get_master_node())
         conn.pause_memcached()

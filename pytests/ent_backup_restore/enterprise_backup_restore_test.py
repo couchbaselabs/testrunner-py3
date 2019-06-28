@@ -814,11 +814,11 @@ class EnterpriseBackupRestoreTest(EnterpriseBackupRestoreBase, NewUpgradeBaseTes
         self._load_all_buckets(self.master, create_gen1, "create", 0)
         self.log.info("Delete half docs of 1st batch")
         delete_gen = BlobGenerator("ent-backup1", "ent-backup-", self.value_size,
-                                   end=self.num_items / 2)
+                                   end=self.num_items // 2)
         self._load_all_buckets(self.master, delete_gen, "delete", 0)
         self.log.info("Load 2nd batch docs")
         create_gen2 = BlobGenerator("ent-backup2", "ent-backup-", self.value_size,
-                                    end=self.num_items / 2)
+                                    end=self.num_items // 2)
         self._load_all_buckets(self.master, create_gen2, "create", 0)
         self.log.info("Start backup")
         self.backup_create()
@@ -839,12 +839,12 @@ class EnterpriseBackupRestoreTest(EnterpriseBackupRestoreBase, NewUpgradeBaseTes
             if not found:
                 self.log.info("Load another docs to bucket %s " % bucket.name)
                 create_gen3 = BlobGenerator("ent-backup3", "ent-backup-", self.value_size,
-                                            end=self.num_items / 4)
+                                            end=self.num_items // 4)
                 self._load_bucket(bucket, self.master, create_gen3, "create",
                                                                  self.expire_time)
                 self.backup_cluster()
                 create_gen4 = BlobGenerator("ent-backup3", "ent-backup-", self.value_size,
-                                            end=self.num_items / 4)
+                                            end=self.num_items // 4)
                 self._load_bucket(bucket, self.master, create_gen4, "create",
                                                                  self.expire_time)
                 self.backup_cluster()

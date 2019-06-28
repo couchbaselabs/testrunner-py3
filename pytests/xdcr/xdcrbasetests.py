@@ -218,10 +218,10 @@ class XDCRBaseTest(unittest.TestCase):
                         for _i in self._xdc_replication_ops[node1][the_bucket.name]:
                             _sum_ += _i
                         self._xdc_replication_ops[node1][the_bucket.name].sort()
-                        _mid = len(self._xdc_replication_ops[node1][the_bucket.name]) / 2
+                        _mid = len(self._xdc_replication_ops[node1][the_bucket.name]) // 2
                         if len(self._xdc_replication_ops[node1][the_bucket.name]) % 2 == 0:
                             _median_value_ = (float)(self._xdc_replication_ops[node1][the_bucket.name][_mid] +
-                                                     self._xdc_replication_ops[node1][the_bucket.name][_mid - 1]) / 2
+                                                     self._xdc_replication_ops[node1][the_bucket.name][_mid - 1]) // 2
                         else:
                             _median_value_ = self._xdc_replication_ops[node1][the_bucket.name][_mid]
                         self.log.info("\tMedian XDC replication ops for bucket '{0}': {1} K ops per second"\
@@ -856,7 +856,7 @@ class XDCRBaseTest(unittest.TestCase):
             self.wait_service_started(server, wait_time)
             wait_time = now + wait_time - time.time()
         num = 0
-        while num < wait_time / 10:
+        while num < wait_time // 10:
             try:
                 ClusterOperationHelper.wait_for_ns_servers_or_assert(
                                             [server], self, wait_time=wait_time - num * 10, wait_if_warmup=wait_if_warmup)
@@ -943,7 +943,7 @@ class XDCRBaseTest(unittest.TestCase):
 
     def _get_num_items_ratio(self, op_type):
         if op_type in ["update", "delete"]:
-            return self.num_items / 3
+            return self.num_items // 3
         else:
             return self.num_items
 
@@ -1053,13 +1053,13 @@ class XDCRBaseTest(unittest.TestCase):
                 tasks.extend(self._async_load_all_buckets(self.src_master, self.gen_update, "update", self._expires))
             if "delete" in self._doc_ops:
                 tasks.extend(self._async_load_all_buckets(self.src_master, self.gen_delete, "delete", 0))
-            self.sleep(self.wait_timeout / 6)
+            self.sleep(self.wait_timeout // 6)
         if self._doc_ops_dest is not None:
             if "update" in self._doc_ops_dest:
                 tasks.extend(self._async_load_all_buckets(self.dest_master, self.gen_update2, "update", self._expires))
             if "delete" in self._doc_ops_dest:
                 tasks.extend(self._async_load_all_buckets(self.dest_master, self.gen_delete2, "delete", 0))
-            self.sleep(self.wait_timeout / 6)
+            self.sleep(self.wait_timeout // 6)
         for task in tasks:
             task.result()
         if self._wait_for_expiration and self._expires:

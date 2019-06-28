@@ -86,7 +86,7 @@ class SubdocAutoTestGenerator(SubdocBaseTest):
     def test_multi_seq_mutations(self):
         self.verify_result = self.input.param("verify_result", False)
         queue = queue.Queue()
-        number_of_times = (self.number_of_documents / self.concurrent_threads)
+        number_of_times = (self.number_of_documents // self.concurrent_threads)
         process_list = []
         number_of_buckets = len(self.buckets)
         for x in range(self.concurrent_threads):
@@ -429,7 +429,7 @@ class SubdocAutoTestGenerator(SubdocBaseTest):
                 for x in range(self.total_writer_threads):
                     client = VBucketAwareMemcached(RestConnection(self.master), bucket)
                     t = Process(target=self.run_populate_data_per_bucket, args=(
-                    client, bucket, json_document, (self.prepopulate_item_count / self.total_writer_threads), x))
+                    client, bucket, json_document, (self.prepopulate_item_count // self.total_writer_threads), x))
                     t.start()
                     self.load_thread_list.append(t)
         for t in self.load_thread_list:
@@ -448,7 +448,7 @@ class SubdocAutoTestGenerator(SubdocBaseTest):
                 for x in range(self.total_writer_threads):
                     client = VBucketAwareMemcached(RestConnection(self.master), bucket)
                     t = Process(target=self.run_populate_data_per_bucket, args=(
-                    client, bucket, json_document, (self.prepopulate_item_count / self.total_writer_threads), x))
+                    client, bucket, json_document, (self.prepopulate_item_count // self.total_writer_threads), x))
                     t.start()
                     self.load_thread_list.append(t)
 

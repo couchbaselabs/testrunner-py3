@@ -227,7 +227,7 @@ class RebalanceProgressTests(RebalanceBaseTest):
             views += temp
 
         timeout = max(self.wait_timeout * 4,
-                      len(self.buckets) * self.wait_timeout * self.num_items / 50000)
+                      len(self.buckets) * self.wait_timeout * self.num_items // 50000)
 
         for task in tasks:
             task.result(timeout)

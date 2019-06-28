@@ -110,7 +110,7 @@ def store_avg_value(db, metric, start_time, end_time):
     if len(values) >= 1:
         for x in values:
             sum = sum + x
-        avg_value = sum / len(values)
+        avg_value = sum // len(values)
 
     return avg_value
 
@@ -157,7 +157,7 @@ def store_90th_avg_value(buckets, start_time, end_time, run_id, i):
             for metric in ns_server_stats:
                 dict_90th['ns_server'][bucket][ip][metric] = store_90th_value(db, metric, start_time, end_time)
                 dict_avg['ns_server'][bucket][ip][metric] = store_avg_value(db, metric, start_time, end_time)
-                if num % (len(ns_server_stats) / toolbar_width) == 0:
+                if num % (len(ns_server_stats) // toolbar_width) == 0:
                     sys.stdout.write("=")
                     sys.stdout.flush()
                     time.sleep(0.5)

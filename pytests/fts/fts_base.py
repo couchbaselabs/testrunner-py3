@@ -363,7 +363,7 @@ class NodeHelper:
             NodeHelper.wait_service_started(server, wait_time)
             wait_time = now + wait_time - time.time()
         num = 0
-        while num < wait_time / 10:
+        while num < wait_time // 10:
             try:
                 ClusterOperationHelper.wait_for_ns_servers_or_assert(
                     [server], test_case, wait_time=wait_time - num * 10,
@@ -3757,11 +3757,11 @@ class FTSBaseTest(unittest.TestCase):
 
         # check 1 - test number of pindexes
         partitions_per_pindex = index.get_max_partitions_pindex()
-        exp_num_pindexes = self._num_vbuckets / partitions_per_pindex
+        exp_num_pindexes = self._num_vbuckets // partitions_per_pindex
         if self._num_vbuckets % partitions_per_pindex:
             import math
             exp_num_pindexes = math.ceil(
-                self._num_vbuckets / partitions_per_pindex + 0.5)
+                self._num_vbuckets // partitions_per_pindex + 0.5)
         total_pindexes = 0
         for node in list(nodes_partitions.keys()):
             total_pindexes += nodes_partitions[node]['pindex_count']
@@ -3804,7 +3804,7 @@ class FTSBaseTest(unittest.TestCase):
                               % list(nodes_partitions.keys()))
 
         # check 4 - balance check(almost equal no of pindexes on all fts nodes)
-        exp_partitions_per_node = self._num_vbuckets / num_fts_nodes
+        exp_partitions_per_node = self._num_vbuckets // num_fts_nodes
         self.log.info("Expecting num of partitions in each node in range %s-%s"
                       % (exp_partitions_per_node - partitions_per_pindex,
                          min(1024, exp_partitions_per_node + partitions_per_pindex)))
@@ -4102,9 +4102,9 @@ class FTSBaseTest(unittest.TestCase):
             # only emp and wiki
             self.create_gen = []
             self.create_gen.append(self.get_generator(
-                "emp", num_items=self._num_items / 2))
+                "emp", num_items=self._num_items // 2))
             self.create_gen.append(self.get_generator(
-                "wiki", num_items=self._num_items / 2))
+                "wiki", num_items=self._num_items // 2))
         else:
             self.create_gen = self.get_generator(
                 self.dataset, num_items=self._num_items)

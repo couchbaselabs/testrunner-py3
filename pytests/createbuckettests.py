@@ -351,7 +351,7 @@ class CreateMembaseBucketsTests(unittest.TestCase):
                 except BucketCreationException as ex:
                     self.log.info(ex)
 
-    # create maximum number of buckets (server memory / 100MB)
+    # create maximum number of buckets (server memory // 100MB)
     # only done on the first server
     def test_max_buckets(self):
         log = logger.Logger.get_logger()

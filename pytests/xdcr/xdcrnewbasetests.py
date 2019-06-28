@@ -367,7 +367,7 @@ class NodeHelper:
             NodeHelper.wait_service_started(server, wait_time)
             wait_time = now + wait_time - time.time()
         num = 0
-        while num < wait_time / 10:
+        while num < wait_time // 10:
             try:
                 ClusterOperationHelper.wait_for_ns_servers_or_assert(
                     [server], test_case, wait_time=wait_time - num * 10,
@@ -1759,7 +1759,7 @@ class CouchbaseCluster:
                         self.__kv_gen[OPS.CREATE].seed,
                         self.__kv_gen[OPS.CREATE].value_size,
                         start=int((self.__kv_gen[OPS.CREATE].end) * (float)(
-                            100 - perc) / 100),
+                            100 - perc) // 100),
                         end=self.__kv_gen[OPS.CREATE].end)
                 elif isinstance(self.__kv_gen[OPS.CREATE], DocumentGenerator):
                     self.__kv_gen[OPS.DELETE] = DocumentGenerator(

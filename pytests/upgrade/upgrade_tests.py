@@ -60,11 +60,11 @@ class UpgradeTests(NewUpgradeBaseTest, EventingBaseTest):
                                         start=self.num_items + 1,
                                         end=self.num_items * 1.5)
         self.gen_update = BlobGenerator('upgrade', 'upgrade', self.value_size,
-                                        start=self.num_items / 2,
+                                        start=self.num_items // 2,
                                         end=self.num_items)
         self.gen_delete = BlobGenerator('upgrade', 'upgrade', self.value_size,
-                                        start=self.num_items / 4,
-                                        end=self.num_items / 2 - 1)
+                                        start=self.num_items // 4,
+                                        end=self.num_items // 2 - 1)
         self.after_gen_create = BlobGenerator('upgrade', 'upgrade',
                                               self.value_size,
                                               start=self.num_items * 1.6,
@@ -883,7 +883,7 @@ class UpgradeTests(NewUpgradeBaseTest, EventingBaseTest):
         out_servers = self._convert_server_map(self.servers[self.nodes_init:])
         self.swap_num_servers = min(self.swap_num_servers, len(out_servers))
         start_services_num = 0
-        for i in range(self.nodes_init / self.swap_num_servers):
+        for i in range(self.nodes_init // self.swap_num_servers):
             servers_in = {}
             new_servers = copy.deepcopy(servers)
             servicesNodeOut = ""

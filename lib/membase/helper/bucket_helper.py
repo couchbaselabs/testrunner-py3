@@ -52,7 +52,7 @@ class BucketOperationHelper():
             success = False
         else:
             available_ram = info.memoryQuota * bucket_ram_ratio
-            if available_ram / howmany > 100:
+            if available_ram // howmany > 100:
                 bucket_ram = int(available_ram / howmany)
             else:
                 bucket_ram = 100
@@ -105,7 +105,7 @@ class BucketOperationHelper():
         rest = RestConnection(serverInfo)
         if bucket_ram < 0:
             info = rest.get_nodes_self()
-            bucket_ram = info.memoryQuota * 2 / 3
+            bucket_ram = info.memoryQuota * 2 // 3
 
         if password == None:
             authType = "sasl"
@@ -426,7 +426,7 @@ class BucketOperationHelper():
         verification_threads = []
         queue = queue.Queue()
         for i in range(concurrency):
-            keys_chunk = BucketOperationHelper.chunks(keys, len(keys) / concurrency)
+            keys_chunk = BucketOperationHelper.chunks(keys, len(keys) // concurrency)
             t = Thread(target=BucketOperationHelper.keys_exist_or_assert,
                        name="verification-thread-{0}".format(i),
                        args=(keys_chunk.get(i), server, bucket_name, test, queue, collection))

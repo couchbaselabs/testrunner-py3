@@ -51,7 +51,7 @@ class SecondaryIndexingBootstrapTests(BaseSecondaryIndexingTests):
             # runs operations
             for task in tasks:
                 task.result()
-            stopped = RestConnection(self.master).stop_rebalance(wait_timeout=self.wait_timeout / 3)
+            stopped = RestConnection(self.master).stop_rebalance(wait_timeout=self.wait_timeout // 3)
             self.assertTrue(stopped, msg="unable to stop rebalance")
             rebalance.result()
             rebalance = self.cluster.async_rebalance(self.servers[:self.nodes_init],

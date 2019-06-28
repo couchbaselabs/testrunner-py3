@@ -33,7 +33,7 @@ class BackupRestoreTests(BaseTestCase):
         self.master = self.servers[0]
         self.shell = RemoteMachineShellConnection(self.master)
 
-        # When using custom data_paths, (smaller / sizes), creates
+        # When using custom data_paths, (smaller // sizes), creates
         # backup in those custom paths ( helpful when running on ec2)
         info = RestConnection(self.master).get_nodes_self()
         data_path = info.storage[0].get_data_path()

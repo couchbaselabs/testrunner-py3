@@ -4075,12 +4075,12 @@ class QuerySanityTests(QueryTests):
     def test_let_nums(self):
         self.fail_if_no_buckets()
         for bucket in self.buckets:
-            self.query = "select test_r, test_r > 2 compare from %s let test_r = (test_rate / 2)" % (bucket.name)
+            self.query = "select test_r, test_r > 2 compare from %s let test_r = (test_rate // 2)" % (bucket.name)
 
             actual_list = self.run_cbq_query()
             actual_result = sorted(actual_list['results'])
-            expected_result = [{"test_r" : doc["test_rate"] / 2,
-                                "compare" : (doc["test_rate"] / 2) > 2}
+            expected_result = [{"test_r" : doc["test_rate"] // 2,
+                                "compare" : (doc["test_rate"] // 2) > 2}
                                for doc in self.full_list]
             expected_result = sorted(expected_result)
             self._verify_results(actual_result, expected_result)
@@ -4088,7 +4088,7 @@ class QuerySanityTests(QueryTests):
     def test_prepared_let_nums(self):
         self.fail_if_no_buckets()
         for bucket in self.buckets:
-            self.query = "select test_r, test_r > 2 compare from %s let test_r = (test_rate / 2)" % (bucket.name)
+            self.query = "select test_r, test_r > 2 compare from %s let test_r = (test_rate // 2)" % (bucket.name)
             self.prepared_common_body()
 
     def test_let_string(self):

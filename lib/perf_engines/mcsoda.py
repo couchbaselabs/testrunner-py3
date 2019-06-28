@@ -163,7 +163,7 @@ def histo_percentile(histo, percentiles):
         if not percentiles:
             return rv
         v_cur += histo[bin]
-        while percentiles and (v_cur / v_sum) >= percentiles[0]:
+        while percentiles and (v_cur // v_sum) >= percentiles[0]:
             rv.append((percentiles[0], bin))
             percentiles.pop(0)
     return rv
@@ -452,9 +452,9 @@ def run_worker(ctl, cfg, cur, store, prefix, heartbeat=0, why=""):
             xfer_recv_delta = xfer_recv_curr - xfer_recv_last
 
             try:
-                ops_per_sec = o_delta / t_delta
-                xfer_sent_per_sec = xfer_sent_delta / t_delta
-                xfer_recv_per_sec = xfer_recv_delta / t_delta
+                ops_per_sec = o_delta // t_delta
+                xfer_sent_per_sec = xfer_sent_delta // t_delta
+                xfer_recv_per_sec = xfer_recv_delta // t_delta
             except ZeroDivisionError:
                 ops_per_sec = o_delta
                 xfer_sent_per_sec = xfer_sent_delta
@@ -498,12 +498,12 @@ def run_worker(ctl, cfg, cur, store, prefix, heartbeat=0, why=""):
                     concurrent_workers = cfg.get('active_fg_workers').value
                 else:
                     concurrent_workers = 1
-                local_max_ops_per_sec = max_ops_per_sec / concurrent_workers
+                local_max_ops_per_sec = max_ops_per_sec // concurrent_workers
                 # Actual throughput
-                ops_per_sec = ops_done / delta2
+                ops_per_sec = ops_done // delta2
                 # Sleep if too fast. It must be too fast.
                 if ops_per_sec > local_max_ops_per_sec:
-                    sleep_time = CORRECTION_FACTOR * ops_done / local_max_ops_per_sec - delta2
+                    sleep_time = CORRECTION_FACTOR * ops_done // local_max_ops_per_sec - delta2
                     time.sleep(max(sleep_time, 0))
 
             if hot_shift > 0:
@@ -799,7 +799,7 @@ class Store(object):
         hp = self.cfg.get("histo-precision", 2)
         if samp > 0:
             p = 10 ** (math.floor(math.log10(samp)) - (hp - 1))
-            r = round(samp / p)
+            r = round(samp // p)
             return r * p
 
     def drange(self, start, stop, step):

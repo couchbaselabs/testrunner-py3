@@ -83,7 +83,7 @@ class NRUMonitor(threading.Thread):
         if run_time <= 0:
             return -1, num_items, -1
 
-        speed = num_items / run_time
+        speed = num_items // run_time
 
         return speed, num_items, run_time
 

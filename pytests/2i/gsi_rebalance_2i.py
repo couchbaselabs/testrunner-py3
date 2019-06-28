@@ -560,7 +560,7 @@ class SecondaryIndexingRebalanceTests(BaseSecondaryIndexingTests, QueryHelperTes
         # rebalance out a indexer node
         rebalance = self.cluster.async_rebalance(self.servers[:self.nodes_init], [], [index_server])
         # stop the rebalance
-        stopped = RestConnection(self.master).stop_rebalance(wait_timeout=self.wait_timeout / 3)
+        stopped = RestConnection(self.master).stop_rebalance(wait_timeout=self.wait_timeout // 3)
         self.assertTrue(stopped, msg="unable to stop rebalance")
         rebalance.result()
         # start rebalance again
@@ -2861,11 +2861,11 @@ class SecondaryIndexingRebalanceTests(BaseSecondaryIndexingTests, QueryHelperTes
     def _set_indexer_compaction(self):
         DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
         date = datetime.now()
-        dayOfWeek = (date.weekday() + (date.hour + ((date.minute + 5) / 60)) / 24) % 7
+        dayOfWeek = (date.weekday() + (date.hour + ((date.minute + 5) // 60)) // 24) % 7
         status, content, header = self.rest.set_indexer_compaction(indexDayOfWeek=DAYS[dayOfWeek],
-                                                                   indexFromHour=date.hour + ((date.minute + 2) / 60),
+                                                                   indexFromHour=date.hour + ((date.minute + 2) // 60),
                                                                    indexFromMinute=(date.minute + 2) % 60,
-                                                                   indexToHour=date.hour + ((date.minute + 3) / 60),
+                                                                   indexToHour=date.hour + ((date.minute + 3) // 60),
                                                                    indexToMinute=(date.minute + 3) % 60,
                                                                    abortOutside=True)
         self.assertTrue(status, "Error in setting Circular Compaction... {0}".format(content))

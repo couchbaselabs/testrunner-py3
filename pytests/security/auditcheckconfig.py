@@ -77,7 +77,7 @@ class auditcheckconfig(BaseTestCase):
                                     'auth_type':'sasl', "autocompaction":'false', "purge_interval":"undefined", \
                                     "flush_enabled":1, "num_threads":3, \
                                     "ip":self.ipAddress, "port":57457, 'sessionid':'' }
-        rest.create_bucket(expectedResults['name'], expectedResults['ram_quota'] / 1048576, expectedResults['auth_type'], 'password', expectedResults['num_replicas'], \
+        rest.create_bucket(expectedResults['name'], expectedResults['ram_quota'] // 1048576, expectedResults['auth_type'], 'password', expectedResults['num_replicas'], \
                                     '11211', 'membase', 0, expectedResults['num_threads'], expectedResults['flush_enabled'], 'valueOnly')
         return expectedResults
 
@@ -426,7 +426,7 @@ class auditcheckconfig(BaseTestCase):
                                        'auth_type':'sasl', "autocompaction":'false', "purge_interval":"undefined", \
                                         "flush_enabled":False, "num_threads":3, "source":source, \
                                        "user":user, "ip":self.ipAddress, "port":57457, 'sessionid':'' }
-            rest.create_bucket(expectedResults['name'], expectedResults['ram_quota'] / 1048576, expectedResults['auth_type'], 'password', expectedResults['num_replicas'], \
+            rest.create_bucket(expectedResults['name'], expectedResults['ram_quota'] // 1048576, expectedResults['auth_type'], 'password', expectedResults['num_replicas'], \
                                        '11211', 'membase', 0, expectedResults['num_threads'], expectedResults['flush_enabled'], 'valueOnly')
 
             #Check on Events

@@ -90,7 +90,7 @@ class AwsIni:
             print("\n[cluster{0}]".format(cluster_id + 1))
 
             servers = list(self._get_servers())
-            cluster_quota = len(servers) / self.options.clusters
+            cluster_quota = len(servers) // self.options.clusters
             left_index = cluster_quota * cluster_id
             right_index = cluster_quota * (cluster_id + 1)
 

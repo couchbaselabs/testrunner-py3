@@ -55,7 +55,7 @@ class CBTransferTests(TransferBaseTest):
     def test_vbucket_id_option(self):
         bucket = RestConnection(self.server_origin).get_bucket(self.buckets[0])
         self.num_items = self.num_items - (self.num_items % len(bucket.vbuckets))
-        num_items_per_vb = self.num_items / len(bucket.vbuckets)
+        num_items_per_vb = self.num_items // len(bucket.vbuckets)
         template = '{{ "mutated" : 0, "age": {0}, "first_name": "{1}" }}'
         gen_load = DocumentGenerator('cbtransfer', template, list(range(5)), ['james', 'john'], start=0, end=self.num_items)
         client = MemcachedClient(self.server_origin.ip,

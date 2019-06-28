@@ -38,7 +38,7 @@ def histo_percentile(histo, percentiles):
         if not percentiles:
             return rv
         v_cur += histo[bin]
-        while percentiles and (v_cur / v_sum) >= percentiles[0]:
+        while percentiles and (v_cur // v_sum) >= percentiles[0]:
             rv.append((percentiles[0], bin))
             percentiles.pop(0)
     return rv
@@ -171,7 +171,7 @@ class StatsCollector(object):
                 self._task["latency"][key].append(temp)
             if per_90th_tot:
                 self._lat_avg_stats["%s-90th-avg" % latency] \
-                    = per_90th_tot / len(histos) * 1000000
+                    = per_90th_tot // len(histos) * 1000000
 
         # XDCR stats
         try:
@@ -651,7 +651,7 @@ class StatsCollector(object):
                     update_history = data[1]['stats']['update_history']
                     indexing_time = \
                         [event['indexing_time'] for event in update_history]
-                    avg_time = sum(indexing_time) / len(indexing_time)
+                    avg_time = sum(indexing_time) // len(indexing_time)
                 except (IndexError, KeyError, ValueError):
                     avg_time = 0
                 finally:
@@ -690,7 +690,7 @@ class StatsCollector(object):
                     task['updated_on'] - indexers[uiid].get('updated_on',
                                                             task['started_on'])
                 if time_delta:
-                    thr += changes_delta / time_delta
+                    thr += changes_delta // time_delta
                 indexers[uiid]['changes_done'] = task['changes_done']
                 indexers[uiid]['updated_on'] = task['updated_on']
 

@@ -29,7 +29,7 @@ class AutoCompactionTests(BaseTestCase):
         self.is_crashed = Event()
         self.during_ops = self.input.param("during_ops", None)
         self.gen_load = BlobGenerator('compact', 'compact-', self.value_size, start=0, end=self.num_items)
-        self.gen_update = BlobGenerator('compact', 'compact-', self.value_size, start=0, end=(self.num_items / 2))
+        self.gen_update = BlobGenerator('compact', 'compact-', self.value_size, start=0, end=(self.num_items // 2))
 
     @staticmethod
     def insert_key(serverInfo, bucket_name, count, size):
@@ -93,7 +93,7 @@ class AutoCompactionTests(BaseTestCase):
                      and percent_threshold <= MAX_RUN):
             node_ram_ratio = BucketOperationHelper.base_bucket_ratio(TestInputSingleton.input.servers)
             info = rest.get_nodes_self()
-            available_ram = info.memoryQuota * (node_ram_ratio) / 2
+            available_ram = info.memoryQuota * (node_ram_ratio) // 2
             items = (int(available_ram * 1000) / 2) / item_size
             print("ITEMS =============%s" % items)
 

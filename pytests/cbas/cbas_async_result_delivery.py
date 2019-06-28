@@ -354,7 +354,7 @@ class CBASAsyncResultDeliveryTests(CBASBaseTest):
                     self.fail("Status is not RUNNING")
                 else:
                     # Allow the request to be processed, and then check status
-                    self.sleep((delay / 1000) + 5)
+                    self.sleep((delay // 1000) + 5)
                     status, result_handle = self.retrieve_request_status_using_handle(
                         self.master, handle)
                     if status.lower() != "success":

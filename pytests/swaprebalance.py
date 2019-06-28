@@ -223,7 +223,7 @@ class SwapRebalanceBase(unittest.TestCase):
         rest = RestConnection(master)
         for bucket in rest.get_buckets():
             loader = dict()
-            loader["mcsoda"] = LoadWithMcsoda(master, self.keys_count / 2, bucket=bucket.name,
+            loader["mcsoda"] = LoadWithMcsoda(master, self.keys_count // 2, bucket=bucket.name,
                     rest_password=master.rest_password, prefix=str(bucket.name), port=8091)
             loader["mcsoda"].cfg["ratio-sets"] = 0.8
             loader["mcsoda"].cfg["ratio-hot"] = 0.2

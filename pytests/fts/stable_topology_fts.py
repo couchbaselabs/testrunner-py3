@@ -1918,7 +1918,7 @@ class StableTopFTS(FTSBaseTest):
     def test_score_none(self):
         # Create bucket, create index
         self.load_data()
-        self.wait_till_items_in_bucket_equal(items=self._num_items / 2)
+        self.wait_till_items_in_bucket_equal(items=self._num_items // 2)
         index = self.create_index(
             self._cb_cluster.get_bucket_by_name('default'),
             "default_index")
@@ -1964,7 +1964,7 @@ class StableTopFTS(FTSBaseTest):
     def test_result_correctness_score_none(self):
         # Create bucket, create index
         self.load_data()
-        self.wait_till_items_in_bucket_equal(items=self._num_items / 2)
+        self.wait_till_items_in_bucket_equal(items=self._num_items // 2)
         index = self.create_index(
             self._cb_cluster.get_bucket_by_name('default'),
             "default_index")

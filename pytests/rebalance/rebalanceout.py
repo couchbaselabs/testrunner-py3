@@ -28,8 +28,8 @@ class RebalanceOutTests(RebalanceBaseTest):
     disk queues to drain, and then verify that there has been no data loss, sum(curr_items) match the
     curr_items_total. We also check for data and its meta-data, vbucket sequene numbers"""
     def rebalance_out_after_ops(self):
-        gen_delete = BlobGenerator('mike', 'mike-', self.value_size, start=self.num_items / 2, end=self.num_items)
-        gen_create = BlobGenerator('mike', 'mike-', self.value_size, start=self.num_items + 1, end=self.num_items * 3 / 2)
+        gen_delete = BlobGenerator('mike', 'mike-', self.value_size, start=self.num_items // 2, end=self.num_items)
+        gen_create = BlobGenerator('mike', 'mike-', self.value_size, start=self.num_items + 1, end=self.num_items * 3 // 2)
         # define which doc's ops will be performed during rebalancing
         # allows multiple of them but one by one
         tasks = []
@@ -71,8 +71,8 @@ class RebalanceOutTests(RebalanceBaseTest):
     disk queues to drain, and then verify that there has been no data loss, sum(curr_items) match the
     curr_items_total. We also check for data and its meta-data, vbucket sequene numbers"""
     def rebalance_out_with_failover_full_addback_recovery(self):
-        gen_delete = BlobGenerator('mike', 'mike-', self.value_size, start=self.num_items / 2, end=self.num_items)
-        gen_create = BlobGenerator('mike', 'mike-', self.value_size, start=self.num_items + 1, end=self.num_items * 3 / 2)
+        gen_delete = BlobGenerator('mike', 'mike-', self.value_size, start=self.num_items // 2, end=self.num_items)
+        gen_create = BlobGenerator('mike', 'mike-', self.value_size, start=self.num_items + 1, end=self.num_items * 3 // 2)
         # define which doc's ops will be performed during rebalancing
         # allows multiple of them but one by one
         tasks = []
@@ -121,8 +121,8 @@ class RebalanceOutTests(RebalanceBaseTest):
     def rebalance_out_with_failover(self):
         fail_over = self.input.param("fail_over", False)
         self.rest = RestConnection(self.master)
-        gen_delete = BlobGenerator('mike', 'mike-', self.value_size, start=self.num_items / 2, end=self.num_items)
-        gen_create = BlobGenerator('mike', 'mike-', self.value_size, start=self.num_items + 1, end=self.num_items * 3 / 2)
+        gen_delete = BlobGenerator('mike', 'mike-', self.value_size, start=self.num_items // 2, end=self.num_items)
+        gen_create = BlobGenerator('mike', 'mike-', self.value_size, start=self.num_items + 1, end=self.num_items * 3 // 2)
         # define which doc's ops will be performed during rebalancing
         # allows multiple of them but one by one
         tasks = []
@@ -170,11 +170,11 @@ class RebalanceOutTests(RebalanceBaseTest):
     def rebalance_out_with_ops(self):
         tasks = list()
         gen_delete = BlobGenerator('mike', 'mike-', self.value_size,
-                                   start=self.num_items / 2,
+                                   start=self.num_items // 2,
                                    end=self.num_items)
         gen_create = BlobGenerator('mike', 'mike-', self.value_size,
                                    start=self.num_items + 1,
-                                   end=self.num_items * 3 / 2)
+                                   end=self.num_items * 3 // 2)
         servs_out = [self.servers[self.num_servers - i - 1]
                      for i in range(self.nodes_out)]
         # define which doc's ops will be performed during rebalancing
@@ -213,8 +213,8 @@ class RebalanceOutTests(RebalanceBaseTest):
     and then verify that there has been no data loss, sum(curr_items) match the curr_items_total.
     Once all nodes have been rebalanced the test is finished."""
     def rebalance_out_with_compaction_and_ops(self):
-        gen_delete = BlobGenerator('mike', 'mike-', self.value_size, start=self.num_items / 2, end=self.num_items)
-        gen_create = BlobGenerator('mike', 'mike-', self.value_size, start=self.num_items + 1, end=self.num_items * 3 / 2)
+        gen_delete = BlobGenerator('mike', 'mike-', self.value_size, start=self.num_items // 2, end=self.num_items)
+        gen_create = BlobGenerator('mike', 'mike-', self.value_size, start=self.num_items + 1, end=self.num_items * 3 // 2)
         servs_out = [self.servers[self.num_servers - i - 1] for i in range(self.nodes_out)]
         tasks = [self.cluster.async_rebalance(self.servers[:1], [], servs_out)]
         for bucket in self.buckets:
@@ -379,7 +379,7 @@ class RebalanceOutTests(RebalanceBaseTest):
             tasks += temp_tasks
         timeout = None
         if self.active_resident_threshold == 0:
-            timeout = max(self.wait_timeout * 4, len(self.buckets) * self.wait_timeout * self.num_items / 50000)
+            timeout = max(self.wait_timeout * 4, len(self.buckets) * self.wait_timeout * self.num_items // 50000)
 
         for task in tasks:
             task.result(self.wait_timeout * 20)
@@ -405,7 +405,7 @@ class RebalanceOutTests(RebalanceBaseTest):
 
         servs_out = self.servers[-self.nodes_out:]
         rebalance = self.cluster.async_rebalance([self.master], [], servs_out)
-        self.sleep(self.wait_timeout / 5)
+        self.sleep(self.wait_timeout // 5)
         # see that the result of view queries are the same as expected during the test
         for bucket in self.buckets:
            self.perform_verify_queries(num_views, prefix, ddoc_name, query, bucket=bucket, wait_time=timeout, expected_rows=expected_rows)
@@ -435,7 +435,7 @@ class RebalanceOutTests(RebalanceBaseTest):
         # increase timeout for big data
         timeout = None
         if self.active_resident_threshold == 0:
-            timeout = max(self.wait_timeout * 5, self.wait_timeout * self.num_items / 25000)
+            timeout = max(self.wait_timeout * 5, self.wait_timeout * self.num_items // 25000)
         query = {}
         query["connectionTimeout"] = 60000;
         query["full_set"] = "true"
@@ -463,7 +463,7 @@ class RebalanceOutTests(RebalanceBaseTest):
         query["stale"] = "update_after"
         for i in reversed(list(range(1, self.num_servers, 2))):
             rebalance = self.cluster.async_rebalance(self.servers[:i], [], self.servers[i:i + 2])
-            self.sleep(self.wait_timeout / 5)
+            self.sleep(self.wait_timeout // 5)
             # see that the result of view queries are the same as expected during the test
             self.perform_verify_queries(num_views, prefix, ddoc_name, query, wait_time=timeout, expected_rows=expected_rows)
             # verify view queries results after rebalancing
@@ -602,7 +602,7 @@ class RebalanceOutTests(RebalanceBaseTest):
     verifies that there has been no data loss, sum(curr_items) match the curr_items_total.
     Once all nodes have been rebalanced out of the cluster the test finishes."""
     def incremental_rebalance_out_with_mutation_and_deletion(self):
-        gen_2 = BlobGenerator('rebalance-del', 'rebalance-del-', self.value_size, start=self.num_items / 2 + 2000,
+        gen_2 = BlobGenerator('rebalance-del', 'rebalance-del-', self.value_size, start=self.num_items // 2 + 2000,
                               end=self.num_items)
         batch_size = 1000
         for i in reversed(list(range(self.num_servers))[1:]):
@@ -629,7 +629,7 @@ class RebalanceOutTests(RebalanceBaseTest):
     verifies that there has been no data loss, sum(curr_items) match the curr_items_total.
     Once all nodes have been rebalanced out of the cluster the test finishes."""
     def incremental_rebalance_out_with_mutation_and_expiration(self):
-        gen_2 = BlobGenerator('mike', 'mike-', self.value_size, start=self.num_items / 2 + 2000,
+        gen_2 = BlobGenerator('mike', 'mike-', self.value_size, start=self.num_items // 2 + 2000,
                               end=self.num_items)
         batch_size = 1000
         for i in reversed(list(range(self.num_servers))[2:]):

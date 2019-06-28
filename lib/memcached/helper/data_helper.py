@@ -83,7 +83,7 @@ class MemcachedClientHelper(object):
                 list.append({'size': size, 'value': payload_generator, 'how_many': how_many})
         else:
             for size, probability in value_size_distribution.items():
-                how_many = ((number_of_items / number_of_threads) * probability)
+                how_many = ((number_of_items // number_of_threads) * probability)
                 payload_generator = DocumentGenerator.make_docs(number_of_items,
                         {"name": "user-${prefix}", "payload": "memcached-json-${prefix}-${padding}",
                          "size": size, "seed": str(uuid.uuid4())})
@@ -1709,7 +1709,7 @@ class DocumentGenerator(object):
 
     @staticmethod
     def create_value(pattern, size):
-        return (pattern * (size / len(pattern))) + pattern[0:(size % len(pattern))]
+        return (pattern * (size // len(pattern))) + pattern[0:(size % len(pattern))]
 
     @staticmethod
     def get_doc_generators(count, kv_template=None, seed=None, sizes=None):
@@ -1725,7 +1725,7 @@ class DocumentGenerator(object):
                            "email": "${prefix}@couchbase.com"}
         for size in sizes:
             options = {"size": size, "seed": seed}
-            docs = DocumentGenerator.make_docs(count / len(sizes),
+            docs = DocumentGenerator.make_docs(count // len(sizes),
                                                kv_template, options)
             doc_gen_iterators.append(docs)
 

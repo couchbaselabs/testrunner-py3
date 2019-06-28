@@ -493,7 +493,7 @@ class MultiNodesUpgradeTests(NewUpgradeBaseTest):
         self.verification(self.servers[1:])
 
     def online_consequentially_upgrade(self):
-        half_node = len(self.servers) / 2
+        half_node = len(self.servers) // 2
         self._install(self.servers[:half_node])
         self.operations(self.servers[:half_node])
         if self.ddocs_num:
@@ -613,7 +613,7 @@ class MultiNodesUpgradeTests(NewUpgradeBaseTest):
         new_vb_nums = RestHelper(RestConnection(self.master))._get_vbuckets(old_servers,
                                                                             bucket_name=self.buckets[0].name)
         new_servers = []
-        for i in range(self.nodes_init / self.swap_num_servers):
+        for i in range(self.nodes_init // self.swap_num_servers):
             old_vb_nums = copy.deepcopy(new_vb_nums)
             servers_in = self.servers[(self.nodes_init + i * self.swap_num_servers):
             (self.nodes_init + (i + 1) * self.swap_num_servers)]
@@ -659,7 +659,7 @@ class MultiNodesUpgradeTests(NewUpgradeBaseTest):
         self.verification(new_servers)
 
     def online_upgrade_add_services(self):
-        half_node = len(self.servers) / 2
+        half_node = len(self.servers) // 2
         self._install(self.servers[:2])
         self.operations(self.servers[:2])
         if self.ddocs_num:
@@ -2523,7 +2523,7 @@ class MultiNodesUpgradeTests(NewUpgradeBaseTest):
             self.set_flusher_batch_split_trigger(self.flusher_batch_split_trigger, [bucket])
         load_thread = Thread(target=self.load_buckets_with_high_ops,
                              name="high_ops_load",
-                             args=(self.master, self.buckets[0], self.num_items / 2,
+                             args=(self.master, self.buckets[0], self.num_items // 2,
                                    self.batch_size,
                                    1, 0,
                                    1, 0))
@@ -2570,7 +2570,7 @@ class MultiNodesUpgradeTests(NewUpgradeBaseTest):
                 rest.diag_eval("ns_config:set(extra_rebalance_quirks, [disable_old_master]).")
         new_servers = []
         # do online upgrade using swap rebalance for all nodes except the master node
-        for i in range(1, self.nodes_init / self.swap_num_servers):
+        for i in range(1, self.nodes_init // self.swap_num_servers):
             servers_in = self.servers[(self.nodes_init + i * self.swap_num_servers):
                                       (self.nodes_init + (i + 1) * self.swap_num_servers)]
             servers_out = self.servers[(i * self.swap_num_servers):((i + 1) * self.swap_num_servers)]
@@ -2630,7 +2630,7 @@ class MultiNodesUpgradeTests(NewUpgradeBaseTest):
             self.set_flusher_batch_split_trigger(self.flusher_batch_split_trigger, [bucket])
         load_thread = Thread(target=self.load_buckets_with_high_ops,
                              name="high_ops_load",
-                             args=(self.master, self.buckets[0], self.num_items / 2,
+                             args=(self.master, self.buckets[0], self.num_items // 2,
                                    self.batch_size,
                                    1, 0,
                                    1, 0))
@@ -2679,7 +2679,7 @@ class MultiNodesUpgradeTests(NewUpgradeBaseTest):
                 rest.diag_eval("ns_config:set(extra_rebalance_quirks, [disable_old_master]).")
         new_servers = []
         # do online upgrade using swap rebalance for all nodes except the master node
-        for i in range(1, self.nodes_init / self.swap_num_servers):
+        for i in range(1, self.nodes_init // self.swap_num_servers):
             servers_in = self.servers[(self.nodes_init + i * self.swap_num_servers):
                                       (self.nodes_init + (i + 1) * self.swap_num_servers)]
             servers_out = self.servers[(i * self.swap_num_servers):((i + 1) * self.swap_num_servers)]
@@ -2743,7 +2743,7 @@ class MultiNodesUpgradeTests(NewUpgradeBaseTest):
             self.set_flusher_batch_split_trigger(self.flusher_batch_split_trigger, [bucket])
         load_thread = Thread(target=self.load_buckets_with_high_ops,
                              name="high_ops_load",
-                             args=(self.master, self.buckets[0], self.num_items / 2,
+                             args=(self.master, self.buckets[0], self.num_items // 2,
                                    self.batch_size,
                                    1, 0,
                                    1, 0))
@@ -2794,7 +2794,7 @@ class MultiNodesUpgradeTests(NewUpgradeBaseTest):
         new_servers = []
         upgrade_nodes = self.servers[:self.nodes_init]
         # do upgrade using graceful failover/ recovery/ rebalance
-        for i in range(1, self.nodes_init / self.swap_num_servers):
+        for i in range(1, self.nodes_init // self.swap_num_servers):
             self.failover_upgrade_recovery_with_data_load(self.master, self.total_items, upgrade_nodes,
                                                           [self.servers[i]], self.recovery_type, bucket)
             self.total_items += self.num_items
@@ -2852,7 +2852,7 @@ class MultiNodesUpgradeTests(NewUpgradeBaseTest):
             self.set_flusher_batch_split_trigger(self.flusher_batch_split_trigger, [bucket])
         load_thread = Thread(target=self.load_buckets_with_high_ops,
                              name="high_ops_load",
-                             args=(self.master, self.buckets[0], self.num_items / 2,
+                             args=(self.master, self.buckets[0], self.num_items // 2,
                                    self.batch_size,
                                    1, 0,
                                    1, 0))
@@ -2991,7 +2991,7 @@ class MultiNodesUpgradeTests(NewUpgradeBaseTest):
         import multiprocessing
         num_cores = multiprocessing.cpu_count()
         cmd = "cbc-pillowfight -U couchbase://{0}/default -I {1} -m {4} -M {4} -B {2} --json  " \
-              "-t {4} --rate-limit={5} --populate-only".format(server.ip, items, batch, docsize, num_cores / 2,
+              "-t {4} --rate-limit={5} --populate-only".format(server.ip, items, batch, docsize, num_cores // 2,
                                                                self.rate_limit)
         if rest.get_nodes_version()[:5] in COUCHBASE_FROM_SPOCK:
             cmd += " -u Administrator -P password"
@@ -2999,7 +2999,7 @@ class MultiNodesUpgradeTests(NewUpgradeBaseTest):
         rc = subprocess.call(cmd, shell=True)
         if rc != 0:
             cmd = "cbc-pillowfight -U couchbase://{0}/default -I {1} -m {4} -M {4} -B {2} --json  " \
-                  "-t {4} --rate-limit={5} --populate-only".format(server.ip, items, batch, docsize, num_cores / 2,
+                  "-t {4} --rate-limit={5} --populate-only".format(server.ip, items, batch, docsize, num_cores // 2,
                                                                    self.rate_limit)
             rc = subprocess.call(cmd, shell=True)
             if rc != 0:

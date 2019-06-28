@@ -169,11 +169,11 @@ class ObserveTests(BaseTestCase):
             if len (self.observe_with) > 0 :
                 if self.observe_with == "delete" :
                     self.log.info("Deleting 0- %s number of items" % (self.num_items / 2))
-                    self._load_doc_data_all_buckets('delete', 0, self.num_items / 2)
+                    self._load_doc_data_all_buckets('delete', 0, self.num_items // 2)
                     query_set = "true"
                 elif self.observe_with == "delete_parallel":
                     self.log.info("Deleting Parallel 0- %s number of items" % (self.num_items / 2))
-                    tasks = self._async_load_doc_data_all_buckets('delete', 0, self.num_items / 2)
+                    tasks = self._async_load_doc_data_all_buckets('delete', 0, self.num_items // 2)
                     query_set = "false"
                 for key in keys:
                     opaque, rep_time, persist_time, persisted, cas = client.memcached(key).observe(key)
@@ -184,7 +184,7 @@ class ObserveTests(BaseTestCase):
                         task.result()
 
                 query = {"stale" : "false", "full_set" : query_set, "connection_timeout" : 600000}
-                self.cluster.query_view(self.master, "dev_Doc1", self.default_view.name, query, self.num_items / 2, bucket, timeout=self.wait_timeout)
+                self.cluster.query_view(self.master, "dev_Doc1", self.default_view.name, query, self.num_items // 2, bucket, timeout=self.wait_timeout)
                 self.log.info("Observe Validation:- view: %s in design doc dev_Doc1 and in bucket %s" % (self.default_view, self.default_bucket_name))
 
         """test_observe_basic_data_load_delete will test observer basic scenario
@@ -216,11 +216,11 @@ class ObserveTests(BaseTestCase):
         self._load_doc_data_all_buckets('create', 0, self.num_items)
         if self.observe_with == "delete" :
             self.log.info("Deleting 0- %s number of items" % (self.num_items / 2))
-            self._load_doc_data_all_buckets('delete', 0, self.num_items / 2)
+            self._load_doc_data_all_buckets('delete', 0, self.num_items // 2)
             query_set = "true"
         elif self.observe_with == "delete_parallel":
             self.log.info("Deleting Parallel 0- %s number of items" % (self.num_items / 2))
-            tasks = self._async_load_doc_data_all_buckets('delete', 0, self.num_items / 2)
+            tasks = self._async_load_doc_data_all_buckets('delete', 0, self.num_items // 2)
             query_set = "false"
         keys = ["observe%s" % (i) for i in range(self.num_items)]
         self.key_count = 0

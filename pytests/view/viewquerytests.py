@@ -107,9 +107,9 @@ class ViewQueryTests(BaseTestCase):
         data_set.add_stale_queries(stale_param="false", limit=self.limit)
         #  generate items
         generator_load = data_set.generate_docs(data_set.views[0], start=0,
-                                                end=self.num_docs / 2)
+                                                end=self.num_docs // 2)
         generator_delete = data_set.generate_docs(data_set.views[0],
-                                                  start=self.num_docs / 2,
+                                                  start=self.num_docs // 2,
                                                   end=self.num_docs)
 
         self.load(data_set, generator_load)
@@ -1323,9 +1323,9 @@ class ViewQueryTests(BaseTestCase):
 
         data_set.add_skip_queries(skip, limit=self.limit)
         generator_load = data_set.generate_docs(data_set.views[0], start=0,
-                                                  end=self.num_docs / 2)
+                                                  end=self.num_docs // 2)
         generator_update_delete = data_set.generate_docs(data_set.views[0],
-                                                  start=self.num_docs / 2,
+                                                  start=self.num_docs // 2,
                                                   end=self.num_docs)
         self.load(data_set, generator_load)
         self.load(data_set, generator_update_delete)
@@ -2619,7 +2619,7 @@ class SimpleDataSet:
         for view in views:
             if view.reduce_fn:
                 continue
-            start_key = self.num_docs / 2
+            start_key = self.num_docs // 2
             end_key = self.num_docs - 2
 
             view.queries += [QueryHelper({"startkey" : end_key,
@@ -2643,7 +2643,7 @@ class SimpleDataSet:
 
         for view in views:
             view.queries = list()
-            start_key = '"%s-%s"' % (views[0].prefix, str(self.num_docs / 2))
+            start_key = '"%s-%s"' % (views[0].prefix, str(self.num_docs // 2))
             end_key = '"%s-%s%s"' % (views[0].prefix, str(self.num_docs - 2), symbol)
 
             view.queries += [QueryHelper({"startkey" : end_key,

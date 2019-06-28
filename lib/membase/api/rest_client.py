@@ -1671,7 +1671,7 @@ class RestConnection(object):
                             count += 1
                             total_percentage += percentage
                     if count:
-                        avg_percentage = (total_percentage / count)
+                        avg_percentage = (total_percentage // count)
                     else:
                         avg_percentage = 0
                     log.info('rebalance percentage : {0:.02f} %'.
@@ -2422,7 +2422,6 @@ class RestConnection(object):
         maxwait = 60
         for numsleep in range(maxwait):
             status, content, header = self._http_request(api, 'POST', params)
-            log.info("-->status:{},content={}".format(status,content))
             if status:
                 break
             elif (int(header['status']) == 503 and
@@ -2430,7 +2429,6 @@ class RestConnection(object):
                 log.info("The bucket still exists, sleep 1 sec and retry")
                 time.sleep(1)
             else:
-                traceback.print_exc()
                 raise BucketCreationException(ip=self.ip, bucket_name=bucket)
 
         if (numsleep + 1) == maxwait:
@@ -2664,7 +2662,7 @@ class RestConnection(object):
         status, content, header = self._http_request(api)
         json_parsed = json.loads(content)
         # disk_size in MB
-        disk_size = (json_parsed[0]["basicStats"]["diskUsed"]) / (1024 * 1024)
+        disk_size = (json_parsed[0]["basicStats"]["diskUsed"]) // (1024 * 1024)
         return status, disk_size
 
     def ddoc_compaction(self, design_doc_id, bucket="default"):
@@ -3084,7 +3082,7 @@ class RestConnection(object):
             # reuse current ram quota in mb per node
             num_nodes = len(self.node_statuses())
             bucket_info = self.get_bucket_json(bucket)
-            quota = self.get_bucket_json(bucket)["quota"]["ram"] / (1048576 * num_nodes)
+            quota = self.get_bucket_json(bucket)["quota"]["ram"] // (1048576 * num_nodes)
             params["ramQuotaMB"] = quota
             if bucket_info["authType"] == "sasl" and bucket_info["name"] != "default":
                 params["authType"] = self.get_bucket_json(bucket)["authType"]

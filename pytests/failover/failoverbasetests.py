@@ -67,8 +67,8 @@ class FailoverBaseTest(BaseTestCase):
         # Defintions of Blod Generator used in tests
         self.gen_initial_create = BlobGenerator('failover', 'failover', self.value_size, end=self.num_items)
         self.gen_create = BlobGenerator('failover', 'failover', self.value_size, start=self.num_items + 1, end=self.num_items * 1.5)
-        self.gen_update = BlobGenerator('failover', 'failover', self.value_size, start=self.num_items / 2, end=self.num_items)
-        self.gen_delete = BlobGenerator('failover', 'failover', self.value_size, start=self.num_items / 4, end=self.num_items / 2 - 1)
+        self.gen_update = BlobGenerator('failover', 'failover', self.value_size, start=self.num_items // 2, end=self.num_items)
+        self.gen_delete = BlobGenerator('failover', 'failover', self.value_size, start=self.num_items // 4, end=self.num_items // 2 - 1)
         self.afterfailover_gen_create = BlobGenerator('failover', 'failover', self.value_size, start=self.num_items * 1.6, end=self.num_items * 2)
         self.afterfailover_gen_update = BlobGenerator('failover', 'failover', self.value_size, start=1, end=self.num_items/4)
         self.afterfailover_gen_delete = BlobGenerator('failover', 'failover', self.value_size, start=self.num_items * .5, end=self.num_items* 0.75)

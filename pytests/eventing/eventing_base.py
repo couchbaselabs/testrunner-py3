@@ -553,7 +553,7 @@ class EventingBaseTest(QueryHelperTests, BaseTestCase):
         count=0
         result=0
         while count <= 20 and doc_count != result:
-            self.sleep(timeout / 20, message="Waiting for eventing to process all dcp mutations...")
+            self.sleep(timeout // 20, message="Waiting for eventing to process all dcp mutations...")
             if deletes:
                     query="select raw(count(*)) from {} where doc_deleted = 1".format(bucket)
             else:

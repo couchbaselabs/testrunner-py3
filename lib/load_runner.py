@@ -59,8 +59,8 @@ class LoadThread(threading.Thread):
         self.bucket_password = load_info['memcached_info'].get('bucket_password', '')
 
         # operation info
-        self.create = load_info['operation_info']['create_percent'] / fractions.gcd(load_info['operation_info']['create_percent'], 100 - load_info['operation_info']['create_percent'])
-        self.nocreate = (100 - load_info['operation_info']['create_percent']) / fractions.gcd(load_info['operation_info']['create_percent'], 100 - load_info['operation_info']['create_percent'])
+        self.create = load_info['operation_info']['create_percent'] // fractions.gcd(load_info['operation_info']['create_percent'], 100 - load_info['operation_info']['create_percent'])
+        self.nocreate = (100 - load_info['operation_info']['create_percent']) // fractions.gcd(load_info['operation_info']['create_percent'], 100 - load_info['operation_info']['create_percent'])
         self.operation_sequence = []
         for op in load_info['operation_info']['operation_distribution']:
             for i in range(load_info['operation_info']['operation_distribution'][op]):

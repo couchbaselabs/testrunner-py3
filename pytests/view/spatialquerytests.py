@@ -814,13 +814,13 @@ class MultidimDataSet:
                 QueryHelper(
                     {"start_range": [0, 0, 0],
                      "end_range": [1001, 13001, 13],
-                     "limit": self.num_docs / 2},
-                     self.num_docs / 2),
+                     "limit": self.num_docs // 2},
+                     self.num_docs // 2),
                 QueryHelper(
                     {"start_range": [None, 0, None],
                      "end_range": [1001, None, None],
-                     "limit": self.num_docs / 2},
-                    self.num_docs / 2),
+                     "limit": self.num_docs // 2},
+                    self.num_docs // 2),
                 QueryHelper(
                     {"start_range": [500, 2000, 3],
                      "end_range": [800, 11111, 9],

@@ -59,7 +59,7 @@ class PerfWrapper(object):
                 executors = list()
 
                 if is_bi_xperf:
-                    prefix_range = range(total_clients / 2)
+                    prefix_range = range(total_clients // 2)
                 else:
                     prefix_range = range(total_clients)
 
@@ -328,9 +328,9 @@ class XPerfTests(EPerfClient):
         stats = {'slave': defaultdict(list), 'master': defaultdict(list)}
 
         # Calculate approximate number of relicated items per node
-        num_nodes = self.parami('num_nodes', 1) / 2
+        num_nodes = self.parami('num_nodes', 1) // 2
         total_items = self.parami('items', 1000000)
-        items = 0.99 * total_items / num_nodes
+        items = 0.99 * total_items // num_nodes
 
         # Get number of relicated items
         curr_items = self.get_samples(slave_rest_conn)['curr_items']
@@ -366,7 +366,7 @@ class XPerfTests(EPerfClient):
         for server in stats:
             mem_used = max(stats[server]['mem_used'])
             print("{0}> MAX memory used: {1}, MB".format(server,
-                                                         mem_used / 1024 ** 2))
+                                                         mem_used // 1024 ** 2))
             cpu_rate = sum(stats[server]['cpu_utilization_rate']) /\
                 len(stats[server]['cpu_utilization_rate'])
             print("{0}> AVG CPU rate: {1}, %".format(server, cpu_rate))

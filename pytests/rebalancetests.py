@@ -480,7 +480,7 @@ class IncrementalRebalanceInTests(unittest.TestCase):
         #because parallel ops is too slow due to num_locks=1 is used in old kvs store
         data_perc = 1
 
-        #self.keys_count = self.keys_count / 10
+        #self.keys_count = self.keys_count // 10
         for server in self.servers[1:]:
             if self.keys_count >= 100000:
                 data_perc *= 0.1
@@ -538,7 +538,7 @@ class IncrementalRebalanceWithMcsoda(unittest.TestCase):
             loader["mcsoda"] = LoadWithMcsoda(master, self.keys_count, prefix='', bucket=bucket.name,
                 password=bucket.saslPassword, protocol='membase-binary')
             loader["mcsoda"].cfg["max-ops"] = 0
-            loader["mcsoda"].cfg["max-ops-per-sec"] = self.max_ops_per_second / len(buckets)
+            loader["mcsoda"].cfg["max-ops-per-sec"] = self.max_ops_per_second // len(buckets)
             loader["mcsoda"].cfg["exit-after-creates"] = 0
             loader["mcsoda"].cfg["min-value-size"] = self.min_item_size
             loader["mcsoda"].cfg["json"] = 0

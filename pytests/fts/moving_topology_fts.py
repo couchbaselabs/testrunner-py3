@@ -969,7 +969,7 @@ class MovingTopFTS(FTSBaseTest):
             self.log.info("Index count for %s: %s"
                           % (index.name, index.get_indexed_doc_count()))
         # wait till indexing is midway...
-        self.wait_for_indexing_complete(self._num_items / 2)
+        self.wait_for_indexing_complete(self._num_items // 2)
         reb_thread = Thread(target=self._cb_cluster.rebalance_out_master,
                             name="rebalance",
                             args=())

@@ -773,7 +773,7 @@ class AppendTests(unittest.TestCase):
                 expected_delta = items * (size + append_iteration_before_delete * append_size * 1.0)
                 msg = "initial mem_used {0}, current mem_used {1} , delta : {2} , expected delta : {3} , increase percentage {4}"
                 self.log.info(
-                    msg.format(initial_mem_used, stats["mem_used"], delta, expected_delta, delta / expected_delta))
+                    msg.format(initial_mem_used, stats["mem_used"], delta, expected_delta, delta // expected_delta))
                 if delta > (1.2 * expected_delta):
                     self.fail("too much memory..")
                 for key in keys:
@@ -1148,7 +1148,7 @@ class MemcachedValueSizeLimitTest(unittest.TestCase):
 #    def test_incr_till_max(self):
 #        initial_value = '0'
 #        max_value = pow(2, 64)
-#        step = max_value / 1024
+#        step = max_value // 1024
 #        self.log.info("step : {0}")
 #        key = str(uuid.uuid4())
 #        self.keys_cleanup.append(key)
@@ -1169,7 +1169,7 @@ class MemcachedValueSizeLimitTest(unittest.TestCase):
 #    def test_decr_till_max(self):
 #        initial_value = '1'
 #        max_value = pow(2, 64)
-#        step = max_value / 1024
+#        step = max_value // 1024
 #        key = str(uuid.uuid4())
 #        self.keys_cleanup.append(key)
 #        self.onenodemc.set(key, 0, 0, initial_value)

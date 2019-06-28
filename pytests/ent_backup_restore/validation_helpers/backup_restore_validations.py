@@ -124,7 +124,7 @@ class BackupRestoreValidations(BackupRestoreValidationBase):
         :param output: list command output
         :return: status and message
 
-        TODO: this function validates list command output for 1 backup / 1 bucket only
+        TODO: this function validates list command output for 1 backup // 1 bucket only
          - need to be enhanced for multiple backups
         """
         backup_name = False

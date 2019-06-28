@@ -2786,7 +2786,7 @@ class GSIIndexPartitioningTests(GSIReplicaIndexesTests):
         rebalance = self.cluster.async_rebalance(self.servers[:self.nodes_init],
                                                  [], [node_out])
         stopped = RestConnection(self.master).stop_rebalance(
-            wait_timeout=self.wait_timeout / 3)
+            wait_timeout=self.wait_timeout // 3)
         self.assertTrue(stopped, msg="unable to stop rebalance")
         rebalance.result()
 

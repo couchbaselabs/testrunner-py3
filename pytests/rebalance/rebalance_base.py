@@ -39,7 +39,7 @@ class RebalanceBaseTest(BaseTestCase):
                                           end=self.num_items)
             # gen_update is used for doing mutation for 1/2th of uploaded data
             self.gen_update = BlobGenerator('mike', 'mike-', self.value_size,
-                                            end=(self.num_items / 2 - 1))
+                                            end=(self.num_items // 2 - 1))
             # upload data before each test
             self._load_all_buckets(self.servers[0], self.gen_load, "create",
                                    0, flag=2, batch_size=20000)

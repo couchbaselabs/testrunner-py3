@@ -4899,9 +4899,9 @@ class RemoteMachineShellConnection:
         command = "mkdir -p {0}".format(location)
         output, error = self.execute_command(command)
         if size:
-            count = (size * 1024 * 1024) / 512
+            count = (size * 1024 * 1024) // 512
         else:
-            count = (5 * 1024 * 1024 * 1024) / 512
+            count = (5 * 1024 * 1024 * 1024) // 512
         command = "mkdir -p /usr/disk-img"
         output, error = self.execute_command(command)
         command = "dd if=/dev/zero of=/usr/disk-img/disk-quota.ext3 count={0}".format(count)
@@ -4943,7 +4943,7 @@ class RemoteMachineShellConnection:
         :param size: Size of disk space to fill up, in MB
         :return: Output and error message from filling up the disk.
         """
-        count = (size * 1024 * 1024) / 512
+        count = (size * 1024 * 1024) // 512
         command = "dd if=/dev/zero of={0}/disk-quota.ext3 count={1}; df -Th".format(location, count)
         output, error = self.execute_command(command)
         return output, error

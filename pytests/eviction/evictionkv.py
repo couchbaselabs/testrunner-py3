@@ -438,7 +438,7 @@ class EphemeralBucketsOOM(EvictionBase, DCPBase):
         self.log.info('Memory is again full at {0} items and memory used is {1}'.
                       format(stats.itemCount, stats.memUsed))
         self.log.info('Compared to previous fullness, we are at {0:.1f}% items and {1:.1f}% memory'.
-                      format(100 * stats.itemCount / itemCountWhenOOM, 100 * stats.memUsed / memoryWhenOOM))
+                      format(100 * stats.itemCount // itemCountWhenOOM, 100 * stats.memUsed // memoryWhenOOM))
 
         self.assertTrue(newly_added_items > 0.95 * NUMBER_OF_DOCUMENTS_TO_DELETE,
                         'Deleted {0} items and were only able to add back {1} items'.format(

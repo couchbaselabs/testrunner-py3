@@ -196,12 +196,12 @@ class CBASClusterOperations(CBASBaseTest):
         self.rebalance()
         self.perform_doc_ops_in_all_cb_buckets(self.num_items, "create",
                                                self.num_items,
-                                               self.num_items * 3 / 2)
+                                               self.num_items * 3 // 2)
 
         self._run_concurrent_queries(query, "immediate", 2000)
 
         if not self.validate_cbas_dataset_items_count(self.cbas_dataset_name,
-                                                      self.num_items * 3 / 2,
+                                                      self.num_items * 3 // 2,
                                                       0):
             self.fail(
                 "No. of items in CBAS dataset do not match that in the CB bucket")

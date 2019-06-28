@@ -2084,7 +2084,7 @@ class EnterpriseBackupMergeBase(EnterpriseBackupRestoreBase):
 
             self.delete_gen = BlobGenerator("ent-backup", "ent-backup-",
                                             self.value_size,
-                                            start=self.num_items / 10,
+                                            start=self.num_items // 10,
                                             end=self.num_items)
         elif self.document_type == "json":
             age = list(range(5))
@@ -2106,7 +2106,7 @@ class EnterpriseBackupMergeBase(EnterpriseBackupRestoreBase):
 
             self.delete_gen = DocumentGenerator('test_docs', template,
                                                 age, first,
-                                                start=self.num_items / 10,
+                                                start=self.num_items // 10,
                                                 end=self.num_items)
         self.new_buckets = 1
         self.bucket_to_flush = 1

@@ -745,8 +745,8 @@ class SpatialViewTests(BaseTestCase):
 
         # Create an index that emits all documents
         self.helper.create_index_fun(design_name)
-        keys_b = self.helper.insert_docs(num_docs / 3, "bbb")
-        keys_c = self.helper.insert_docs(num_docs - (num_docs / 3), "ccc")
+        keys_b = self.helper.insert_docs(num_docs // 3, "bbb")
+        keys_c = self.helper.insert_docs(num_docs - (num_docs // 3), "ccc")
         self.helper.query_index_for_verification(design_name, keys_b + keys_c)
 
         # Update index to only a subset of the documents

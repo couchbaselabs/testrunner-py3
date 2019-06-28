@@ -140,7 +140,7 @@ class NodeInitializeTask(Task):
         self.quota = int(info.mcdMemoryReserved * CLUSTER_QUOTA_RATIO)
         if self.index_quota_percent:
             self.index_quota = int((info.mcdMemoryReserved * CLUSTER_QUOTA_RATIO) * \
-                                      self.index_quota_percent / 100)
+                                      self.index_quota_percent // 100)
             rest.set_service_memoryQuota(service='indexMemoryQuota', username=username,\
                                          password=password, memoryQuota=self.index_quota)
         if self.quota_percent:
@@ -276,7 +276,7 @@ class BucketCreateTask(Task):
         info = rest.get_nodes_self()
 
         if self.size <= 0:
-            self.size = info.memoryQuota * 2 / 3
+            self.size = info.memoryQuota * 2 // 3
 
         authType = 'none' if self.password is None else 'sasl'
 
@@ -1733,7 +1733,7 @@ class ValidateDataTask(GenericLoadingTask):
             return True
         self.log.info("{0} items were verified in {1} sec.the average number of ops\
             - {2} per second ".format(self.itr, time.time() - self.start_time,
-                self.itr / (time.time() - self.start_time)).rstrip())
+                self.itr // (time.time() - self.start_time)).rstrip())
         return False
 
     def __next__(self):
@@ -1829,7 +1829,7 @@ class ValidateDataWithActiveAndReplicaTask(GenericLoadingTask):
             return True
         self.log.info("{0} items were verified in {1} sec.the average number of ops\
             - {2} per second ".format(self.itr, time.time() - self.start_time,
-                self.itr / (time.time() - self.start_time)).rstrip())
+                self.itr // (time.time() - self.start_time)).rstrip())
         return False
 
     def __next__(self):
@@ -1913,7 +1913,7 @@ class BatchedValidateDataTask(GenericLoadingTask):
         if not has:
             self.log.info("{0} items were verified in {1} sec.the average number of ops\
                 - {2} per second".format(self.itr, time.time() - self.start_time,
-                self.itr / (time.time() - self.start_time)).rstrip())
+                self.itr // (time.time() - self.start_time)).rstrip())
         return has
 
     def __next__(self):

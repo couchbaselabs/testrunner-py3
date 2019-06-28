@@ -269,7 +269,7 @@ class SecondaryIndexingRecoveryTests(BaseSecondaryIndexingTests):
                 self.nodes_in_list,
                 self.nodes_out_list, services=self.services_in)
             stopped = RestConnection(self.master).stop_rebalance(
-                wait_timeout=self.wait_timeout / 3)
+                wait_timeout=self.wait_timeout // 3)
             self.assertTrue(stopped, msg="Unable to stop rebalance")
             rebalance.result()
             self.sleep(100)

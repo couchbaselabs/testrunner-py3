@@ -47,12 +47,12 @@ class CollectinfoTests(CliBaseTest):
         gen_load = BlobGenerator('nosql', 'nosql-', self.value_size,
                                                   end=self.num_items)
         gen_update = BlobGenerator('nosql', 'nosql-', self.value_size,
-                                          end=(self.num_items / 2 - 1))
+                                          end=(self.num_items // 2 - 1))
         gen_expire = BlobGenerator('nosql', 'nosql-', self.value_size,
-                                             start=self.num_items / 2,
-                                             end=(self.num_items * 3 / 4 - 1))
+                                             start=self.num_items // 2,
+                                             end=(self.num_items * 3 // 4 - 1))
         gen_delete = BlobGenerator('nosql', 'nosql-', self.value_size,
-                                                 start=self.num_items * 3 / 4,
+                                                 start=self.num_items * 3 // 4,
                                                           end=self.num_items)
         self._load_all_buckets(self.master, gen_load, "create", 0)
 

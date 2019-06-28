@@ -320,7 +320,7 @@ class CliBaseTest(BaseTestCase):
                      result["bucketType"])
             return False
 
-        quota = result["quota"]["rawRAM"] / 1024 / 1024
+        quota = result["quota"]["rawRAM"] // 1024 // 1024
         if memory_quota is not None and memory_quota != quota:
             log.info("Bucket quota does not match (%s vs %s)", memory_quota,
                      quota)

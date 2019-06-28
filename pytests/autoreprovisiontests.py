@@ -214,7 +214,7 @@ class AutoReprovisionTests(unittest.TestCase):
             self.assertEqual(settings.max_nodes, max_node)
 
     def test_node_firewall_enabled(self):
-        timeout = self.timeout / 2
+        timeout = self.timeout // 2
 
         status = self.rest.update_autoreprovision_settings(True, 1)
         if not status:
@@ -237,7 +237,7 @@ class AutoReprovisionTests(unittest.TestCase):
             self.verify_loaded_data(self.master, bucket.name, self.loaded_items[bucket.name])
 
     def test_node_stop(self):
-        timeout = self.timeout / 2
+        timeout = self.timeout // 2
         status = self.rest.update_autoreprovision_settings(True, 1)
         if not status:
             self.fail('failed to change autoreprovision_settings!')
@@ -262,7 +262,7 @@ class AutoReprovisionTests(unittest.TestCase):
             self.verify_loaded_data(self.master, bucket.name, self.loaded_items[bucket.name])
 
     def test_node_cb_restart(self):
-        timeout = self.timeout / 2
+        timeout = self.timeout // 2
         status = self.rest.update_autoreprovision_settings(True, 1)
         if not status:
             self.fail('failed to change autoreprovision_settings!')
@@ -287,7 +287,7 @@ class AutoReprovisionTests(unittest.TestCase):
 
     def test_node_reboot(self):
         wait_timeout = 120
-        timeout = self.timeout / 2
+        timeout = self.timeout // 2
         status = self.rest.update_autoreprovision_settings(True, 1)
         if not status:
             self.fail('failed to change autoreprovision_settings!')
@@ -320,7 +320,7 @@ class AutoReprovisionTests(unittest.TestCase):
     def test_firewall_node_when_autoreprovisioning(self):
         wait_timeout = 120
         before = self.input.param("before", True)
-        timeout = self.timeout / 2
+        timeout = self.timeout // 2
         status = self.rest.update_autoreprovision_settings(True, 1)
         if not status:
             self.fail('failed to change autoreprovision_settings!')
@@ -366,7 +366,7 @@ class AutoReprovisionTests(unittest.TestCase):
             self.verify_loaded_data(self.master, bucket.name, self.loaded_items[bucket.name])
 
     def test_node_memcached_failure(self):
-        timeout = self.timeout / 2
+        timeout = self.timeout // 2
         status = self.rest.update_autoreprovision_settings(True, 1)
         if not status:
             self.fail('failed to change autoreprovision_settings!')
@@ -388,7 +388,7 @@ class AutoReprovisionTests(unittest.TestCase):
             self.verify_loaded_data(self.master, bucket.name, self.loaded_items[bucket.name])
 
     def test_two_failed_nodes(self):
-        timeout = self.timeout / 2
+        timeout = self.timeout // 2
         server_fail1 = self.servers[1]
         server_fail2 = self.servers[2]
         status = self.rest.update_autoreprovision_settings(True, 1)
@@ -427,7 +427,7 @@ class AutoReprovisionTests(unittest.TestCase):
         self.assertTrue(self.rest.monitorRebalance())
 
     def test_reset_count(self):
-        timeout = self.timeout / 2
+        timeout = self.timeout // 2
         server_fail1 = self.servers[1]
         server_fail2 = self.servers[2]
         status = self.rest.update_autoreprovision_settings(True, 2)
@@ -487,7 +487,7 @@ class AutoReprovisionTests(unittest.TestCase):
             self.assertEqual(settings.max_nodes, 1)
 
     def test_node_memcached_failure_in_series(self):
-        timeout = self.timeout / 2
+        timeout = self.timeout // 2
         status = self.rest.update_autoreprovision_settings(True, 1)
         if not status:
             self.fail('failed to change autoreprovision_settings!')
@@ -550,7 +550,7 @@ class AutoReprovisionTests(unittest.TestCase):
                     self.verify_loaded_data(self.master, bucket.name, self.loaded_items[bucket.name])
 
     def test_ui_logs(self):
-        timeout = self.timeout / 2
+        timeout = self.timeout // 2
         server_fail1 = self.servers[1]
         server_fail2 = self.servers[2]
         status = self.rest.update_autoreprovision_settings(True, 2)
@@ -719,7 +719,7 @@ class AutoReprovisionTests(unittest.TestCase):
 
         if num_buckets == 1:
             bucket_name = "default"
-            bucket_ram = info.memoryQuota * 2 / 3
+            bucket_ram = info.memoryQuota * 2 // 3
             rest.create_bucket(bucket=bucket_name,
                                ramQuotaMB=bucket_ram,
                                replicaNumber=self.replicas,
