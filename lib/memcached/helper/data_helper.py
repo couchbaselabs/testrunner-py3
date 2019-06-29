@@ -367,8 +367,8 @@ class MemcachedClientHelper(object):
                     client = MemcachedClient(server.ip, port_moxi, timeout=timeout)
                 client.vbucket_count = len(vBuckets)
                 if bucket_info.authType == "sasl":
-                    client.sasl_auth_plain(bucket_info.name.encode('ascii'),
-                                           bucket_info.saslPassword.encode('ascii'))
+                    client.sasl_auth_plain(bucket_info.name,
+                                           bucket_info.saslPassword)
             return client
         if isinstance(server, dict):
             raise Exception("unable to find {0} in get_nodes()".format(server["ip"]))
