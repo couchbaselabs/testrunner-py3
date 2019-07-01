@@ -16,6 +16,7 @@ from datetime import datetime
 import time
 import subprocess
 import logger
+import traceback
 log = logger.Logger.get_logger()
 
 class audit:
@@ -316,8 +317,13 @@ class audit:
                             defaultFields[key] = value
                         elif key == 'mandatory_fields':
                             for items in particulars['mandatory_fields']:
+                                #log.info("-->items:{},{}".format(type(items),items))
+                                try:
+                                  items = items.decode()
+                                except AttributeError:
+                                  pass
                                 mandatoryFields.append(items)
-                                if (isinstance((particulars['mandatory_fields'][items.encode('utf-8')]), dict)):
+                                if (isinstance((particulars['mandatory_fields'][items]), dict)):
                                     tempStr = items
                                     for secLevel in list(particulars['mandatory_fields'][items].items()):
                                         tempStr = tempStr + ":" + secLevel[0]
@@ -325,7 +331,12 @@ class audit:
                         elif key == 'optional_fields':
                             for items in particulars['optional_fields']:
                                 optionalFields.append(items)
-                                if (isinstance((particulars['optional_fields'][items.encode('utf-8')]), dict)):
+                                #log.info("-->items:{},{}".format(type(items),items))
+                                try:
+                                  items = items.decode()
+                                except AttributeError:
+                                  pass
+                                if (isinstance((particulars['optional_fields'][items]), dict)):
                                     tempStr = items
                                     for secLevel in list(particulars['optional_fields'][items].items()):
                                         tempStr = tempStr + ":" + secLevel[0]
@@ -443,15 +454,15 @@ class audit:
                     else:
                         if items == "requestId" or items == 'clientContextId':
                             expectedResult[items] = data[items]
-                        log.info ('expected values - {0} -- actual value -- {1} - eventName - {2}'.format(expectedResult[items.encode('utf-8')], data[items.encode('utf-8')], items))
+                        log.info ('expected values - {0} -- actual value -- {1} - eventName - {2}'.format(expectedResult[items], data[items], items))
                         if (items == 'peername'):
                             if (expectedResult[items] not in data[items]):
                                 flag = False
-                                log.info ('Mis - Match Found expected values - {0} -- actual value -- {1} - eventName - {2}'.format(expectedResult[items.encode('utf-8')], data[items.encode('utf-8')], items))
+                                log.info ('Mis - Match Found expected values - {0} -- actual value -- {1} - eventName - {2}'.format(expectedResult[items], data[items], items))
                         else:
                             if (data[items] != expectedResult[items]):
                                 flag = False
-                                log.info ('Mis - Match Found expected values - {0} -- actual value -- {1} - eventName - {2}'.format(expectedResult[items.encode('utf-8')], data[items.encode('utf-8')], items))
+                                log.info ('Mis - Match Found expected values - {0} -- actual value -- {1} - eventName - {2}'.format(expectedResult[items], data[items], items))
             ignore = False
         return flag
 
@@ -474,24 +485,26 @@ class audit:
                 currTimeZone = shell.execute_command('date +%z')
             finally:
                 shell.disconnect()
-            log.info (" Matching expected date - currDate {0}; actual Date - {1}".format(currDate[0][0], date))
-            log.info (" Matching expected time - currTime {0} ; actual Time - {1}".format(currHourMin[0][0], hourMin))
-            if ((date != currDate[0][0])):
+            log.info (" Matching expected date - currDate {0}; actual Date - {1}".format(currDate[0][0].decode(), date))
+            log.info (" Matching expected time - currTime {0} ; actual Time - {1}".format(currHourMin[0][0].decode(), hourMin))
+            if ((date != currDate[0][0].decode())):
                 log.info ("Mis-match in values for timestamp - date")
                 return False
                 #Compare time and minutes, will fail if time is 56 mins or above
             else:
-                if ((int((hourMin.split(":"))[0])) != (int((currHourMin[0][0].split(":"))[0]))) or ((int((hourMin.split(":"))[1]) + 10) < (int((currHourMin[0][0].split(":"))[1]))):
+                #log.info("-->{},{},{},{}".format(type(hourMin),hourMin,type(currHourMin),currHourMin))
+                if ((int((hourMin.split(":"))[0])) != (int((currHourMin[0][0].decode().split(":"))[0]))) or ((int((hourMin.split(":"))[1]) + 10) < (int((currHourMin[0][0].decode().split(":"))[1]))):
                     log.info ("Mis-match in values for timestamp - time")
                     return False
                 else:
                     tempTimeZone = tempTimeZone.replace(":", "")
-                    if (tempTimeZone != currTimeZone[0][0]):
+                    if (tempTimeZone != currTimeZone[0][0].decode()):
                         log.info ("Mis-match in value of timezone")
                         return False
 
         except Exception as e:
-            log.info ("Value of execption is {0}".format(e))
+            log.info ("Value of exception is {0}".format(e))
+            traceback.print_exc()
             return False
 
 
