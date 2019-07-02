@@ -937,7 +937,7 @@ class RestConnection(object):
           traceback.print_exc()
 
     def init_node_services(self, username='Administrator', password='password', hostname='127.0.0.1', port='8091', services=None):
-        log.info("--> init_node_services({},{},{},{},{},{})".format(username,password,hostname,port,services))
+        log.info("--> init_node_services({},{},{},{},{})".format(username,password,hostname,port,services))
         api = self.baseUrl + '/node/controller/setupServices'
         if services == None:
             log.info(" services are marked as None, will not work")
