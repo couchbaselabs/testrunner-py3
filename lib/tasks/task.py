@@ -1116,6 +1116,10 @@ class LoadDocumentsGeneratorsTask(LoadDocumentsTask):
             try:
               while self.has_next() and not self.done():
                 next(self)
+            except NotImplementedError:
+              self.log.info("iteration:{}".format(iterator)) 
+              traceback.print_exc()
+              return
             except Exception as e:
               traceback.print_exc()
             iterator += 1

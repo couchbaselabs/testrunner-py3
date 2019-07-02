@@ -512,9 +512,9 @@ class CouchbaseServerInstaller(Installer):
             sys.exit(mesg)
         while time.time() < start_time + 5 * 60:
             try:
-                log.info("creating RestConnection(server) and the server type is {}".format(type(server)))
+                log.info("creating RestConnection({}) and the server type is {}".format(server,type(server)))
                 rest = RestConnection(server)
-
+                log.info("Done creating rest connection")
                 # Optionally change node name and restart server
                 if params.get('use_domain_names', 0):
                     RemoteUtilHelper.use_hostname_for_server_settings(server)
@@ -561,6 +561,8 @@ class CouchbaseServerInstaller(Installer):
                     elif server.services:
                         set_services = server.services.split(',')
 
+                    log.info("--> info.mcdMemoryReserved={},CLUSTER_QUOTA_RATIO={}".format(info.mcdMemoryReserved,CLUSTER_QUOTA_RATIO))
+                    log.info("--> rest.get_nodes_self().mcdMemoryReserved".format(rest.get_nodes_self().mcdMemoryReserved))
                     kv_quota = 0
                     while kv_quota == 0:
                         time.sleep(1)
