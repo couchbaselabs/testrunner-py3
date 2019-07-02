@@ -561,14 +561,14 @@ class CouchbaseServerInstaller(Installer):
                     elif server.services:
                         set_services = server.services.split(',')
 
-                    log.info("--> info.mcdMemoryReserved={},CLUSTER_QUOTA_RATIO={}".format(info.mcdMemoryReserved,CLUSTER_QUOTA_RATIO))
-                    log.info("--> rest.get_nodes_self().mcdMemoryReserved".format(rest.get_nodes_self().mcdMemoryReserved))
                     kv_quota = 0
                     while kv_quota == 0:
                         time.sleep(1)
                         kv_quota = int(rest.get_nodes_self().mcdMemoryReserved)
                     info = rest.get_nodes_self()
                     cb_version = info.version[:5]
+                    log.info("--> rest.get_nodes_self().mcdMemoryReserved".format(rest.get_nodes_self().mcdMemoryReserved))
+                    log.info("--> info.mcdMemoryReserved={},CLUSTER_QUOTA_RATIO={}".format(info.mcdMemoryReserved,CLUSTER_QUOTA_RATIO))
                     kv_quota = int(info.mcdMemoryReserved * CLUSTER_QUOTA_RATIO)
                     """ for fts, we need to grep quota from ns_server
                                 but need to make it works even RAM of vm is
@@ -780,8 +780,8 @@ class CouchbaseServerInstaller(Installer):
                                          cbft_env_options= cbft_env_options,
                                          enable_ipv6=enable_ipv6,
                                          debug_logs=debug_logs)
-                    log.info('wait 5 seconds for Couchbase server to start')
-                    time.sleep(5)
+                    log.info('wait 30 seconds for Couchbase server to start')
+                    time.sleep(30)
                     if "rest_vbuckets" in params:
                         rest_vbuckets = int(params["rest_vbuckets"])
                         ClusterOperationHelper.set_vbuckets(server, rest_vbuckets)

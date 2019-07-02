@@ -840,7 +840,7 @@ class RemoteMachineShellConnection:
                 os_version = "centos 7"
                 output, e = self.execute_command("systemctl status ntpd")
                 for line in output:
-                    if "Active: active (running)" in line:
+                    if "Active: active (running)" in line.decode():
                         ntp_installed = True
                 if not ntp_installed:
                     log.info("ntp not installed yet or not run.\n"\
@@ -854,7 +854,7 @@ class RemoteMachineShellConnection:
                     self.execute_command("firewall-cmd --reload", debug=False)
                     do_install = True
                 timezone, _ = self.execute_command("date")
-                if "PST" not in timezone[0]:
+                if "PST" not in timezone[0].decode():
                     self.execute_command("timedatectl set-timezone America/Los_Angeles",
                                                                             debug=False)
             elif "centos release 6" in self.info.distribution_version.lower():
@@ -4549,7 +4549,7 @@ class RemoteMachineShellConnection:
                 self.execute_command("cd /bin; %s --no-check-certificate -q %s "
                                                         % (wget, download_command))
                 out, err = self.execute_command(cmd)
-                if out and command_output in out[0]:
+                if out and command_output in out[0].decode():
                     log.info("%s command is ready" % cmd)
                 else:
                     mesg = "Failed to download %s " % cmd
@@ -4557,13 +4557,14 @@ class RemoteMachineShellConnection:
         elif self.info.distribution_type.lower() == 'centos':
             if cmd == "unzip":
                 command_output = "UnZip 6.00 of 20 April 2009"
-                if out and command_output in out.encode()[0]:
+                #log.info("{},{},{},{}".format(type(out),type(command_output),type(out),type(out[0])))
+                if out and command_output in out[0].decode():
                     log.info("unzip command is ready")
                     found_command = True
             if not found_command and err and "command not found" in err[0]:
                 self.execute_command("yum install -y unzip")
                 out, err = self.execute_command(cmd)
-                if out and command_output in out[0]:
+                if out and command_output in out[0].decode():
                     log.info("%s command is ready" % cmd)
                 else:
                     mesg = "Failed to install %s " % cmd
