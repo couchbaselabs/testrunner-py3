@@ -801,7 +801,7 @@ class MemcachedClient(object):
         while not done:
             cmd, opaque, cas, klen, extralen, data, frameextralen = self._handleKeyedResponse(None)
             if klen:
-                rv[data[0:klen]] = data[klen:]
+                rv[data[0:klen].decode()] = data[klen:].decode()
             else:
                 done = True
         return rv
