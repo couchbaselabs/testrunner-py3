@@ -5043,7 +5043,7 @@ class RestParser(object):
             if storageTotals.get("ram"):
                 if storageTotals["ram"].get("total"):
                     ramKB = storageTotals["ram"]["total"]
-                    node.storageTotalRam = ramKB/(1024*1024)
+                    node.storageTotalRam = ramKB//(1024*1024)
 
                     if IS_CONTAINER:
                         # the storage total values are more accurate than
