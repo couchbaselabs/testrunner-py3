@@ -559,6 +559,7 @@ class RestConnection(object):
         log.info("index query url: {0}".format(api))
         status, content, header = self._http_request(api, headers=self._create_capi_headers(),
                                                      timeout=timeout)
+        log.info("-->status={},content={},header={}".format(status,content,header))
         return status, content, header
 
     def view_results(self, bucket, ddoc_name, params, limit=100, timeout=120,
@@ -711,6 +712,7 @@ class RestConnection(object):
         status, content, header = self._http_request(
             api, 'PUT', function, headers=self._create_capi_headers())
         json_parsed = json.loads(content)
+        print("-->create_design_doc: {},{}".format(status,json_parsed))
         return status, json_parsed
 
     def _get_design_doc(self, bucket, name):
@@ -728,8 +730,11 @@ class RestConnection(object):
                 meta_parsed = json.loads(meta)
             else:
                 meta_parsed = {}
-                meta_parsed["_rev"] = json_parsed["_rev"]
-                meta_parsed["_id"] = json_parsed["_id"]
+                try:
+                  meta_parsed["_rev"] = json_parsed["_rev"]
+                  meta_parsed["_id"] = json_parsed["_id"]
+                except KeyError:
+                  pass
         return status, json_parsed, meta_parsed
 
     def _delete_design_doc(self, bucket, name):
@@ -3407,12 +3412,22 @@ class RestConnection(object):
             log.info("%s"%api)
         else:
             params = {key : query}
-            if 'creds' in query_params and query_params['creds']:
-                headers = self._create_headers_with_auth(query_params['creds'][0]['user'].encode('utf-8'),
-                                                         query_params['creds'][0]['pass'].encode('utf-8'))
+            #log.info("-->query_params:{}".format(query_params))
+            try:
+              #log.info("-->user={}".format(query_params['creds'][0]['user']))
+              #log.info("-->password={}".format(query_params['creds'][0]['pass']))
+              if 'creds' in query_params and query_params['creds']:
+                headers = self._create_headers_with_auth(query_params['creds'][0]['user'],
+                                                         query_params['creds'][0]['pass'])
                 del query_params['creds']
+              #log.info("-->headers={}".format(headers))
+            except Exception:
+                traceback.print_exc()
+
             params.update(query_params)
+            #log.info("-->before urlencode params:{}".format(params))
             params = urllib.parse.urlencode(params)
+            #log.info("-->after urlencode params:{}".format(params))
             if verbose:
                 log.info('query params : {0}'.format(params))
             api = "http://%s:%s/query?%s" % (self.ip, port, params)
