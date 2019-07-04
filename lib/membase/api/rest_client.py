@@ -3406,8 +3406,8 @@ class RestConnection(object):
                 prepared = str(prepared)
                 params = 'prepared=' + urllib.parse.quote(prepared, '~()')
             if 'creds' in query_params and query_params['creds']:
-                headers = self._create_headers_with_auth(query_params['creds'][0]['user'].encode('utf-8'),
-                                                         query_params['creds'][0]['pass'].encode('utf-8'))
+                headers = self._create_headers_with_auth(query_params['creds'][0]['user'],
+                                                         query_params['creds'][0]['pass'])
             api = "http://%s:%s/query/service?%s" % (self.ip, port, params)
             log.info("%s"%api)
         else:
@@ -3467,15 +3467,15 @@ class RestConnection(object):
                 prepared = str(prepared.encode('utf-8'))
                 params = 'prepared=' + urllib.parse.quote(prepared, '~()')
             if 'creds' in query_params and query_params['creds']:
-                headers = self._create_headers_with_auth(query_params['creds'][0]['user'].encode('utf-8'),
-                                                         query_params['creds'][0]['pass'].encode('utf-8'))
+                headers = self._create_headers_with_auth(query_params['creds'][0]['user'],
+                                                         query_params['creds'][0]['pass'])
             api = "%s/analytics/service?%s" % (self.cbas_base_url, params)
             log.info("%s"%api)
         else:
             params = {key : query}
             if 'creds' in query_params and query_params['creds']:
-                headers = self._create_headers_with_auth(query_params['creds'][0]['user'].encode('utf-8'),
-                                                         query_params['creds'][0]['pass'].encode('utf-8'))
+                headers = self._create_headers_with_auth(query_params['creds'][0]['user'],
+                                                         query_params['creds'][0]['pass'])
                 del query_params['creds']
             params.update(query_params)
             params = urllib.parse.urlencode(params)
