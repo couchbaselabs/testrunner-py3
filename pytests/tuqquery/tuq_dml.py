@@ -452,8 +452,11 @@ class DMLQueryTests(QueryTests):
         for bucket in self.buckets:
             self.query = 'select * from %s use keys [%s]'  % (bucket.name, ','.join(['"%s_%s"' % (prefix, i) for i in range(num_docs)]))
             actual_result = self.run_cbq_query()
-            expected_result = sorted([{bucket.name: {'name': doc['name']}} for doc in values[:num_docs]])
-            actual_result = sorted(actual_result['results'])
+            expected_result = [{bucket.name: {'name': doc['name']}} for doc in values[:num_docs]]
+            #print("--> expected_result:{}".format(expected_result))
+            #print("--> actual_result:{}".format(actual_result))
+            expected_result = sorted(expected_result,key=(lambda x: x[bucket.name]['name']))
+            actual_result = sorted(actual_result['results'],key=(lambda x: x[bucket.name]['name']))
             self._delete_ids(actual_result)
             self._delete_ids(expected_result)
             self.assertEqual(actual_result, expected_result, 'Item did not appear')
