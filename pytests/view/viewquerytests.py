@@ -34,7 +34,7 @@ class StoppableThread(Thread):
     def __init__(self, group=None, target=None, name=None,
                  args=(), kwargs=None, verbose=None):
         super(StoppableThread, self).__init__(group=group, target=target,
-                        name=name, args=args, kwargs=kwargs, verbose=verbose)
+                        name=name, args=args, kwargs=kwargs)
         self._stop = Event()
         self.tasks = []
 

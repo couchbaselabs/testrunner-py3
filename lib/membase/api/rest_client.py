@@ -499,16 +499,25 @@ class RestConnection(object):
         return self.create_design_document(bucket, design_doc)
 
     def create_design_document(self, bucket, design_doc):
-        design_doc_name = design_doc.id
-        api = '%s/%s/%s' % (self.capiBaseUrl, bucket, design_doc_name)
-        if isinstance(bucket, Bucket):
+        log.info("-->create_design_document")
+        try:
+          design_doc_name = design_doc.id
+          api = '%s/%s/%s' % (self.capiBaseUrl, bucket, design_doc_name)
+          if isinstance(bucket, Bucket):
             api = '%s/%s/%s' % (self.capiBaseUrl, bucket.name, design_doc_name)
 
-        status, content, header = self._http_request(api, 'PUT', str(design_doc),
+          log.info("--> calling _http_request({},{},{},{}".format(api,'PUT',str(design_doc),self._create_capi_headers()))
+          status, content, header = self._http_request(api, 'PUT', str(design_doc),
                                                      headers=self._create_capi_headers())
+          log.info("-->status={},content={},header={}".format(status,content,header))
+          #log.info("-->FIX ME.Sleeping for 60 secs..")
+          #time.sleep(60)
+        except Exception as e:
+          traceback.print_exc()
+
         if not status:
             raise DesignDocCreationException(design_doc_name, content)
-        return json.loads(content)
+        return json.loads(content.decode())
 
     def is_index_triggered(self, ddoc_name, index_type='main'):
         run, block = self._get_indexer_task_pid(ddoc_name, index_type=index_type)
@@ -585,6 +594,7 @@ class RestConnection(object):
         return node_info.memcached
 
     def get_ddoc(self, bucket, ddoc_name):
+        log.info("-->get_ddoc..") 
         status, json, meta = self._get_design_doc(bucket, ddoc_name)
         if not status:
             raise ReadDocumentException(ddoc_name, json)
@@ -721,12 +731,15 @@ class RestConnection(object):
             api = self.capiBaseUrl + '/%s/_design/%s' % (bucket.name, name)
 
         status, content, header = self._http_request(api, headers=self._create_capi_headers())
-        json_parsed = json.loads(content)
+        log.info("-->status={},content={},header={}".format(status,content,header))
+        json_parsed = json.loads(content.decode())
         meta_parsed = ""
         if status:
             # in dp4 builds meta data is in content, not in header
-            if 'x-couchbase-meta' in header:
-                meta = header['x-couchbase-meta']
+            log.info("-->X-Couchbase-Meta header value={}".format(header['X-Couchbase-Meta']))
+            #log.info("-->x-couchbase-meta header value={}".format(header['x-couchbase-meta']))
+            if 'X-Couchbase-Meta' in header:
+                meta = header['X-Couchbase-Meta']
                 meta_parsed = json.loads(meta)
             else:
                 meta_parsed = {}

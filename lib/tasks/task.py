@@ -2273,24 +2273,33 @@ class ViewCreateTask(Task):
 
         try:
             # appending view to existing design doc
+            self.log.info("-->Calling rest.get_ddoc...")
             content, meta = self.rest.get_ddoc(self.bucket, self.design_doc_name)
+            self.log.info("-->Calling DesignDocument._init_from_json...")
             ddoc = DesignDocument._init_from_json(self.design_doc_name, content)
             # if view is to be updated
+            self.log.info("-->Checking if view needs to be updated...")
             if self.view:
                 if self.view.is_spatial:
+                    self.log.info("-->Calling Design doc spatial view: add_view")
                     ddoc.add_spatial_view(self.view)
                 else:
+                    self.log.info("-->Calling Design doc: add_view")
                     ddoc.add_view(self.view)
             self.ddoc_rev_no = self._parse_revision(meta['rev'])
         except ReadDocumentException:
             # creating first view in design doc
+            self.log.info("-->creating first view in design doc...")
             if self.view:
                 if self.view.is_spatial:
+                    self.log.info("-->creating first spatial view in design doc...")
                     ddoc = DesignDocument(self.design_doc_name, [], spatial_views=[self.view])
                 else:
+                    self.log.info("-->creating first non-spatial view in design doc...")
                     ddoc = DesignDocument(self.design_doc_name, [self.view])
             # create an empty design doc
             else:
+                self.log.info("-->creating empty design doc...")
                 ddoc = DesignDocument(self.design_doc_name, [])
             if self.ddoc_options:
                 ddoc.options = self.ddoc_options
@@ -2366,8 +2375,11 @@ class ViewCreateTask(Task):
     def _check_ddoc_revision(self):
         valid = False
         try:
+            self.log.info("-->rest.get_ddoc: {},{}".format(self.bucket,self.design_doc_name))
             content, meta = self.rest.get_ddoc(self.bucket, self.design_doc_name)
+            self.log.info("-->content={},meta={}".format(content,meta))
             new_rev_id = self._parse_revision(meta['rev'])
+            self.log.info("-->new_rev_id={}".format(new_rev_id))
             if new_rev_id != self.ddoc_rev_no:
                 self.ddoc_rev_no = new_rev_id
                 valid = True
@@ -3559,7 +3571,7 @@ class GenerateExpectedViewResultsTask(Task):
             task_manager.schedule(self)
         except Exception as ex:
             self.state = FINISHED
-            self.set_unexpected_exception(e)
+            self.set_unexpected_exception(ex)
 
     def check(self, task_manager):
         self.state = FINISHED
