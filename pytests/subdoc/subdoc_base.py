@@ -131,9 +131,9 @@ class SubdocBaseTest(BaseTestCase):
 
     def generate_path(self, level, key):
         path = key
-        list = list(range(level))
-        list.reverse()
-        for i in list:
+        list1 = list(range(level))
+        list1.reverse()
+        for i in list1:
             path = "level_"+str(i)+"."+path
         return path
 

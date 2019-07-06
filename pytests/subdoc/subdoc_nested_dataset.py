@@ -2,6 +2,7 @@ from .subdoc_base import SubdocBaseTest
 import copy, json
 import yaml
 import random
+import traceback
 
 import couchbase.subdocument as SD
 from sdk_client import SDKClient
@@ -50,26 +51,30 @@ class SubdocNestedDataset(SubdocBaseTest):
             "a_i_a": [1, 1],
             "ai_sub": [0, 0]
         }
-        base_json = self.generate_json_for_nesting()
-        nested_json = self.generate_nested(base_json, array, self.nesting_level)
-        if not self.is_sdk_client:
+        try:
+          base_json = self.generate_json_for_nesting()
+          nested_json = self.generate_nested(base_json, array, self.nesting_level)
+          if not self.is_sdk_client:
             nested_json = json.dumps(nested_json)
-        self.set_doc(self.client, self.key, nested_json, 0, 0, xattr=self.xattr)
-        self.counter(self.client, key=self.key, path='i_add', value="1",
+          self.set_doc(self.client, self.key, nested_json, 0, 0, xattr=self.xattr)
+          self.counter(self.client, key=self.key, path='i_add', value="1",
                      xattr=self.xattr, create_parents=self.create_parents)
-        self.counter(self.client, key=self.key, path='i_sub', value="-1",
+          self.counter(self.client, key=self.key, path='i_sub', value="-1",
                      xattr=self.xattr, create_parents=self.create_parents)
-        self.counter(self.client, key=self.key, path='a_i_a[0]', value="1",
+          self.counter(self.client, key=self.key, path='a_i_a[0]', value="1",
                      xattr=self.xattr, create_parents=self.create_parents)
-        self.counter(self.client, key=self.key, path='ai_sub[1]', value="-1",
+          self.counter(self.client, key=self.key, path='ai_sub[1]', value="-1",
                      xattr=self.xattr, create_parents=self.create_parents)
-        self.json = expected_array
-        for key in list(expected_array.keys()):
+          self.json = expected_array
+          for key in expected_array.keys():
             logic, data_return = self.get_string_and_verify_return(
                 self.client, key=self.key, path = key, expected_value = expected_array[key], xattr=self.xattr)
             if not logic:
                 dict[key] = {"expected": expected_array[key], "actual": data_return}
             result = result and logic
+        except Exception as e:
+          traceback.print_exc()
+
         self.assertTrue(result, dict)
 
 # SD_GET
@@ -934,7 +939,7 @@ class SubdocNestedDataset(SubdocBaseTest):
             self.log.error(e)
             msg = "Unable to get key {0} for path {1} after {2} tries".format(key, path, 1)
             return False, msg
-        return (str(data).encode('utf-8') == str(expected_value)), str(data).encode('utf-8')
+        return (str(data) == str(expected_value)), str(data).encode('utf-8')
 
     def _fix_unicode(self, data):
         if isinstance(data, str):
