@@ -1107,6 +1107,7 @@ class LoadDocumentsGeneratorsTask(LoadDocumentsTask):
 
     def run_normal_throughput_mode(self):
         iterator = 0
+        #self.log.info("-->run_normal_throuhput,generators:{}".format(self.generators))
         for generator in self.generators:
             self.generator = generator
             if self.op_types:
@@ -1115,11 +1116,11 @@ class LoadDocumentsGeneratorsTask(LoadDocumentsTask):
                 self.bucket = self.buckets[iterator]
             try:
               while self.has_next() and not self.done():
-                next(self)
+                self.next()
             except NotImplementedError:
-              self.log.info("iteration:{}".format(iterator)) 
-              traceback.print_exc()
-              return
+              self.log.info("Not implemented,iteration:{}".format(iterator)) 
+              #traceback.print_exc()
+              #return
             except Exception as e:
               traceback.print_exc()
             iterator += 1
@@ -1210,6 +1211,7 @@ class LoadDocumentsGeneratorsTask(LoadDocumentsTask):
                 # generate
                 key_value = generator.next_batch()
                 # create
+                self.log.info("-->run_generator:calling _care_batch_client...key_value={},client={}".format(key_value,client))
                 self._create_batch_client(key_value, client)
 
                 # cache
@@ -2273,15 +2275,15 @@ class ViewCreateTask(Task):
 
         try:
             # appending view to existing design doc
-            self.log.info("-->Calling rest.get_ddoc...")
+            #self.log.info("-->Calling rest.get_ddoc...")
             content, meta = self.rest.get_ddoc(self.bucket, self.design_doc_name)
-            self.log.info("-->Calling DesignDocument._init_from_json...")
+            #self.log.info("-->Calling DesignDocument._init_from_json...")
             ddoc = DesignDocument._init_from_json(self.design_doc_name, content)
             # if view is to be updated
-            self.log.info("-->Checking if view needs to be updated...")
+            #self.log.info("-->Checking if view needs to be updated...")
             if self.view:
                 if self.view.is_spatial:
-                    self.log.info("-->Calling Design doc spatial view: add_view")
+                    #self.log.info("-->Calling Design doc spatial view: add_view")
                     ddoc.add_spatial_view(self.view)
                 else:
                     self.log.info("-->Calling Design doc: add_view")
@@ -3012,8 +3014,7 @@ class MonitorViewQueryResultsTask(Task):
                     RestHelper(self.rest)._wait_for_indexer_ddoc(self.servers, self.design_doc_name)
                     if self.current_retry == 70:
                         self.query["stale"] = 'false'
-                    self.log.info("View result is still not expected (ddoc=%s, query=%s, server=%s). retry in 10 sec" % (
-                                    self.design_doc_name, self.query, self.servers[0].ip))
+                    self.log.info("View result is still not expected (ddoc={}, query={}, server={}). retry# {} of {} in 10 sec".format(self.design_doc_name, self.query, self.servers[0].ip, self.current_retry, self.retries))
                     self.state = EXECUTING
                     task_manager.schedule(self, 10)
             elif len(self.expected_docs) < len(self.results.get('rows', [])):
@@ -3572,6 +3573,7 @@ class GenerateExpectedViewResultsTask(Task):
         except Exception as ex:
             self.state = FINISHED
             self.set_unexpected_exception(ex)
+            traceback.print_exc()
 
     def check(self, task_manager):
         self.state = FINISHED
@@ -3633,9 +3635,10 @@ class GenerateExpectedViewResultsTask(Task):
 
 
         # sort expected results to match view results
-        expected_rows = sorted(self.emitted_rows,
-                               cmp=GenerateExpectedViewResultsTask.cmp_result_rows,
-                               reverse=descending_set)
+        #self.log.info("-->emitted_rows={}".format(self.emitted_rows))
+        expected_rows = sorted(self.emitted_rows, key=(lambda x: (x['key'],x['id'])),reverse=descending_set)
+                               #cmp=GenerateExpectedViewResultsTask.cmp_result_rows,
+                               #reverse=descending_set)
 
         # filter rows according to query flags
         if startkey_set:
@@ -3644,7 +3647,7 @@ class GenerateExpectedViewResultsTask(Task):
                 start_key = start_key[1:-1]
             if isinstance(start_key, str) and start_key.find('[') == 0:
                 start_key = start_key[1:-1].split(',')
-                start_key = [int(x) if x != 'null' else None for x in start_key]
+                start_key = [int(x) if x != 'null' else 0 for x in start_key]
         else:
             start_key = expected_rows[0]['key']
             if isinstance(start_key, str) and start_key.find('"') == 0:
@@ -3669,6 +3672,7 @@ class GenerateExpectedViewResultsTask(Task):
                 start_key = start_key.strip("\"")
             if isinstance(end_key, str):
                 end_key = end_key.strip("\"")
+            #self.log.info("-->start_key={},end_key={},expected_rows:{}".format(start_key,end_key,expected_rows))
             expected_rows = [row for row in expected_rows if row['key'] >= start_key and row['key'] <= end_key]
 
         if key_set:
@@ -3791,9 +3795,8 @@ class GenerateExpectedViewResultsTask(Task):
                     group = group[1:-1].split(",")
                     group = [int(k) for k in group]
                 expected_rows.append({"key" : group, "value" : value})
-            expected_rows = sorted(expected_rows,
-                               cmp=GenerateExpectedViewResultsTask.cmp_result_rows,
-                               reverse=descending_set)
+            expected_rows = sorted(self.emitted_rows, key=(lambda x: (x['key'],x['id'])),reverse=descending_set)
+
         if 'skip' in query:
             expected_rows = expected_rows[(int(query['skip'])):]
         if 'limit' in query:

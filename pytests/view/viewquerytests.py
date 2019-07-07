@@ -35,17 +35,16 @@ class StoppableThread(Thread):
                  args=(), kwargs=None, verbose=None):
         super(StoppableThread, self).__init__(group=group, target=target,
                         name=name, args=args, kwargs=kwargs)
-        self._stop = Event()
+        self._stopper = Event()
         self.tasks = []
 
-    def stop(self):
+    def stopit(self):
         for task in self.tasks:
             task.cancel();
-        self._stop.set()
-        self._Thread__stop()
+        self._stopper.set()
 
     def stopped(self):
-        return self._stop.isSet()
+        return self._stopper.isSet()
 
 class ViewQueryTests(BaseTestCase):
     def setUp(self):
@@ -868,7 +867,9 @@ class ViewQueryTests(BaseTestCase):
             gen_load = data_set.generate_docs(data_set.views[0])
             self.load(data_set, gen_load)
             for server in self.servers:
+                self.log.info("-->RebalanceHelper.wait_for_persistence({},{}".format(server, data_set.bucket))
                 RebalanceHelper.wait_for_persistence(server, data_set.bucket)
+            self.log.info("-->_query_all_views...")
             self._query_all_views(data_set.views, gen_load)
         else:
             self._query_test_init(data_set)
@@ -992,7 +993,7 @@ class ViewQueryTests(BaseTestCase):
             self.thread_stopped.wait(60)
             if self.thread_crashed.is_set():
                 for t in query_nodes_threads:
-                    t.stop()
+                    t.stopit()
                 break
             else:
                 query_nodes_threads = [d for d in query_nodes_threads if d.is_alive()]
@@ -1261,7 +1262,7 @@ class ViewQueryTests(BaseTestCase):
             self.thread_stopped.wait(60)
             if self.thread_crashed.is_set():
                 for t in query_nodes_threads:
-                    t.stop()
+                    t.stopit()
                 break
             else:
                 query_nodes_threads = [d for d in query_nodes_threads if d.is_alive()]
@@ -1469,7 +1470,7 @@ class ViewQueryTests(BaseTestCase):
             self.thread_stopped.wait(60)
             if self.thread_crashed.is_set():
                 for t in query_bucket_threads:
-                    t.stop()
+                    t.stopit()
                 break
             else:
                 query_bucket_threads = [d for d in query_bucket_threads if d.is_alive()]
@@ -1898,7 +1899,7 @@ class ViewQueryTests(BaseTestCase):
             self.thread_stopped.wait(60)
             if self.thread_crashed.is_set():
                 for t in query_threads:
-                    t.stop()
+                    t.stopit()
                 break
             else:
                 query_threads = [d for d in query_threads if d.is_alive()]
@@ -1997,7 +1998,7 @@ class ViewQueryTests(BaseTestCase):
                 if 'stop' in dir(threading.currentThread()) and\
                    isinstance(threading.currentThread(), StoppableThread):
                     threading.currentThread().tasks.append(task)
-                    threading.currentThread().stop()
+                    threading.currentThread().stopit()
                 else:
                     task.cancel()
             raise ex
@@ -2035,10 +2036,10 @@ class ViewQueryTests(BaseTestCase):
             if self.thread_crashed.is_set():
                 self.log.error("Will stop all threads!")
                 for t in threads:
-                    t.stop()
+                    t.stopit()
                     self.log.error("Thread %s stopped" % str(t))
                 for t in query_threads:
-                    t.stop()
+                    t.stopit()
                     self.log.error("Thread %s stopped" % str(t))
                 self._check_view_intergrity(views)
                 return
