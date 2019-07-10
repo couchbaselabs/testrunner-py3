@@ -506,10 +506,10 @@ class RestConnection(object):
           if isinstance(bucket, Bucket):
             api = '%s/%s/%s' % (self.capiBaseUrl, bucket.name, design_doc_name)
 
-          log.info("--> calling _http_request({},{},{},{}".format(api,'PUT',str(design_doc),self._create_capi_headers()))
+          #log.info("--> calling _http_request({},{},{},{}".format(api,'PUT',str(design_doc),self._create_capi_headers()))
           status, content, header = self._http_request(api, 'PUT', str(design_doc),
                                                      headers=self._create_capi_headers())
-          log.info("-->status={},content={},header={}".format(status,content,header))
+          #log.info("-->status={},content={},header={}".format(status,content,header))
           #log.info("-->FIX ME.Sleeping for 60 secs..")
           #time.sleep(60)
         except Exception as e:
@@ -568,7 +568,7 @@ class RestConnection(object):
         log.info("index query url: {0}".format(api))
         status, content, header = self._http_request(api, headers=self._create_capi_headers(),
                                                      timeout=timeout)
-        log.info("-->status={},content={},header={}".format(status,content,header))
+        #log.info("-->status={},content={},header={}".format(status,content,header))
         return status, content, header
 
     def view_results(self, bucket, ddoc_name, params, limit=100, timeout=120,
@@ -594,7 +594,7 @@ class RestConnection(object):
         return node_info.memcached
 
     def get_ddoc(self, bucket, ddoc_name):
-        log.info("-->get_ddoc..") 
+        #log.info("-->get_ddoc..") 
         status, json, meta = self._get_design_doc(bucket, ddoc_name)
         if not status:
             raise ReadDocumentException(ddoc_name, json)
@@ -722,7 +722,7 @@ class RestConnection(object):
         status, content, header = self._http_request(
             api, 'PUT', function, headers=self._create_capi_headers())
         json_parsed = json.loads(content)
-        print("-->create_design_doc: {},{}".format(status,json_parsed))
+        #print("-->create_design_doc: {},{}".format(status,json_parsed))
         return status, json_parsed
 
     def _get_design_doc(self, bucket, name):
@@ -731,12 +731,12 @@ class RestConnection(object):
             api = self.capiBaseUrl + '/%s/_design/%s' % (bucket.name, name)
 
         status, content, header = self._http_request(api, headers=self._create_capi_headers())
-        log.info("-->status={},content={},header={}".format(status,content,header))
+        #log.info("-->status={},content={},header={}".format(status,content,header))
         json_parsed = json.loads(content.decode())
         meta_parsed = ""
         if status:
             # in dp4 builds meta data is in content, not in header
-            log.info("-->X-Couchbase-Meta header value={}".format(header['X-Couchbase-Meta']))
+            #log.info("-->X-Couchbase-Meta header value={}".format(header['X-Couchbase-Meta']))
             #log.info("-->x-couchbase-meta header value={}".format(header['x-couchbase-meta']))
             if 'X-Couchbase-Meta' in header:
                 meta = header['X-Couchbase-Meta']
