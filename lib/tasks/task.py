@@ -3790,12 +3790,15 @@ class GenerateExpectedViewResultsTask(Task):
                             groups[key]['min'] = min(row['value'], groups[key]['min'])
                             groups[key]['sumsqr'] += row['value'] ** 2
             expected_rows = []
+            is_reduce_group=False
             for group, value in groups.items():
                 if isinstance(group, str) and group.find("[") == 0:
                     group = group[1:-1].split(",")
                     group = [int(k) for k in group]
                 expected_rows.append({"key" : group, "value" : value})
-            expected_rows = sorted(self.emitted_rows, key=(lambda x: (x['key'],x['id'])),reverse=descending_set)
+                is_reduce_group=True
+            if not is_reduce_group: #sort only when not reduced to group
+                expected_rows = sorted(self.emitted_rows, key=(lambda x: (x['key'],x['id'])),reverse=descending_set)
 
         if 'skip' in query:
             expected_rows = expected_rows[(int(query['skip'])):]
