@@ -4288,7 +4288,12 @@ class QueriesIndexTests(QueryTests):
                 self.sleep(15, 'wait for index')
                 self.query = "SELECT name, join_day FROM %s where name = 'employee-9'"  % (bucket.name)
                 result = self.run_cbq_query()
-                self.assertEqual(sorted(actual_result['results']), sorted(result['results']))
+                actual_result1 = sorted(actual_result['results'], key=(lambda x: x['name']))
+                result1 = sorted(result['results'], key=(lambda x: x['name']))
+
+                #self.assertEqual(sorted(actual_result['results']), sorted(result['results']))
+                self.assertEqual(actual_result1, result1)
+
                 self.query = "DROP PRIMARY INDEX ON %s" % bucket.name
                 self.run_cbq_query()
 
