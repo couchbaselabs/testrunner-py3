@@ -85,7 +85,9 @@ class DocumentGenerator(KVGenerator):
             seed //= len(arg)
         doc = self.template.format(*doc_args).replace('\'', '"').replace('True',
                              'true').replace('False', 'false').replace('\\', '\\\\')
+
         json_doc = json.loads(doc)
+
         if self.name == "random_keys":
             """ This will generate a random ascii key with 12 characters """
             json_doc['_id'] = ''.join(choice(ascii_uppercase+ascii_lowercase+digits) \
@@ -93,7 +95,12 @@ class DocumentGenerator(KVGenerator):
         else:
             json_doc['_id'] = self.name + '-' + str(self.itr)
         self.itr += 1
-        return json_doc['_id'], json.dumps(json_doc).encode("ascii", "ignore")
+        #jsondumps = json.dumps(json_doc).encode("ascii", "ignore")
+        #print("-->doc#{}:{}".format(self.itr, doc))
+        #print("-->json doc#{}:{}".format(self.itr, json_doc))
+        #print("-->json dumps#{}:{}:{}".format(self.itr, json_doc['_id'],jsondumps))
+        #return json_doc['_id'], json.dumps(json_doc).encode("ascii", "ignore")
+        return json_doc['_id'], json_doc
 
 class SubdocDocumentGenerator(KVGenerator):
     """ An idempotent document generator."""

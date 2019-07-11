@@ -125,6 +125,7 @@ class MemcachedClient(object):
         _, w, _ = select.select([], [self.s], [], self.timeout)
         if w:
             #self.log.info("--->_send:{},{},{},{},{}".format(type(msg),type(extraHeader),type(key),type(val),type(extended_meta_data)))
+            #self.log.info("--->_send:{},{},{},{},{}".format(msg,extraHeader,key,val,extended_meta_data))
             try:
               key = key.encode()
             except AttributeError:
@@ -754,7 +755,7 @@ class MemcachedClient(object):
         # If this is a dict, convert it to a pair generator
         collection = self.collection_name(collection)
 
-        if hasattr(items, 'iteritems'):
+        if hasattr(items, 'items'):
             items = iter(items.items())
 
         opaqued = dict(enumerate(items))
