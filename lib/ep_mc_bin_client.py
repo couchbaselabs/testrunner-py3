@@ -487,7 +487,7 @@ class MemcachedClient(object):
         Give me (key, value) pairs."""
 
         # If this is a dict, convert it to a pair generator
-        if hasattr(items, 'iteritems'):
+        if hasattr(items, 'items'):
             items = iter(items.items())
 
         opaqued=dict(enumerate(items))
