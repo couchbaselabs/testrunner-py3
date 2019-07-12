@@ -9,6 +9,13 @@ from .xdcrnewbasetests import XDCRNewBaseTest
 
 class XDCRAdvFilterTests(XDCRNewBaseTest):
 
+
+    def suite_setUp(self):
+        print("*** XDCRAdvFilterTests : suite_Setup() ***")
+
+    def suite_tearDown(self):
+        print("*** XDCRAdvFilterTests : suite_tearDown() ***")
+
     def setUp(self):
         XDCRNewBaseTest.setUp(self)
         self.src_cluster = self.get_cb_cluster_by_name('C1')
