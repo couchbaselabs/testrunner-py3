@@ -1211,7 +1211,7 @@ class LoadDocumentsGeneratorsTask(LoadDocumentsTask):
                 # generate
                 key_value = generator.next_batch()
                 # create
-                self.log.info("-->run_generator:calling _care_batch_client...key_value={},client={}".format(key_value,client))
+                #self.log.info("-->run_generator:calling _care_batch_client...key_value={},client={}".format(key_value,client))
                 self._create_batch_client(key_value, client)
 
                 # cache
@@ -2286,7 +2286,7 @@ class ViewCreateTask(Task):
                     #self.log.info("-->Calling Design doc spatial view: add_view")
                     ddoc.add_spatial_view(self.view)
                 else:
-                    self.log.info("-->Calling Design doc: add_view")
+                    #self.log.info("-->Calling Design doc: add_view")
                     ddoc.add_view(self.view)
             self.ddoc_rev_no = self._parse_revision(meta['rev'])
         except ReadDocumentException:
@@ -2377,11 +2377,11 @@ class ViewCreateTask(Task):
     def _check_ddoc_revision(self):
         valid = False
         try:
-            self.log.info("-->rest.get_ddoc: {},{}".format(self.bucket,self.design_doc_name))
+            #self.log.info("-->rest.get_ddoc: {},{}".format(self.bucket,self.design_doc_name))
             content, meta = self.rest.get_ddoc(self.bucket, self.design_doc_name)
-            self.log.info("-->content={},meta={}".format(content,meta))
+            #self.log.info("-->content={},meta={}".format(content,meta))
             new_rev_id = self._parse_revision(meta['rev'])
-            self.log.info("-->new_rev_id={}".format(new_rev_id))
+            #self.log.info("-->new_rev_id={}".format(new_rev_id))
             if new_rev_id != self.ddoc_rev_no:
                 self.ddoc_rev_no = new_rev_id
                 valid = True
