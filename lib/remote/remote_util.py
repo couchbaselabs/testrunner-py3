@@ -3274,12 +3274,12 @@ class RemoteMachineShellConnection:
 
         if self.remote:
             for line in stdout.read().splitlines():
-                output.append(line)
+                output.append(line.decode())
             for line in stderro.read().splitlines():
-                error.append(line)
+                error.append(line.decode())
             if temp:
                 line = temp.splitlines()
-                output.extend(line)
+                output.extend(line.decode())
             stdout.close()
             stderro.close()
         if debug:

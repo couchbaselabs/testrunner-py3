@@ -1026,7 +1026,7 @@ class RestConnection(object):
         error_message = "storageMode must be one of plasma, memory_optimized"
         log.info('settings/indexes params : {0}'.format(params))
         status, content, header = self._http_request(api, 'POST', params)
-        if not status and error_message in content:
+        if not status and error_message in content.decode():
             #TODO: Currently it just acknowledges if there is an error.
             #And proceeds with further initialization.
             log.info(content)
