@@ -15,14 +15,14 @@ from membase.helper.cluster_helper import ClusterOperationHelper
 from remote.remote_util import RemoteMachineShellConnection, RemoteUtilHelper
 from couchbase_helper.document import DesignDocument, View
 from couchbase_helper.documentgenerator import BlobGenerator
-from .query_tests_helper import QueryHelperTests
+from query_tests_helper import QueryHelperTests
 from couchbase_helper.tuq_helper import N1QLHelper
 from scripts.install import InstallerJob
 from builds.build_query import BuildQuery
-from .eventing.eventing_base import EventingBaseTest
+from eventing.eventing_base import EventingBaseTest
 from pytests.eventing.eventing_constants import HANDLER_CODE
 from random import randrange, randint
-from .fts.fts_base import FTSIndex, FTSBaseTest
+from fts.fts_base import FTSIndex, FTSBaseTest
 from pytests.fts.fts_callable import FTSCallable
 from .cbas.cbas_base import CBASBaseTest
 from pprint import pprint
