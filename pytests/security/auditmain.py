@@ -485,20 +485,20 @@ class audit:
                 currTimeZone = shell.execute_command('date +%z')
             finally:
                 shell.disconnect()
-            log.info (" Matching expected date - currDate {0}; actual Date - {1}".format(currDate[0][0].decode(), date))
-            log.info (" Matching expected time - currTime {0} ; actual Time - {1}".format(currHourMin[0][0].decode(), hourMin))
-            if ((date != currDate[0][0].decode())):
+            log.info (" Matching expected date - currDate {0}; actual Date - {1}".format(currDate[0][0], date))
+            log.info (" Matching expected time - currTime {0} ; actual Time - {1}".format(currHourMin[0][0], hourMin))
+            if ((date != currDate[0][0])):
                 log.info ("Mis-match in values for timestamp - date")
                 return False
                 #Compare time and minutes, will fail if time is 56 mins or above
             else:
                 #log.info("-->{},{},{},{}".format(type(hourMin),hourMin,type(currHourMin),currHourMin))
-                if ((int((hourMin.split(":"))[0])) != (int((currHourMin[0][0].decode().split(":"))[0]))) or ((int((hourMin.split(":"))[1]) + 10) < (int((currHourMin[0][0].decode().split(":"))[1]))):
+                if ((int((hourMin.split(":"))[0])) != (int((currHourMin[0][0].split(":"))[0]))) or ((int((hourMin.split(":"))[1]) + 10) < (int((currHourMin[0][0].split(":"))[1]))):
                     log.info ("Mis-match in values for timestamp - time")
                     return False
                 else:
                     tempTimeZone = tempTimeZone.replace(":", "")
-                    if (tempTimeZone != currTimeZone[0][0].decode()):
+                    if (tempTimeZone != currTimeZone[0][0]):
                         log.info ("Mis-match in value of timezone")
                         return False
 

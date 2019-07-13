@@ -3283,12 +3283,24 @@ class RemoteMachineShellConnection:
 
         if self.remote:
             for line in stdout.read().splitlines():
-                output.append(line.decode())
+                try:
+                   line = line.decode()
+                except AttributeError:
+                   pass
+                output.append(line)
             for line in stderro.read().splitlines():
-                error.append(line.decode())
+                try:
+                   line = line.decode()
+                except AttributeError:
+                   pass
+                error.append(line)
             if temp:
                 line = temp.splitlines()
-                output.extend(line.decode())
+                try:
+                   line = line.decode()
+                except AttributeError:
+                   pass
+                output.extend(line)
             stdout.close()
             stderro.close()
         if debug:
