@@ -94,6 +94,10 @@ class CliBaseTest(BaseTestCase):
                                                               self.master.rest_password)
         cmd += '-d "path_config:component_path(bin)."'
         bin_path  = subprocess.check_output(cmd, shell=True)
+        try:
+            bin_path = bin_path.decode()
+        except AttributeError:
+            pass
         if "bin" not in bin_path:
             self.fail("Check if cb server install on %s" % self.master.ip)
         else:
