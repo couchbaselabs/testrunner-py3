@@ -1027,8 +1027,8 @@ class FTSIndex:
         query_json['explain'] = explain
         if max_matches is not None and max_matches != 'None':
             query_json['size'] = int(max_matches)
-	else:
-	    del query_json['size']
+        else:
+            del query_json['size']
         if max_limit_matches is not None:
             query_json['limit'] = int(max_limit_matches)
         if show_results_from_item:

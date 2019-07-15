@@ -24,7 +24,7 @@ from pytests.eventing.eventing_constants import HANDLER_CODE
 from random import randrange, randint
 from fts.fts_base import FTSIndex, FTSBaseTest
 from pytests.fts.fts_callable import FTSCallable
-from .cbas.cbas_base import CBASBaseTest
+from cbas.cbas_base import CBASBaseTest
 from pprint import pprint
 from testconstants import CB_REPO
 from testconstants import MV_LATESTBUILD_REPO
