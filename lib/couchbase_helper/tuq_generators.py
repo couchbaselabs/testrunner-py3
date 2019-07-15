@@ -937,7 +937,7 @@ class JsonGenerator:
             address["country"] = "India"
             address["postal_code"] = "{0}".format(random.randint(560071, 560090))
             credit_cards = [random.randint(-1000000, 9999999) for i in range(random.randint(3, 7))]
-            secret_combo = [''.join(random.choice(string.lowercase) for i in range(7)),
+            secret_combo = [''.join(random.choice(string.ascii_lowercase) for i in range(7)),
                             random.randint(1000000, 9999999)]
             travel_history = [random.choice(COUNTRIES[:9]) for i in range(1, 11)]
             travel_history_code = [COUNTRY_CODE[COUNTRIES.index(i)] for i in travel_history]

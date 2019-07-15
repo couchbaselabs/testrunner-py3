@@ -66,7 +66,7 @@ class SpatialViewsTests(BaseTestCase):
         name_lenght = self.input.param('name_lenght', None)
         view_name = self.input.param('view_name', self.default_view_name)
         if name_lenght:
-            view_name = ''.join(random.choice(string.lowercase) for x in range(name_lenght))
+            view_name = ''.join(random.choice(string.ascii_lowercase) for x in range(name_lenght))
         not_compilable = self.input.param('not_compilable', False)
         error = self.input.param('error', None)
         map_fn = (self.default_map, 'function (doc) {emit(doc.geometry, doc.age);')[not_compilable]
