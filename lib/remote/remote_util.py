@@ -1709,9 +1709,10 @@ class RemoteMachineShellConnection:
     def create_directory(self, remote_path):
         sftp = self._ssh_client.open_sftp()
         try:
+            log.info("Checking if the directory {0} exists or not.".format(remote_path))
             sftp.stat(remote_path)
         except IOError as e:
-            if e[0] == 2:
+            if e.errno == 2:
                 log.info("Directory at {0} DOES NOT exist. We will create on here".format(remote_path))
                 sftp.mkdir(remote_path)
                 sftp.close()
