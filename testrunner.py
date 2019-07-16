@@ -528,10 +528,12 @@ def main():
     # terminate any non main thread - these were causing hangs
     for t in threading.enumerate():
         if t.name != 'MainThread' and t.isAlive():
-            print('Thread', t.name, 'was not properly terminated, will be terminated now.')
+            print('Thread', t, 'was not properly terminated, will be terminated now.')
             if hasattr(t, 'shutdown'):
+                print("Shutting down the thread...")
                 t.shutdown(True)
             else:
+                print("Stopping the thread...")
                 t._stop()
 
 
