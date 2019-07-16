@@ -23,6 +23,12 @@ class StableTopFTS(FTSBaseTest):
     def tearDown(self):
         super(StableTopFTS, self).tearDown()
 
+    def suite_setUp(self):
+        self.log.info("*** StableTopFTS: suite_setUp() ***")
+
+    def suite_tearDown(self):
+        self.log.info("*** StableTopFTS: suite_tearDown() ***")
+
     def check_fts_service_started(self):
         try:
             rest = RestConnection(self._cb_cluster.get_random_fts_node())
@@ -1730,7 +1736,7 @@ class StableTopFTS(FTSBaseTest):
         from .random_query_generator.rand_query_gen import FTSESQueryGenerator
         testcase_failed = False
         for i in range(self.num_queries):
-	    self.log.info("Running Query no --> " + str(i))
+            self.log.info("Running Query no --> " + str(i))
             fts_query, es_query = FTSESQueryGenerator.construct_geo_location_query()
             print(fts_query)
             print("fts_query location ---> " + str(fts_query["location"]))
