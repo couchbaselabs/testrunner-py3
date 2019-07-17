@@ -14,6 +14,7 @@ from remote.remote_util import RemoteMachineShellConnection
 from membase.api.exception import CBQError, ReadDocumentException
 from membase.api.rest_client import RestConnection
 import copy
+import traceback
 
 class N1QLHelper():
     def __init__(self, version=None, master=None, shell=None,  max_verify=0, buckets=[], item_flag=0,
@@ -501,12 +502,28 @@ class N1QLHelper():
             try:
                 actual_result = self.run_cbq_query(query=query, server=server, scan_consistency=scan_consistency,
                                                    scan_vector=scan_vector)
+                #self.log.info("-->actual_result={}".format(actual_result))
                 if verify_results:
-                    self._verify_results(sorted(actual_result['results']), sorted(expected_result))
+                    #self._verify_results(sorted(actual_result['results']), sorted(expected_result))
+                    aresult = actual_result['results']
+                    if isinstance(aresult,dict):
+                       bname = list(aresult)[0]
+                       skey = aresult[bname][list(aresult[bname].keys())[0]]
+                       sorted_actual_result = sorted(aresult, key=(lambda x: skey))
+                    else:
+                       bname = list(aresult[0])[0]
+                       skey = aresult[0][bname][list(aresult[0][bname].keys())[0]]
+                       sorted_actual_result = sorted(aresult, key=(lambda x: skey))
+                    if isinstance(expected_result,dict):
+                       sorted_expected_result = sorted(expected_result, key=(lambda x: skey))
+                    else:
+                       sorted_expected_result = sorted(expected_result, key=(lambda x: skey))
+                    self._verify_results(sorted_actual_result, sorted_expected_result)
                 else:
                     return "ran query with success and validated results", True
                 check = True
             except Exception as ex:
+                traceback.print_exc()
                 if next_time - init_time > timeout or try_count >= max_try:
                     return ex, False
             finally:
