@@ -533,8 +533,8 @@ def main():
                 print("Shutting down the thread...")
                 t.shutdown(True)
             else:
-                print("Stopping the thread...")
-                t._stop()
+                print("Stopping the thread skipping...")
+                #t._stop()
 
 
 def watcher():
