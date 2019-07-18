@@ -1462,7 +1462,7 @@ class RestConnection(object):
                 elif response['status'] in ['200', '201', '202']:
                     count_cbserver_up = 2
                     log.info("couchbase server is up again")
-            except socket.error as e:
+            except (socket.error, AttributeError) as e:
                 log.info("couchbase server is down.  Waiting for couchbase server up")
                 time.sleep(2)
                 break_out += 1
