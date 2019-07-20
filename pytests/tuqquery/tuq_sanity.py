@@ -1621,12 +1621,12 @@ class QuerySanityTests(QueryTests):
             actual_list = self.run_cbq_query()
             actual_result = actual_list['results']
             expected_result = [{"job_title" : group,
-                                "names" : sorted([x["name"] for x in self.full_list
+                                "names" : [x["name"] for x in self.full_list
                                                   if x["job_title"] == group] + \
                                                  [x["email"] for x in self.full_list
                                                   if x["job_title"] == group] + \
                                                  [x["join_day"] for x in self.full_list
-                                                  if x["job_title"] == group])}
+                                                  if x["job_title"] == group]}
                                for group in tmp_groups][0:10]
             if DeepDiff(actual_result, expected_result):
                 self.assertTrue(False,"actual vs expected did not matched")

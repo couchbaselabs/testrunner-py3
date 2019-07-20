@@ -26,6 +26,7 @@ from couchbase.cluster import PasswordAuthenticator
 import couchbase.subdocument as SD
 from couchbase.n1ql import N1QLQuery, STATEMENT_PLUS, CONSISTENCY_REQUEST, MutationState
 import ast
+from deepdiff import DeepDiff
 
 
 JOIN_INNER = "INNER"
@@ -1213,6 +1214,14 @@ class QueryTests(BaseTestCase):
         if self.max_verify is not None:
             actual_result = actual_result[:self.max_verify]
             expected_result = expected_result[:self.max_verify]
+        diffs = DeepDiff(actual_result, expected_result)
+        if diffs:
+            self.assertTrue(False, diffs)
+
+    def _verify_results_old(self, actual_result, expected_result):
+        if self.max_verify is not None:
+            actual_result = actual_result[:self.max_verify]
+            expected_result = expected_result[:self.max_verify]
             self.assertTrue(actual_result == expected_result, "Results are incorrect")
             return
         if len(actual_result) != len(expected_result):
@@ -1222,6 +1231,7 @@ class QueryTests(BaseTestCase):
         msg = "Results are incorrect.\n Actual first and last 100:  %s.\n ... \n %s Expected first and last 100: %s.\n  ... \n %s" \
               % (actual_result[:100], actual_result[-100:], expected_result[:100], expected_result[-100:])
         self.assertTrue(actual_result == expected_result, msg)
+
 
     def _verify_aggregate_query_results(self, result, query, bucket):
         def _gen_dict(res):
