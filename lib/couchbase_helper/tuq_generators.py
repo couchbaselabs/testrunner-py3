@@ -324,7 +324,11 @@ class TuqGenerators(object):
                         else:
                             select_clause = select_clause + '"%s" : %s,' %([at.replace('"','') for at in re.compile('"\w+"').findall(attr)][0], attr)
                     select_clause = select_clause + '}'
+
+        log.info("-->select_clause:{}; where_clause={}".format(select_clause, where_clause))
         if where_clause:
+            where_clause = where_clause.replace('if  t  >  "', 'if  str(t)  >  "') # to fix the type error between int, str comparison
+            log.info("-->where_clause={}".format(where_clause))
             result = [eval(select_clause) for doc in self.full_set if eval(where_clause)]
         else:
             result = [eval(select_clause) for doc in self.full_set]
