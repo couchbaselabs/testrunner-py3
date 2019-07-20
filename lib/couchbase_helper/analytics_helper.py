@@ -472,7 +472,7 @@ class AnalyticsHelper():
                 actual_result = self.run_analytics_query(query = query, server = server,
                  scan_consistency = scan_consistency, scan_vector = scan_vector)
                 if verify_results:
-                    self._verify_results(sorted(actual_result['results']), sorted(expected_result))
+                    self._verify_results(actual_result['results'], expected_result)
                 else:
                     return "ran query with success and validated results" , True
                 check = True

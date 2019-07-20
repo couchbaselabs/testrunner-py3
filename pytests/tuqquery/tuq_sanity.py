@@ -9,7 +9,7 @@ from membase.api.exception import CBQError, ReadDocumentException
 from membase.api.rest_client import RestConnection
 from .tuq import QueryTests
 import random
-
+from deepdiff import DeepDiff
 
 class QuerySanityTests(QueryTests):
 
@@ -235,8 +235,7 @@ class QuerySanityTests(QueryTests):
                                for doc in self.full_list
                                if len([vm for vm in doc["VMs"]
                                        if vm["RAM"] == 5]) > 0]
-            expected_result = sorted(expected_result)
-            self._verify_results(sorted(actual_result['results']), expected_result)
+            self._verify_results(actual_result['results'], expected_result)
 
     def test_any_no_in_clause(self):
         self.fail_if_no_buckets()
@@ -1146,8 +1145,7 @@ class QuerySanityTests(QueryTests):
                                                           for doc in self.full_list
                                                           if doc['join_mo'] == group])}
                                for group in tmp_groups]
-            expected_result = sorted(expected_result, key=lambda doc: (doc['join_mo']))
-            self._verify_results(sorted(actual_result['results']), expected_result)
+            self._verify_results(actual_result['results'], expected_result)
 
             self.query = "SELECT join_mo, SUM(test_rate) as rate FROM %s " % (bucket.name) +\
                          "as employees WHERE job_title='Sales' GROUP BY join_mo " +\
@@ -1621,10 +1619,7 @@ class QuerySanityTests(QueryTests):
                          " FROM %s GROUP BY job_title  limit 10" % (bucket.name)
 
             actual_list = self.run_cbq_query()
-            actual_result = self.sort_nested_list(actual_list['results'])
-            actual_result2 = sorted(actual_result, key=lambda doc: (doc['job_title']))
-
-
+            actual_result = actual_list['results']
             expected_result = [{"job_title" : group,
                                 "names" : sorted([x["name"] for x in self.full_list
                                                   if x["job_title"] == group] + \
@@ -1633,8 +1628,9 @@ class QuerySanityTests(QueryTests):
                                                  [x["join_day"] for x in self.full_list
                                                   if x["job_title"] == group])}
                                for group in tmp_groups][0:10]
-            expected_result2 = sorted(expected_result, key=lambda doc: (doc['job_title']))
-            self.assertTrue(actual_result2==expected_result2)
+            if DeepDiff(actual_result, expected_result):
+                self.assertTrue(False,"actual vs expected did not matched")
+
 
     def test_array_prepend(self):
         self.fail_if_no_buckets()
@@ -3004,14 +3000,12 @@ class QuerySanityTests(QueryTests):
         for bucket in self.buckets:
             self.query = "SELECT TOSTR(join_mo) month FROM %s" % bucket.name
             actual_result = self.run_cbq_query()
-            actual_result = sorted(actual_result['results'])
+            actual_result = actual_result['results']
             self.query = "SELECT REVERSE(TOSTR(join_mo)) rev_month FROM %s" % bucket.name
             actual_result1 = self.run_cbq_query()
-            actual_result2 = sorted(actual_result1['results'])
+            actual_result2 = actual_result1['results']
             expected_result = [{"month" : str(doc['join_mo'])} for doc in self.full_list]
-            expected_result = sorted(expected_result)
             expected_result2 = [{"rev_month" : str(doc['join_mo'])[::-1]} for doc in self.full_list]
-            expected_result2 = sorted(expected_result2)
             self._verify_results(actual_result, expected_result)
             self._verify_results(actual_result2, expected_result2)
 

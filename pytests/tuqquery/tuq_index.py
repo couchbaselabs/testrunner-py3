@@ -937,7 +937,7 @@ class QueriesViewsTests(QuerySanityTests):
                                        for doc in full_list if doc['join_day'] > 2 and doc['join_mo'] > 3]
                     self.query = "select * from %s" % bucket.name
                     self.run_cbq_query()
-                    self._verify_results(sorted(res['results']), sorted(expected_result))
+                    self._verify_results(res['results'], expected_result)
                     self.query = 'EXPLAIN SELECT name, join_day, join_mo FROM %s WHERE join_day>2 AND join_mo>3' % (bucket.name)
                     res = self.run_cbq_query()
                     plan = self.ExplainPlanHelper(res)
@@ -973,7 +973,7 @@ class QueriesViewsTests(QuerySanityTests):
                     full_list = self.generate_full_docs_list(self.gens_load)
                     expected_result = [{"name" : doc['name'], "join_yr" : doc['join_yr'], "join_day" : doc["join_day"]}
                                        for doc in full_list if doc['join_yr'] > 3]
-                    self._verify_results(sorted(res['results']), sorted(expected_result))
+                    self._verify_results(res['results'], expected_result)
                     #self.assertTrue(len(res['results'])==10)
                     self.query = 'EXPLAIN SELECT name, join_day, join_yr FROM %s WHERE join_yr>3' % (bucket.name)
                     res = self.run_cbq_query()

@@ -80,7 +80,7 @@ class QueryNewTuqTests(QueryTests):
         for bucket in self.buckets:
             query_template = 'SELECT emp.$int0, task FROM %s emp UNNEST emp.$nested_list_3l0 task' % bucket.name
             actual_result, expected_result = self.run_query_from_template(query_template)
-            self._verify_results(sorted(actual_result['results']), sorted(expected_result))
+            self._verify_results(actual_result['results'], expected_result)
 
     def test_subquery_select(self):
         self.fail_if_no_buckets()
