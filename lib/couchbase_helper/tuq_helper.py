@@ -15,6 +15,7 @@ from membase.api.exception import CBQError, ReadDocumentException
 from membase.api.rest_client import RestConnection
 import copy
 import traceback
+from deepdiff import DeepDiff
 
 class N1QLHelper():
     def __init__(self, version=None, master=None, shell=None,  max_verify=0, buckets=[], item_flag=0,
@@ -110,7 +111,9 @@ class N1QLHelper():
         if len(actual_result) != len(expected_result):
             raise Exception("Results are incorrect.Actual num %s. Expected num: %s.\n" % (len(actual_result), len(expected_result)))
         msg = "The number of rows match but the results mismatch, please check"
-        if actual_result != expected_result:
+        diffs = DeepDiff(actual_result, expected_result, ignore_order=True)
+        if diffs:
+            self.log.info("-->actual vs expected diffs found:{}".format(diffs))
             raise Exception(msg)
 
     def _verify_results_rqg(self, subquery, aggregate=False, n1ql_result=[], sql_result=[], hints=["a1"], aggregate_pushdown=False):
@@ -505,20 +508,7 @@ class N1QLHelper():
                 #self.log.info("-->actual_result={}".format(actual_result))
                 if verify_results:
                     #self._verify_results(sorted(actual_result['results']), sorted(expected_result))
-                    aresult = actual_result['results']
-                    if isinstance(aresult,dict):
-                       bname = list(aresult)[0]
-                       skey = aresult[bname][list(aresult[bname].keys())[0]]
-                       sorted_actual_result = sorted(aresult, key=(lambda x: skey))
-                    else:
-                       bname = list(aresult[0])[0]
-                       skey = aresult[0][bname][list(aresult[0][bname].keys())[0]]
-                       sorted_actual_result = sorted(aresult, key=(lambda x: skey))
-                    if isinstance(expected_result,dict):
-                       sorted_expected_result = sorted(expected_result, key=(lambda x: skey))
-                    else:
-                       sorted_expected_result = sorted(expected_result, key=(lambda x: skey))
-                    self._verify_results(sorted_actual_result, sorted_expected_result)
+                    self._verify_results(actual_result['results'], expected_result)
                 else:
                     return "ran query with success and validated results", True
                 check = True
@@ -789,7 +779,7 @@ class N1QLHelper():
                 items_count_after_rebalance[index] = stats_map_after_rebalance[bucket][index]["items_count"]
         self.log.info("item_count of indexes before rebalance {0}".format(items_count_before_rebalance))
         self.log.info("item_count of indexes after rebalance {0}".format(items_count_after_rebalance))
-        if cmp(items_count_before_rebalance, items_count_after_rebalance) != 0:
+        if DeepDiff(items_count_before_rebalance, items_count_after_rebalance):
             self.log.info("items_count mismatch")
             raise Exception("items_count mismatch")
 
@@ -804,7 +794,7 @@ class N1QLHelper():
                 index_state_after_rebalance[index] = map_after_rebalance[bucket][index]["status"]
         self.log.info("index status of indexes rebalance {0}".format(index_state_before_rebalance))
         self.log.info("index status of indexes rebalance {0}".format(index_state_after_rebalance))
-        if cmp(index_state_before_rebalance, index_state_after_rebalance) != 0:
+        if DeepDiff(index_state_before_rebalance, index_state_after_rebalance):
             self.log.info("index status mismatch")
             raise Exception("index status mismatch")
 
