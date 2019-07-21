@@ -962,7 +962,10 @@ class QueryTests(BaseTestCase):
             self.assertFalse('ERROR' in (str(word).upper() for word in result_with_prepare))
         msg = "Query result with prepare and without doesn't match.\nNo prepare: %s ... %s\nWith prepare: %s ... %s" \
               % (result_no_prepare[:100], result_no_prepare[-100:], result_with_prepare[:100], result_with_prepare[-100:])
-        self.assertTrue(sorted(result_no_prepare) == sorted(result_with_prepare), msg)
+        diffs = DeepDiff(result_no_prepare, result_with_prepare, ignore_order=True)
+        if diffs:
+            self.assertTrue(False, diffs)
+        #self.assertTrue(sorted(result_no_prepare) == sorted(result_with_prepare), msg)
 
     def run_cbq_query_curl(self, query=None, server=None):
         if query is None:
