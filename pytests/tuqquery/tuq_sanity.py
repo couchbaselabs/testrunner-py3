@@ -1736,14 +1736,12 @@ class QuerySanityTests(QueryTests):
                          " FROM %s GROUP BY job_title" % (bucket.name)
 
             actual_list = self.run_cbq_query()
-            actual_result = self.sort_nested_list(actual_list['results'])
-            actual_result = sorted(actual_result, key=lambda doc: (doc['job_title']))
+            actual_result = actual_list['results']
             tmp_groups = {doc['job_title'] for doc in self.full_list}
             expected_result = [{"job_title" : group,
                                 "names" : {x["name"] for x in self.full_list
                                                if x["job_title"] == group and x["name"]!= value1 and x["name"]!=value3}}
                                for group in tmp_groups]
-            expected_result = sorted(expected_result, key=lambda doc: (doc['job_title']))
             self._verify_results(actual_result, expected_result)
 
     def test_array_insert(self):
@@ -1820,15 +1818,12 @@ class QuerySanityTests(QueryTests):
             " FROM %s GROUP BY job_title" % (bucket.name)
 
             actual_list = self.run_cbq_query()
-            actual_result = self.sort_nested_list(actual_list['results'])
-            actual_result = sorted(actual_result, key=lambda doc: (doc['job_title']))
-
+            actual_result = actual_list['results']
             tmp_groups = {doc['job_title'] for doc in self.full_list}
             expected_result = [{"job_title" : group,
                                 "names" : {x["name"] for x in self.full_list
                                                if x["job_title"] == group}}
                                for group in tmp_groups]
-            expected_result = sorted(expected_result, key=lambda doc: (doc['job_title']))
             self._verify_results(actual_result, expected_result)
 
     def test_array_max(self):
@@ -1903,47 +1898,35 @@ class QuerySanityTests(QueryTests):
             " FROM %s GROUP BY job_title" % (bucket.name)
 
             actual_list = self.run_cbq_query()
-            actual_result = self.sort_nested_list(actual_list['results'])
-            actual_result = sorted(actual_result,
-                                   key=lambda doc: (doc['job_title']))
-
+            actual_result = actual_list['results']
             tmp_groups = {doc['job_title'] for doc in self.full_list}
             expected_result = [{"job_title" : group,
                                 "emp_job" : {x["name"] for x in self.full_list
                                            if x["job_title"] == group}}
                                for group in tmp_groups]
-            expected_result = sorted(expected_result, key=lambda doc: (doc['job_title']))
             self._verify_results(actual_result, expected_result)
 
             self.query = "SELECT job_title, array_put(array_agg(distinct name), 'employee-50','employee-51') as emp_job" +\
             " FROM %s GROUP BY job_title" % (bucket.name)
 
             actual_list = self.run_cbq_query()
-            actual_result = self.sort_nested_list(actual_list['results'])
-            actual_result = sorted(actual_result,
-                                   key=lambda doc: (doc['job_title']))
-
+            actual_result = actual_list['results']
             tmp_groups = {doc['job_title'] for doc in self.full_list}
             expected_result = [{"job_title" : group,
                                 "emp_job" : set([x["name"] for x in self.full_list
                                            if x["job_title"] == group]  + ['employee-50'] + ['employee-51'])}
                                for group in tmp_groups]
-            expected_result = sorted(expected_result, key=lambda doc: (doc['job_title']))
             self._verify_results(actual_result, expected_result)
 
             self.query = "SELECT job_title, array_put(array_agg(distinct name), 'employee-47') as emp_job" +\
             " FROM %s GROUP BY job_title" % (bucket.name)
 
             actual_list = self.run_cbq_query()
-            actual_result = self.sort_nested_list(actual_list['results'])
-            actual_result = sorted(actual_result,
-                                   key=lambda doc: (doc['job_title']))
-
+            actual_result = actual_list['results']
             expected_result = [{"job_title" : group,
                                 "emp_job" : set([x["name"] for x in self.full_list
                                            if x["job_title"] == group] + ['employee-47'])}
                                for group in tmp_groups]
-            expected_result = sorted(expected_result, key=lambda doc: (doc['job_title']))
             self._verify_results(actual_result, expected_result)
 
     def test_array_range(self):
