@@ -1214,7 +1214,7 @@ class QueryTests(BaseTestCase):
         if self.max_verify is not None:
             actual_result = actual_result[:self.max_verify]
             expected_result = expected_result[:self.max_verify]
-        diffs = DeepDiff(actual_result, expected_result)
+        diffs = DeepDiff(actual_result, expected_result, ignore_order=True)
         if diffs:
             self.assertTrue(False, diffs)
 

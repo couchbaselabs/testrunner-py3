@@ -1140,9 +1140,9 @@ class QuerySanityTests(QueryTests):
             tmp_groups = {doc['join_mo'] for doc in self.full_list
                               if doc['join_mo'] < 5}
             expected_result = [{"join_mo" : group,
-                                "points_sum" : math.fsum([doc['tasks_points']['task1']
+                                "points_sum" : int(math.fsum([doc['tasks_points']['task1']
                                                           for doc in self.full_list
-                                                          if doc['join_mo'] == group])}
+                                                          if doc['join_mo'] == group]))}
                                for group in tmp_groups]
             self._verify_results(actual_result['results'], expected_result)
 
@@ -1436,7 +1436,8 @@ class QuerySanityTests(QueryTests):
         for bucket in self.buckets:
             self.query = 'select * from %s let x1 = {"name":1} order by meta().id limit 1'%(bucket.name)
             actual_result = self.run_cbq_query()
-            self.assertTrue("query-testemployee10153.1877827-0" in str(actual_result['results']))
+            if not "query-testemployee10153.1877827-0" in str(actual_result['results']):
+                self.assertTrue(False, str(actual_result['results']))
             self.assertTrue( "'x1': {'name': 1}" in str(actual_result['results']))
 
     def test_let_missing(self):
@@ -1557,7 +1558,7 @@ class QuerySanityTests(QueryTests):
 
             self.query = 'select d.x,d.y from {0} d where x IN (select raw b.x from {0} b  where b.x IN (select raw d.x from {0} c  use keys["kk02"]))'.format(bucket.name)
             actual_result=self.run_cbq_query()
-            diffs = DeepDiff(actual_result['results'],[{'y': 101, 'x': 100}])
+            diffs = DeepDiff(actual_result['results'],[{'y': 101, 'x': 100}], ignore_order=True)
             if diffs:
                 self.assertTrue(False, diffs)
             self.query = 'explain select d.x from {0} d where x IN (select raw (select raw d.x from {0} c  use keys[d.id] where d.x = b.x)[0] from {0} b  where b.x is not null)'.format(bucket.name)
@@ -1577,7 +1578,7 @@ class QuerySanityTests(QueryTests):
             self.assertTrue(plan['~children'][0]['index']=='ix1')
             self.query = 'select (select raw d.x from default c  use keys[d.id]) as s, d.x from default d where x is not null'.format(bucket.name)
             actual_result=self.run_cbq_query()
-            diffs = DeepDiff(actual_result['results'], [{'x': 100, 's': [100]}])
+            diffs = DeepDiff(actual_result['results'], [{'x': 100, 's': [100]}], ignore_order=True)
             if diffs:
                 self.assertTrue(False, diffs)
 
@@ -1632,8 +1633,9 @@ class QuerySanityTests(QueryTests):
                                                  [x["join_day"] for x in self.full_list
                                                   if x["job_title"] == group]}
                                for group in tmp_groups][0:10]
-            if DeepDiff(actual_result, expected_result):
-                self.assertTrue(False,"actual vs expected did not matched")
+            diffs = DeepDiff(actual_result, expected_result, ignore_order=True)
+            if diffs:
+                self.assertTrue(False,diffs)
 
 
     def test_array_prepend(self):
@@ -2641,7 +2643,7 @@ class QuerySanityTests(QueryTests):
                                                            if doc['job_title'] == group})}
                                for group in tmp_groups]
             expected_result = [{"job_title": doc["job_title"],
-                              "avg_per_year" : round(doc["avg_per_year"], 2)}
+                              "avg_per_year" : int(round(doc["avg_per_year"], 2))}
                               for doc in expected_result]
             expected_result = sorted(expected_result, key=lambda doc: (doc['job_title']))
             self._verify_results(actual_result, expected_result)

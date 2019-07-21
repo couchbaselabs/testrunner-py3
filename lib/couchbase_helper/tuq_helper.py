@@ -779,8 +779,9 @@ class N1QLHelper():
                 items_count_after_rebalance[index] = stats_map_after_rebalance[bucket][index]["items_count"]
         self.log.info("item_count of indexes before rebalance {0}".format(items_count_before_rebalance))
         self.log.info("item_count of indexes after rebalance {0}".format(items_count_after_rebalance))
-        if DeepDiff(items_count_before_rebalance, items_count_after_rebalance):
-            self.log.info("items_count mismatch")
+        diffs = DeepDiff(items_count_before_rebalance, items_count_after_rebalance, ignore_order=True)
+        if diffs:
+            self.log.info(diffs)
             raise Exception("items_count mismatch")
 
         # verify that index status before and after rebalance are same
@@ -794,8 +795,9 @@ class N1QLHelper():
                 index_state_after_rebalance[index] = map_after_rebalance[bucket][index]["status"]
         self.log.info("index status of indexes rebalance {0}".format(index_state_before_rebalance))
         self.log.info("index status of indexes rebalance {0}".format(index_state_after_rebalance))
-        if DeepDiff(index_state_before_rebalance, index_state_after_rebalance):
-            self.log.info("index status mismatch")
+        diffs = DeepDiff(index_state_before_rebalance, index_state_after_rebalance, ignore_order=True)
+        if diffs:
+            self.log.info(diffs)
             raise Exception("index status mismatch")
 
         # Rebalance is not guaranteed to achieve a balanced cluster.
