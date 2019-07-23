@@ -49,17 +49,17 @@ def main():
 
     for i in range( len(data) ):
           if 'dynamic' in data[i]:
-             data[i] = string.replace(data[i], 'dynamic', servers[0])
+             data[i] = data[i].replace('dynamic', servers[0])
              servers.pop(0)
           elif addPoolServers and options.addPoolServerId in data[i]:
-             data[i] = string.replace(data[i], options.addPoolServerId, addPoolServers[0])
+             data[i] = data[i].replace(options.addPoolServerId, addPoolServers[0])
              addPoolServers.pop(0)
 
           if options.os == 'windows':
               if 'root' in data[i]:
-                  data[i] = string.replace(data[i], 'root', 'Administrator')
+                  data[i] = data[i].replace('root', 'Administrator')
               if 'password:couchbase' in data[i]:
-                  data[i] = string.replace(data[i], 'couchbase', 'Membase123')
+                  data[i] = data[i].replace('couchbase', 'Membase123')
 
     for d in data:
           print(d, end=' ')
