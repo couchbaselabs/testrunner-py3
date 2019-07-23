@@ -2117,7 +2117,10 @@ class QueriesIndexTests(QueryTests):
                 actual_result = self.run_cbq_query()
                 self.query = "SELECT x FROM default emp1 USE INDEX(`#primary`)  UNNEST emp1.VMs as x  JOIN default task ON KEYS meta(`emp1`).id where  x.RAM > 1 and x.RAM < 5 ;"
                 expected_result = self.run_cbq_query()
-                self.assertTrue(sorted(actual_result['results']) ==sorted(expected_result['results']))
+                #self.assertTrue(sorted(actual_result['results']) ==sorted(expected_result['results']))
+                diffs = DeepDiff(actual_result['results'], expected_result['results'], ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
             finally:
                 for idx in created_indexes:
                     self.query = "DROP INDEX %s.%s USING %s" % (bucket.name, idx, self.index_type)
@@ -2163,7 +2166,10 @@ class QueriesIndexTests(QueryTests):
                 bucket.name, bucket.name) + \
                              "order BY name limit 10"
                 expected_result = self.run_cbq_query()
-                self.assertTrue(sorted(actual_result['results'])==sorted(expected_result['results']))
+                #self.assertTrue(sorted(actual_result['results'])==sorted(expected_result['results']))
+                diffs = DeepDiff(actual_result['results'], expected_result['results'], ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
             finally:
                 for idx in created_indexes:
                     self.query = "DROP INDEX %s.%s USING %s" % (bucket.name, idx, self.index_type)
