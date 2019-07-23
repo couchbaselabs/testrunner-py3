@@ -2082,7 +2082,10 @@ class QueriesIndexTests(QueryTests):
                 actual_result = self.run_cbq_query()
                 self.query = "SELECT x FROM default emp1 USE INDEX(`#primary`)  UNNEST emp1.VMs as x  JOIN default task ON KEYS meta(`emp1`).id  where  x.RAM > 1 and x.RAM < 5 ;"
                 expected_result = self.run_cbq_query()
-                self.assertTrue(sorted(actual_result['results']) ==sorted(expected_result['results']))
+                diffs = DeepDiff(actual_result['results'], expected_result['results'], ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
+
             finally:
                 for idx in created_indexes:
                     self.query = "DROP INDEX %s.%s USING %s" % (bucket.name, idx, self.index_type)
@@ -3411,13 +3414,14 @@ class QueriesIndexTests(QueryTests):
                 bucket.name, bucket.name) + \
                              "order BY name limit 10"
                 actual_result = self.run_cbq_query()
-                actual_result = sorted(actual_result['results'])
+
                 self.query = "select name from %s WHERE department = 'Support' and ANY i IN %s.hobbies.hobby SATISFIES i = 'art' END " % (
                 bucket.name, bucket.name) + \
                              "order BY name limit 10"
                 expected_result = self.run_cbq_query()
-                expected_result = sorted(expected_result['results'])
-                self.assertTrue(actual_result==expected_result)
+                diffs = DeepDiff(actual_result['results'], expected_result['results'], ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
             finally:
                 for idx in created_indexes:
                     self.query = "DROP INDEX %s.%s USING %s" % (bucket.name, idx, self.index_type)
@@ -3651,12 +3655,12 @@ class QueriesIndexTests(QueryTests):
                 self.query = "select name from %s WHERE department = 'Support' and ANY v IN VMs SATISFIES GREATEST(v.RAM,100) END " % (
                     bucket.name)
                 actual_result = self.run_cbq_query()
-                actual_result = actual_result['results']
                 self.query = "select name from %s USE index(`#primary`) WHERE department = 'Support' and ANY v IN VMs SATISFIES GREATEST(v.RAM,100) END " % (
                     bucket.name)
                 expected_result = self.run_cbq_query()
-                expected_result = expected_result['results']
-                self.assertTrue(sorted(expected_result)==sorted(actual_result))
+                diffs = DeepDiff(actual_result['results'], expected_result['results'], ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
             finally:
                 for idx in created_indexes:
                     self.query = "DROP INDEX %s.%s USING %s" % (bucket.name, idx, self.index_type)
