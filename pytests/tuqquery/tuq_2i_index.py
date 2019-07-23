@@ -7,7 +7,7 @@ from .tuq import QueryTests
 from remote.remote_util import RemoteMachineShellConnection
 from membase.api.rest_client import RestConnection
 from membase.api.exception import CBQError
-
+from deepdiff import DeepDiff
 
 class QueriesIndexTests(QueryTests):
 
@@ -2198,7 +2198,10 @@ class QueriesIndexTests(QueryTests):
                 bucket.name, bucket.name) + \
                              "order BY name limit 10"
                 expected_result = self.run_cbq_query()
-                self.assertTrue(sorted(actual_result['results'])==sorted(expected_result['results']))
+                #self.assertTrue(sorted(actual_result['results'])==sorted(expected_result['results']))
+                diffs = DeepDiff(actual_result['results'], expected_result['results'], ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
             finally:
                 for idx in created_indexes:
                     self.query = "DROP INDEX %s.%s USING %s" % (bucket.name, idx, self.index_type)
@@ -2426,13 +2429,14 @@ class QueriesIndexTests(QueryTests):
                              "order BY name limit 10"
                 actual_result = self.run_cbq_query()
                 #actual_result = sorted(actual_result['results'])
-                actual_result = sorted(actual_result['results'], key=(lambda x: x['name']))
                 self.query = "select name from %s USE INDEX(`#primary`) WHERE ANY i IN %s.hobbies.hobby SATISFIES  (ANY j IN i.dance SATISFIES j='contemporary' end) END and department='Support'" % (
                 bucket.name, bucket.name) + \
                              "order BY name limit 10"
                 expected_result = self.run_cbq_query()
-                expected_result = sorted(expected_result['results'])
-                self.assertTrue(actual_result==expected_result)
+                diffs = DeepDiff(actual_result['results'], expected_result['results'], ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
+
             finally:
                 for idx in created_indexes:
                     self.query = "DROP INDEX %s.%s USING %s" % (bucket.name, idx, self.index_type)
@@ -2468,13 +2472,13 @@ class QueriesIndexTests(QueryTests):
                              "order BY name limit 10"
                 actual_result = self.run_cbq_query()
                 #actual_result = sorted(actual_result['results'])
-                actual_result = sorted(actual_result['results'], key=(lambda x: x['name']))
                 self.query = "select name from %s USE INDEX(`#primary`) WHERE ANY i IN %s.hobbies.hobby SATISFIES  (ANY j IN i.dance SATISFIES j='contemporary' end) END and department='Support'" % (
                 bucket.name, bucket.name) + \
                              "order BY name limit 10"
                 expected_result = self.run_cbq_query()
-                expected_result = sorted(expected_result['results'])
-                self.assertTrue(actual_result==expected_result)
+                diffs = DeepDiff(actual_result['results'], expected_result['results'], ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
             finally:
                 for idx in created_indexes:
                     self.query = "DROP INDEX %s.%s USING %s" % (bucket.name, idx, self.index_type)
@@ -2509,13 +2513,14 @@ class QueriesIndexTests(QueryTests):
                              "order BY name limit 10"
                 actual_result = self.run_cbq_query()
                 #actual_result = sorted(actual_result['results'])
-                actual_result = sorted(actual_result['results'], key=(lambda x: x['name']))
+                #actual_result = sorted(actual_result['results'], key=(lambda x: x['name']))
                 self.query = "select name from %s USE INDEX(`#primary`) WHERE ANY i IN %s.hobbies.hobby SATISFIES  (ANY j IN i.dance SATISFIES j='contemporary' end) END and department='Support'" % (
                 bucket.name, bucket.name) + \
                              "order BY name limit 10"
                 expected_result = self.run_cbq_query()
-                expected_result = sorted(expected_result['results'])
-                self.assertTrue(actual_result==expected_result)
+                diffs = DeepDiff(actual_result['results'], expected_result['results'], ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
             finally:
                 for idx in created_indexes:
                     self.query = "DROP INDEX %s.%s USING %s" % (bucket.name, idx, self.index_type)
@@ -2549,13 +2554,13 @@ class QueriesIndexTests(QueryTests):
                              "order BY name limit 10"
                 actual_result = self.run_cbq_query()
                 #actual_result = sorted(actual_result['results'])
-                actual_result = sorted(actual_result['results'], key=(lambda x: x['name']))
                 self.query = "select name from %s use index (`#primary`) WHERE department = 'Support' and ANY i IN %s.hobbies.hobby SATISFIES i = 'art' END " % (
                 bucket.name, bucket.name) + \
                              "order BY name limit 10"
                 expected_result = self.run_cbq_query()
-                expected_result = sorted(expected_result['results'])
-                self.assertTrue(actual_result==expected_result)
+                diffs = DeepDiff(actual_result['results'], expected_result['results'], ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
             finally:
                 for idx in created_indexes:
                     self.query = "DROP INDEX %s.%s USING %s" % (bucket.name, idx, self.index_type)
@@ -2587,13 +2592,13 @@ class QueriesIndexTests(QueryTests):
                              "order BY name limit 10"
                 actual_result = self.run_cbq_query()
                 #actual_result = sorted(actual_result['results'])
-                actual_result = sorted(actual_result['results'], key=(lambda x: x['name']))
                 self.query = "select name from %s use index (`#primary`) WHERE department = 'Support' and ANY i IN %s.hobbies.hobby SATISFIES i = 'art' END " % (
                 bucket.name, bucket.name) + \
                              "order BY name limit 10"
                 expected_result = self.run_cbq_query()
-                expected_result = sorted(expected_result['results'])
-                self.assertTrue(actual_result==expected_result)
+                diffs = DeepDiff(actual_result['results'], expected_result['results'], ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
             finally:
                 for idx in created_indexes:
                     self.query = "DROP INDEX %s.%s USING %s" % (bucket.name, idx, self.index_type)
@@ -2647,7 +2652,10 @@ class QueriesIndexTests(QueryTests):
                 actual_result2 = self.run_cbq_query()
                 self.query = "select a.cnt from (select count(1) as cnt from %s where _id is not null) as a " %(bucket.name)
                 result = self.run_cbq_query()
-                self.assertEqual(sorted(actual_result2['results']), sorted(result['results']))
+                #self.assertEqual(sorted(actual_result2['results']), sorted(result['results']))
+                diffs = DeepDiff(actual_result2['results'], result['results'], ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
 
                 self.assertTrue(actual_result2['results']==[{'cnt': self.docs_per_day*2016}])
                 self.query = "select count(DISTINCT 1) from %s WHERE meta().id like '%s' " %(bucket.name, 'query-test%')
@@ -2661,7 +2669,10 @@ class QueriesIndexTests(QueryTests):
                 self.assertTrue(actual_result['results']==[{'$1': self.docs_per_day*2016}])
                 self.query = "select count(1) from %s use index(`#primary`) WHERE meta().id like '%s'  " %(bucket.name, 'query-test%')
                 result = self.run_cbq_query()
-                self.assertEqual(sorted(actual_result['results']), sorted(result['results']))
+                #self.assertEqual(sorted(actual_result['results']), sorted(result['results']))
+                diffs = DeepDiff(actual_result['results'], result['results'], ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
             finally:
                 for idx in created_indexes:
                     self.query = "DROP INDEX %s.%s USING %s" % (bucket.name, idx, self.index_type)
@@ -2699,7 +2710,10 @@ class QueriesIndexTests(QueryTests):
                 actual_result = self.run_cbq_query()
                 self.query = "select join_yr from %s use index(`#primary`) WHERE _id like '%s' and join_yr=2010 order by meta().id limit 10" %(bucket.name, 'query-test%')
                 expected_result = self.run_cbq_query()
-                self.assertEqual(actual_result['results'], expected_result['results'])
+                #self.assertEqual(actual_result['results'], expected_result['results'])
+                diffs = DeepDiff(actual_result['results'], expected_result['results'], ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
 
                 self.query = "EXPLAIN select count(DISTINCT join_yr) from %s WHERE _id like '%s' and join_yr=2010 " %(bucket.name, 'query-test%')
                 actual_result = self.run_cbq_query()
@@ -2726,13 +2740,19 @@ class QueriesIndexTests(QueryTests):
                 actual_result = self.run_cbq_query()
                 self.query = "select join_yr from %s use index(`#primary`) WHERE join_yr=2010 order by meta().id limit 10" %(bucket.name)
                 expected_result = self.run_cbq_query()
-                self.assertEqual(actual_result['results'], expected_result['results'])
+                #self.assertEqual(actual_result['results'], expected_result['results'])
+                diffs = DeepDiff(actual_result['results'], expected_result['results'], ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
 
                 self.query = "select count(join_yr) from %s WHERE join_yr=2010 " %(bucket.name)
                 actual_result = self.run_cbq_query()
                 self.query = "select count(join_yr) from %s use index(`#primary`) WHERE join_yr=2010 " %(bucket.name)
                 expected_result = self.run_cbq_query()
-                self.assertEqual(sorted(actual_result['results']), sorted(expected_result['results']))
+                #self.assertEqual(sorted(actual_result['results']), sorted(expected_result['results']))
+                diffs = DeepDiff(actual_result['results'], expected_result['results'], ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
 
                 self.query = "EXPLAIN select meta().id,join_yr from %s WHERE join_yr=2010 " %(bucket.name)
                 actual_result = self.run_cbq_query()
@@ -3517,8 +3537,11 @@ class QueriesIndexTests(QueryTests):
                 "FROM %s as employee use index (`#primary`)  JOIN default as new_project_full " % (bucket.name) +\
                 "ON KEYS meta(`employee`).id WHERE ANY i IN employee.address SATISFIES  (ANY j IN i SATISFIES j.city='Delhi' end) END "
                 expected_result = self.run_cbq_query()
-                expected_result = expected_result['results']
-                self.assertTrue(sorted(expected_result)==sorted(actual_result['results']))
+                #expected_result = expected_result['results']
+                #self.assertTrue(sorted(expected_result)==sorted(actual_result['results']))
+                diffs = DeepDiff(actual_result['results'], expected_result['results'], ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
             finally:
                 for idx in created_indexes:
                     self.query = "DROP INDEX %s.%s USING %s" % (bucket.name, idx, self.index_type)
