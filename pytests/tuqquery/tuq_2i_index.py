@@ -297,6 +297,7 @@ class QueriesIndexTests(QueryTests):
     def test_pairs(self):
         self.query = "select pairs(self) from default order by meta().id limit 1"
         actual_result = self.run_cbq_query()
+        print("actual={} vs {}".format(actual_result['metrics']['resultSize'],"3608"))
         self.assertTrue(actual_result['metrics']['resultSize'] == 3608)
 
     def test_index_missing_null(self):
@@ -1885,7 +1886,7 @@ class QueriesIndexTests(QueryTests):
                 scan1 = plan['~children'][0]['~children'][0]
                 self.assertTrue((scan1['#operator'] == 'IntersectScan') or
                                 (scan1['#operator'] == 'UnionScan' and scan1['scans'][0]['#operator'] == 'IntersectScan' and scan1['scans'][1]['#operator'] == 'IntersectScan'),
-                                "Single InteresectScan or UnionScan of two IntersectScans not being used")
+                                "Single InteresectScan or UnionScan of two IntersectScans not being used:" + scan1['#operator'])
 
                 if 'scan' in plan['~children'][0]['~children'][0]['scans'][0]:
                     result1 =plan['~children'][0]['~children'][0]['scans'][0]['scan']['index']
@@ -1961,9 +1962,9 @@ class QueriesIndexTests(QueryTests):
             actual_result = self.run_cbq_query()
             self.query = 'SELECT v.os FROM default USE index (`#primary`) UNNEST default.VMs AS v WHERE  v.os = "centos"'
             expected_result = self.run_cbq_query()
-            #self.assertEqual(sorted(actual_result['results']), sorted(expected_result['results']))
-            self.assertEqual(sorted(actual_result['results'], key=(lambda x: x['name'])), \
-                            sorted(expected_result['results'], key=(lambda x: x['name'])))
+            diffs = DeepDiff(actual_result['results'], expected_result['results'], ignore_order=True)
+            if diffs:
+                self.assertTrue(False, diffs)
         finally:
             for idx in created_indexes:
                 self.query = "DROP INDEX %s.%s USING %s" % ("default", idx, self.index_type)
@@ -7372,14 +7373,12 @@ class QueriesIndexTests(QueryTests):
                 self.query = "select name from %s WHERE department = 'Support' and ANY v IN tokens(VMs) SATISFIES GREATEST(v.RAM,100) END " % (
                     bucket.name)
                 actual_result = self.run_cbq_query()
-                actual_result = actual_result['results']
                 self.query = "select name from %s USE index(`#primary`) WHERE department = 'Support' and ANY v IN tokens(VMs) SATISFIES GREATEST(v.RAM,100) END " % (
                     bucket.name)
                 expected_result = self.run_cbq_query()
-                expected_result = expected_result['results']
-                #self.assertTrue(sorted(expected_result)==sorted(actual_result))
-                self.assertTrue(sorted(actual_result['results'], key=(lambda x: x['name'])) == \
-                                sorted(expected_result, key=(lambda x: x['name'])))
+                diffs = DeepDiff(actual_result['results'], expected_result['results'], ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
 
             finally:
                 for idx in created_indexes:
