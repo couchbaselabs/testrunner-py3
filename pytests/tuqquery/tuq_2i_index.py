@@ -803,7 +803,7 @@ class QueriesIndexTests(QueryTests):
                 self.log.info(plan)
                 self.log.info(plan['~children'][0]['~children'][0]['#operator'])
                 self.assertTrue(plan['~children'][0]['~children'][0]['#operator'] == 'IntersectScan'
-                                or plan['~children'][0]['~children'][0]['#operator'] == 'UnionScan')
+                                or plan['~children'][0]['~children'][0]['#operator'] == 'UnionScan', "actual="+plan['~children'][0]['~children'][0]['#operator'])
                 if plan['~children'][0]['~children'][0]['#operator'] == 'UnionScan':
                     result1 = plan['~children'][0]['~children'][0]['scans'][0]['scans'][0]['scan']['index']
                     result2 = plan['~children'][0]['~children'][0]['scans'][0]['scans'][1]['scan']['index']
@@ -1422,7 +1422,7 @@ class QueriesIndexTests(QueryTests):
                 actual_result = self.run_cbq_query()
                 plan = self.ExplainPlanHelper(actual_result)
                 self.assertTrue(plan['~children'][0]['~children'][0]['#operator'] == 'IntersectScan'
-                                or plan['~children'][0]['~children'][0]['#operator'] == 'UnionScan')
+                                or plan['~children'][0]['~children'][0]['#operator'] == 'UnionScan',"actual="+plan['~children'][0]['~children'][0]['#operator'])
                 if plan['~children'][0]['~children'][0]['#operator'] == 'UnionScan':
                     result1 = plan['~children'][0]['~children'][0]['scans'][0]['scans'][0]['scan']['index']
                     result2 = plan['~children'][0]['~children'][0]['scans'][0]['scans'][1]['scan']['index']
