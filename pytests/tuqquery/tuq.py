@@ -2487,8 +2487,9 @@ class QueryTests(BaseTestCase):
             fileout.close()
 
         #newdata = filedata.replace("bucketname", bucket2)
+        newdata = filedata
         try:
-            newdata = filedata.decode().replace("bucketname", bucket2)
+            newdata = newdata.decode().replace("bucketname", bucket2)
         except AttributeError:
             pass
         newdata = newdata.replace("user", bucket1)
