@@ -368,7 +368,7 @@ class JoinTests(QuerySanityTests, QueryTests):
                                 "new_project" : doc['job_title']}
             for doc in expected_result if doc and 'join_day' in doc and\
                                           doc['join_day'] <= 2]
-            expected_result = expected_result)[0:10]
+            expected_result = expected_result[0:10]
             #self.assertTrue(actual_result, expected_result)
             for index_name in created_indexes:
                 self.query = "DROP INDEX %s.%s USING %s" % (bucket.name, index_name, self.index_type)
