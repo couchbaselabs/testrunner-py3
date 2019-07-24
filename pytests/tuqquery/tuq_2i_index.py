@@ -1830,9 +1830,9 @@ class QueriesIndexTests(QueryTests):
                                   "LIKE '%@%.%' and VMs[0].RAM > 5 and join_day > 10"
                     result = self.run_cbq_query()
                     #self.assertEqual(sorted(actual_result1['results']), sorted(result['results']))
-                    self.assertEqual(sorted(actual_result1['results'], key=(lambda x: x['name'])), \
-                                    sorted(result['results'], key=(lambda x: x['name'])))
-
+                    diffs = DeepDiff(actual_result1['results'], result['results'], ignore_order=True)
+                    if diffs:
+                        self.assertTrue(False, diffs)
                     self.query = " select email from %s where email "  % (bucket.name) +\
                                  "LIKE '%@%.%' and join_day > 10 order by meta().id limit 10"
                     actual_result2 = self.run_cbq_query()
@@ -2640,7 +2640,7 @@ class QueriesIndexTests(QueryTests):
                 plan = self.ExplainPlanHelper(actual_result)
                 self.assertTrue("covers" in str(plan))
                 result1 = plan['~children'][0]['index']
-                self.assertTrue(result1 == idx)
+                self.assertTrue(result1 == idx, "actual_value="+result1+" vs "+idx)
                 self.query = "CREATE PRIMARY INDEX ON %s" % bucket.name
                 self.run_cbq_query()
                 self.sleep(15, 'wait for index')
@@ -4854,7 +4854,7 @@ class QueriesIndexTests(QueryTests):
 
                 self.query = "select MIN(test_rate) from %s where test_rate is not missing and CONTAINS(test_rate,'z')" % (bucket.name)
                 actual_result = self.run_cbq_query()
-                self.assertTrue(str(actual_result['results'][0]) == "{u'$1': None}", "actual value="+str(actual_result['results'][0]) )
+                self.assertTrue(str(actual_result['results'][0]) == "{'$1': None}", "actual value="+str(actual_result['results'][0]) )
 
                 self.query = "explain select count(test_rate) from %s where test_rate is not missing and CONTAINS(test_rate,'z')" % (bucket.name)
                 if self.covering_index:
@@ -5258,7 +5258,9 @@ class QueriesIndexTests(QueryTests):
             self.query = "SELECT job_title, array_avg(array_agg(test_rate))" + \
                                  " as rates FROM %s  WHERE join_mo=7  GROUP BY job_title" % (bucket.name)
             result = self.run_cbq_query()
-            self.assertEqual(sorted(actual_result['results']), sorted(result['results']))
+            diffs = DeepDiff(actual_result['results'], result['results'], ignore_order=True)
+            if diffs:
+                self.assertTrue(False, diffs)
             self.query = "DROP PRIMARY INDEX ON %s" % bucket.name
             self.run_cbq_query()
 
