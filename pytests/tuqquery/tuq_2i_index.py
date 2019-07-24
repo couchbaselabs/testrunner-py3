@@ -415,7 +415,10 @@ class QueriesIndexTests(QueryTests):
                 self.query = 'SELECT meta().id, IFMISSING(IsSpecial,b,name) from %s limit 5'%(bucket.name)
                 actual_result = self.run_cbq_query()
                 expected_result = [{'id': 'k01', '$1': True}, {'id': 'k02', '$1': True}, {'id': 'k03', '$1': False}, {'id': 'k04', '$1': 'null'}, {'id': 'query-testemployee10153.1877827-0', '$1': 'employee-9'}]
-                self.assertTrue(actual_result['results']==expected_result)
+                #self.assertTrue(actual_result['results']==expected_result)
+                diffs = DeepDiff(actual_result['results'], expected_result, ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
                 self.query = 'EXPLAIN SELECT name from {0} where IFMISSING(IsSpecial,b,name) = TRUE and join_day> 1'.format(bucket.name)
                 actual_result = self.run_cbq_query()
                 plan1 = self.ExplainPlanHelper(actual_result)
@@ -1814,8 +1817,8 @@ class QueriesIndexTests(QueryTests):
                                if re.match(r'.*@.*\..*', doc['email']) and \
                                   doc['join_day'] > 10]
                     #self._verify_results(sorted(actual_result2['results']), sorted(expected_result))
-                    self._verify_results(sorted(actual_result2['results'], key=(lambda x: x['name'])), \
-                                    sorted(expected_result, key=(lambda x: x['name'])))
+                    self._verify_results(actual_result2['results'], expected_result)
+
             finally:
                 for index_name in created_indexes:
                     self.query = "DROP INDEX %s.%s USING %s" % (bucket.name, index_name, self.index_type)
@@ -2645,7 +2648,10 @@ class QueriesIndexTests(QueryTests):
                 actual_result = self.run_cbq_query()
                 self.query = "select count(1) from %s use index(`#primary`) WHERE meta().id like '%s' " %(bucket.name, 'query-test%')
                 expected_result = self.run_cbq_query()
-                self.assertTrue(actual_result['results']==expected_result['results'])
+                #self.assertTrue(actual_result['results']==expected_result['results'])
+                diffs = DeepDiff(actual_result['results'], expected_result['results'], ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
                 self.assertTrue(actual_result['results']==[{'$1': self.docs_per_day*2016}])
                 self.assertTrue("index_group_aggs" in str(plan))
                 self.assertEqual(plan['~children'][0]['index_group_aggs']['aggregates'][0]['aggregate'], "COUNT")
@@ -4633,7 +4639,9 @@ class QueriesIndexTests(QueryTests):
                 self.sleep(15, 'wait for index')
                 self.query = "SELECT name,join_day, join_mo FROM %s WHERE join_day>2 AND join_mo>3"  % (bucket.name)
                 result = self.run_cbq_query()
-                self.assertEqual(sorted(result['results']), sorted(res['results']))
+                diffs = DeepDiff(result['results'], res['results'], ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
                 self.query = "DROP PRIMARY INDEX ON %s" % bucket.name
                 self.run_cbq_query()
 
@@ -4846,7 +4854,7 @@ class QueriesIndexTests(QueryTests):
 
                 self.query = "select MIN(test_rate) from %s where test_rate is not missing and CONTAINS(test_rate,'z')" % (bucket.name)
                 actual_result = self.run_cbq_query()
-                self.assertTrue(str(actual_result['results'][0]) == "{u'$1': None}")
+                self.assertTrue(str(actual_result['results'][0]) == "{u'$1': None}", "actual value="+str(actual_result['results'][0]) )
 
                 self.query = "explain select count(test_rate) from %s where test_rate is not missing and CONTAINS(test_rate,'z')" % (bucket.name)
                 if self.covering_index:
