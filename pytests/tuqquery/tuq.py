@@ -2486,7 +2486,11 @@ class QueryTests(BaseTestCase):
             filedata = fileout.read()
             fileout.close()
 
-        newdata = filedata.replace("bucketname", bucket2)
+        #newdata = filedata.replace("bucketname", bucket2)
+        try:
+            newdata = filedata.decode().replace("bucketname", bucket2)
+        except AttributeError:
+            pass
         newdata = newdata.replace("user", bucket1)
         newdata = newdata.replace("pass", password)
         newdata = newdata.replace("bucket1", bucket1)
