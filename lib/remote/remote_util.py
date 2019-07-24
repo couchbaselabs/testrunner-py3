@@ -3136,8 +3136,10 @@ class RemoteMachineShellConnection:
             fileout = open(filename, 'r')
             filedata = fileout.read()
             fileout.close()
+
+        newdata = filedata
         try:
-            newdata = filedata.decode().replace("bucketname", bucket2)
+            newdata = newdata.decode().replace("bucketname", bucket2)
         except AttributeError:
             pass
 
