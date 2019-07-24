@@ -2,6 +2,7 @@ import copy
 from tuqquery.tuq import QueryTests
 from .tuq_sanity import QuerySanityTests
 import time
+from deepdiff import DeepDiff
 
 JOIN_INNER = "INNER"
 JOIN_LEFT = "LEFT"
@@ -273,13 +274,12 @@ class JoinTests(QuerySanityTests, QueryTests):
             "FROM %s as employee %s JOIN default as new_project_full " % (bucket.name, self.type_join) +\
             "ON KEYS employee.tasks_ids WHERE employee.join_day != 2"
             actual_result = self.run_cbq_query()
-            actual_result = sorted(actual_result['results'])
+            actual_result = actual_result['results']
             expected_result = self._generate_full_joined_docs_list(join_type=self.type_join)
             expected_result = [{"join_day" : doc['join_day'], "tasks_ids" : doc['tasks_ids'],
                                 "new_project" : doc['project']}
                                for doc in expected_result if doc and 'join_day' in doc and\
                                doc['join_day'] != 2]
-            expected_result = sorted(expected_result)
             self._verify_results(actual_result, expected_result)
 
     def test_where_join_keys_between(self):
@@ -288,13 +288,12 @@ class JoinTests(QuerySanityTests, QueryTests):
             "FROM %s as employee %s JOIN default as new_project_full " % (bucket.name, self.type_join) +\
             "ON KEYS employee.tasks_ids WHERE employee.join_day between 1 and 2"
             actual_result = self.run_cbq_query()
-            actual_result = sorted(actual_result['results'])
+            actual_result = actual_result['results']
             expected_result = self._generate_full_joined_docs_list(join_type=self.type_join)
             expected_result = [{"join_day" : doc['join_day'], "tasks_ids" : doc['tasks_ids'],
                                 "new_project" : doc['project']}
                                for doc in expected_result if doc and 'join_day' in doc and\
                                doc['join_day'] <= 2]
-            expected_result = sorted(expected_result)
             self._verify_results(actual_result, expected_result)
 
     def test_where_join_keys_not_equal_more_less(self):
@@ -303,13 +302,12 @@ class JoinTests(QuerySanityTests, QueryTests):
             "FROM %s as employee %s JOIN default as new_project_full " % (bucket.name, self.type_join) +\
             "ON KEYS employee.tasks_ids WHERE employee.join_day <> 2"
             actual_result = self.run_cbq_query()
-            actual_result = sorted(actual_result['results'])
+            actual_result = actual_result['results']
             expected_result = self._generate_full_joined_docs_list(join_type=self.type_join)
             expected_result = [{"join_day" : doc['join_day'], "tasks_ids" : doc['tasks_ids'],
                                 "new_project" : doc['project']}
                                for doc in expected_result if doc and 'join_day' in doc and\
                                doc['join_day'] != 2]
-            expected_result = sorted(expected_result)
             self._verify_results(actual_result, expected_result)
 
     def test_where_join_keys_equal_less(self):
@@ -318,13 +316,12 @@ class JoinTests(QuerySanityTests, QueryTests):
             "FROM %s as employee %s JOIN default as new_project_full " % (bucket.name, self.type_join) +\
             "ON KEYS employee.tasks_ids WHERE employee.join_day <= 2"
             actual_result = self.run_cbq_query()
-            actual_result = sorted(actual_result['results'])
+            actual_result = actual_result['results']
             expected_result = self._generate_full_joined_docs_list(join_type=self.type_join)
             expected_result = [{"join_day" : doc['join_day'], "tasks_ids" : doc['tasks_ids'],
                                 "new_project" : doc['project']}
                                for doc in expected_result if doc and 'join_day' in doc and\
                                doc['join_day'] <= 2]
-            expected_result = sorted(expected_result)
             self._verify_results(actual_result, expected_result)
 
     def test_where_join_keys_equal_more(self):
@@ -333,15 +330,13 @@ class JoinTests(QuerySanityTests, QueryTests):
             "FROM %s as employee %s JOIN default as new_project_full " % (bucket.name, self.type_join) +\
             "ON KEYS employee.tasks_ids WHERE employee.join_day <= 2"
             actual_result = self.run_cbq_query()
-            actual_result = sorted(actual_result['results'])
+            actual_result = actual_result['results']
             expected_result = self._generate_full_joined_docs_list(join_type=self.type_join)
             expected_result = [{"join_day" : doc['join_day'], "tasks_ids" : doc['tasks_ids'],
                                 "new_project" : doc['job_title']}
                                for doc in expected_result if doc and 'join_day' in doc and\
                                doc['join_day'] <= 2]
-            expected_result = sorted(expected_result)
-            self.assertTrue(actual_result, expected_result)
-            #self._verify_results(actual_result, expected_result)
+            self._verify_results(actual_result, expected_result)
 
     def test_where_join_keys_equal_more_covering(self):
         created_indexes = []
@@ -367,13 +362,13 @@ class JoinTests(QuerySanityTests, QueryTests):
                          "FROM %s as employee %s JOIN default as new_project_full " % (bucket.name, self.type_join) +\
                          "ON KEYS employee.tasks_ids WHERE employee.join_day <= 2  order by employee.join_day limit 10"
             actual_result = self.run_cbq_query()
-            actual_result = sorted(actual_result['results'])
+            actual_result = actual_result['results']
             expected_result = self._generate_full_joined_docs_list(join_type=self.type_join)
             expected_result = [{"join_day" : doc['join_day'], "tasks_ids" : doc['tasks_ids'],
                                 "new_project" : doc['job_title']}
             for doc in expected_result if doc and 'join_day' in doc and\
                                           doc['join_day'] <= 2]
-            expected_result = sorted(expected_result, key=lambda doc: (doc['join_day']))[0:10]
+            expected_result = expected_result)[0:10]
             #self.assertTrue(actual_result, expected_result)
             for index_name in created_indexes:
                 self.query = "DROP INDEX %s.%s USING %s" % (bucket.name, index_name, self.index_type)
@@ -385,7 +380,9 @@ class JoinTests(QuerySanityTests, QueryTests):
                          "FROM %s as employee %s JOIN default as new_project_full " % (bucket.name, self.type_join) +\
                          "ON KEYS employee.tasks_ids WHERE employee.join_day <= 2  order by employee.join_day limit 10"
             result = self.run_cbq_query()
-            self.assertEqual(actual_result, sorted(result['results']))
+            diffs = DeepDiff(actual_result, result['results'], ignore_order=True)
+            if diffs:
+                self.assertTrue(False, diffs)
             self.query = "DROP PRIMARY INDEX ON %s" % bucket.name
             self.run_cbq_query()
 
@@ -395,26 +392,23 @@ class JoinTests(QuerySanityTests, QueryTests):
             self.query = "SELECT task2 FROM %s emp1 JOIN %s" % (bucket.name, bucket.name) +\
             " task ON KEYS emp1.tasks_ids UNNEST emp1.tasks_ids as task2"
             actual_result = self.run_cbq_query()
-            actual_result = sorted(actual_result['results'], key=lambda doc:(
-                                                               doc['task2']))
+            actual_result = actual_result['results']
             expected_result = self._generate_full_joined_docs_list()
             expected_result = [{"task2" : task} for doc in expected_result
                                for task in doc['tasks_ids']]
-            expected_result = sorted(expected_result, key=lambda doc:(
-                                                          doc['task2']))
             self._verify_results(actual_result, expected_result)
 
     def test_unnest(self):
         for bucket in self.buckets:
             self.query = "SELECT emp.name, task FROM %s emp %s UNNEST emp.tasks_ids task" % (bucket.name, self.type_join)
             actual_result = self.run_cbq_query()
-            actual_result = sorted(actual_result['results'])
+            actual_result = actual_result['results']
             expected_result = self.generate_full_docs_list(self.gens_load)
             expected_result = [{"task" : task, "name" : doc["name"]}
                                for doc in expected_result for task in doc['tasks_ids']]
             if self.type_join.upper() == JOIN_LEFT:
                 expected_result.extend([{}] * self.gens_tasks[-1].end)
-            expected_result = sorted(expected_result)
+
             self._verify_results(actual_result, expected_result)
 
     def test_unnest_covering(self):
@@ -438,18 +432,21 @@ class JoinTests(QuerySanityTests, QueryTests):
                 self.check_explain_covering_index(index_name[0])
             self.query = "SELECT emp.name, task FROM %s emp %s UNNEST emp.tasks_ids task where emp.name is not null" % (bucket.name, self.type_join)
             actual_result = self.run_cbq_query()
-            actual_result = sorted(actual_result['results'])
+            actual_result = actual_result['results']
             expected_result = self.generate_full_docs_list(self.gens_load)
             expected_result = [{"task": task, "name": doc["name"]} for doc in expected_result for task in doc['tasks_ids']]
             if self.type_join.upper() == JOIN_LEFT:
                 expected_result.extend([{}] * self.gens_tasks[-1].end)
-            expected_result = sorted(expected_result)
+
             self.query = "create primary index on %s" % bucket.name
             self.run_cbq_query()
             self.sleep(15, 'wait for index')
             self.query = "SELECT emp.name, task FROM %s emp use index (`#primary`) %s UNNEST emp.tasks_ids task where emp.name is not null" % (bucket.name, self.type_join)
             result = self.run_cbq_query()
-            self.assertEqual(actual_result, sorted(result['results']))
+
+            diffs = DeepDiff(actual_result, result['results'], ignore_order=True)
+            if diffs:
+                self.assertTrue(False, diffs)
             #self._verify_results(actual_result, expected_result)
           finally:
             self.query= "drop primary index on %s" % bucket.name
@@ -474,7 +471,7 @@ class JoinTests(QuerySanityTests, QueryTests):
                                                                                                                     bucket.name)
             self.run_cbq_query()
             actual_result = self.run_cbq_query()
-            actual_result = sorted(actual_result['results'])
+            actual_result = actual_result['results']
             all_docs_list = self.generate_full_docs_list(self.gens_load)
             expected_result= [{'name': doc['name'],'cn' : 29} for doc in all_docs_list]
             expected_result.extend([{'cn' : 29}] * 29)
@@ -486,12 +483,11 @@ class JoinTests(QuerySanityTests, QueryTests):
                                                                                                                     bucket.name)
             self.run_cbq_query()
             actual_result = self.run_cbq_query()
-            actual_result = sorted(actual_result['results'])
+            actual_result = actual_result['results']
             expected_result_subquery = {"cn" : 29}
             expected_result = [{'names' : [expected_result_subquery]}] * len(self.generate_full_docs_list(self.gens_load))
             expected_result.extend([{'task_name': doc['task_name'], 'names' : [expected_result_subquery]}
                                     for doc in self.generate_full_docs_list(self.gens_tasks)])
-            expected_result = sorted(expected_result)
             self._verify_results(actual_result, expected_result)
 
     def test_prepared_subquery_select(self):
@@ -508,9 +504,8 @@ class JoinTests(QuerySanityTests, QueryTests):
                                                                                     for i in range(0, self.docs_per_day)]))
             all_docs_list = self.generate_full_docs_list(self.gens_load)
             actual_result = self.run_cbq_query()
-            actual_result = sorted(actual_result['results'])
+            actual_result = actual_result['results']
             expected_result = [{'name' : doc['name'], 'join_day' : doc['join_day']} for doc in all_docs_list if doc['join_day'] == 1]
-            expected_result = sorted(expected_result)
             self._verify_results(actual_result, expected_result)
 
     def test_subquery_where_in(self):
@@ -521,10 +516,9 @@ class JoinTests(QuerySanityTests, QueryTests):
                                                                                     for i in range(0, self.docs_per_day)]))
             all_docs_list = self.generate_full_docs_list(self.gens_load)
             actual_result = self.run_cbq_query()
-            actual_result = sorted(actual_result['results'])
+            actual_result = actual_result['results']
             expected_result = [{'name' : doc['name'], 'join_day' : doc['join_day']}
                                for doc in all_docs_list if doc['join_day'] == 1]
-            expected_result = sorted(expected_result)
             self._verify_results(actual_result, expected_result)
 
     def test_where_in_subquery(self):
@@ -534,10 +528,9 @@ class JoinTests(QuerySanityTests, QueryTests):
             "use keys %s where project='MB')[0].names" % ('["test_task-1", "test_task-2"]')
             all_docs_list = self.generate_full_docs_list(self.gens_load)
             actual_result = self.run_cbq_query()
-            actual_result = sorted(actual_result['results'])
+            actual_result = actual_result['results']
             expected_result = [{'name' : doc['name'], 'tasks_ids' : doc['tasks_ids']}
                                for doc in all_docs_list if doc['tasks_ids'] in ['test_task-1', 'test_task-2']]
-            expected_result = sorted(expected_result)
             self._verify_results(actual_result, expected_result)
 
     def test_where_in_subquery_not_equal(self):
@@ -547,10 +540,9 @@ class JoinTests(QuerySanityTests, QueryTests):
             "use keys %s where project!='AB')[0].names" % ('["test_task-1", "test_task-2"]')
             all_docs_list = self.generate_full_docs_list(self.gens_load)
             actual_result = self.run_cbq_query()
-            actual_result = sorted(actual_result['results'])
+            actual_result = actual_result['results']
             expected_result = [{'name' : doc['name'], 'tasks_ids' : doc['tasks_ids']}
                                for doc in all_docs_list if ('test_task-1' in doc['tasks_ids'] or 'test_task-2' in doc['tasks_ids'])]
-            expected_result = sorted(expected_result)
             self._verify_results(actual_result, expected_result)
 
     def test_where_in_subquery_equal_more(self):
@@ -560,10 +552,9 @@ class JoinTests(QuerySanityTests, QueryTests):
             "use keys %s where project!='AB')[0].names" % ('["test_task-1", "test_task-2"]')
             all_docs_list = self.generate_full_docs_list(self.gens_load)
             actual_result = self.run_cbq_query()
-            actual_result = sorted(actual_result['results'])
+            actual_result = actual_result['results']
             expected_result = [{'name' : doc['name'], 'tasks_ids' : doc['tasks_ids'], 'join_day': doc['join_day']}
                                for doc in all_docs_list if ('test_task-1' in doc['tasks_ids'] or 'test_task-2' in doc['tasks_ids']) and doc['join_day'] >=2]
-            expected_result = sorted(expected_result)
             self._verify_results(actual_result, expected_result)
 
     def test_where_in_subquery_equal_less(self):
@@ -573,10 +564,9 @@ class JoinTests(QuerySanityTests, QueryTests):
             "use keys %s where project!='AB')[0].names" % ('["test_task-1", "test_task-2"]')
             all_docs_list = self.generate_full_docs_list(self.gens_load)
             actual_result = self.run_cbq_query()
-            actual_result = sorted(actual_result['results'])
+            actual_result = actual_result['results']
             expected_result = [{'name' : doc['name'], 'tasks_ids' : doc['tasks_ids'], 'join_day': doc['join_day']}
                                for doc in all_docs_list if ('test_task-1' in doc['tasks_ids'] or 'test_task-2' in doc['tasks_ids']) and doc['join_day'] <=2]
-            expected_result = sorted(expected_result)
             self._verify_results(actual_result, expected_result)
 
     def test_where_in_subquery_between(self):
@@ -586,10 +576,9 @@ class JoinTests(QuerySanityTests, QueryTests):
             "use keys %s where project!='AB')[0].names" % ('["test_task-1", "test_task-2"]')
             all_docs_list = self.generate_full_docs_list(self.gens_load)
             actual_result = self.run_cbq_query()
-            actual_result = sorted(actual_result['results'])
+            actual_result = actual_result['results']
             expected_result = [{'name' : doc['name'], 'tasks_ids' : doc['tasks_ids'], 'join_day': doc['join_day']}
                                for doc in all_docs_list if ('test_task-1' in doc['tasks_ids'] or 'test_task-2' in doc['tasks_ids']) and doc['join_day'] <=12]
-            expected_result = sorted(expected_result)
             self._verify_results(actual_result, expected_result)
 
     def test_subquery_exists(self):
@@ -611,9 +600,8 @@ class JoinTests(QuerySanityTests, QueryTests):
             all_docs_list = self.generate_full_docs_list(self.gens_load)
             tasks_ids = [doc["task_name"] for doc in self.generate_full_docs_list(self.gens_tasks) if doc['project'] == 'MB']
             actual_result = self.run_cbq_query()
-            actual_result = sorted(actual_result['results'])
+            actual_result = actual_result['results']
             expected_result = [{'name' : doc['name']} for doc in all_docs_list if doc['tasks_ids'][0] in tasks_ids]
-            expected_result = sorted(expected_result)
             self._verify_results(actual_result, expected_result)
 
     def test_subquery_exists_and(self):
@@ -623,9 +611,8 @@ class JoinTests(QuerySanityTests, QueryTests):
             all_docs_list = self.generate_full_docs_list(self.gens_load)
             tasks_ids = [doc["task_name"] for doc in self.generate_full_docs_list(self.gens_tasks)]
             actual_result = self.run_cbq_query()
-            actual_result = sorted(actual_result['results'])
+            actual_result = actual_result['results']
             expected_result = [{'name' : doc['name']} for doc in all_docs_list if doc['tasks_ids'][0] in tasks_ids and doc['join_mo']>5]
-            expected_result = sorted(expected_result)
             self._verify_results(actual_result, expected_result)
 
     def test_subquery_from(self):
@@ -633,9 +620,8 @@ class JoinTests(QuerySanityTests, QueryTests):
             self.query = "SELECT TASKS.task_name FROM (SELECT task_name, project FROM %s WHERE project = 'CB') as TASKS" % bucket.name
             all_docs_list = self.generate_full_docs_list(self.gens_tasks)
             actual_result = self.run_cbq_query()
-            actual_result = sorted(actual_result['results'])
+            actual_result = actual_result['results']
             expected_result = [{'task_name' : doc['task_name']} for doc in all_docs_list if doc['project'] == 'CB']
-            expected_result = sorted(expected_result)
             self._verify_results(actual_result, expected_result)
 
     def test_subquery_from_join(self):
@@ -644,9 +630,8 @@ class JoinTests(QuerySanityTests, QueryTests):
             "%s WHERE join_mo>10) as EMP %s JOIN %s TASK ON KEYS EMP.tasks_ids" % (bucket.name, self.type_join, bucket.name)
             all_docs_list = self._generate_full_joined_docs_list(join_type=self.type_join)
             actual_result = self.run_cbq_query()
-            actual_result = sorted(actual_result['results'])
+            actual_result = actual_result['results']
             expected_result = [{'Name' : doc['name'], 'proj' : doc['project']} for doc in all_docs_list if doc['join_mo'] > 10]
-            expected_result = sorted(expected_result)
             self._verify_results(actual_result, expected_result)
 ##############################################################################################
 #
@@ -662,17 +647,15 @@ class JoinTests(QuerySanityTests, QueryTests):
                 keys_select.append(key)
             self.query = 'select task_name FROM %s USE KEYS %s' % (bucket.name, keys_select)
             actual_result = self.run_cbq_query()
-            actual_result = sorted(actual_result['results'], key=lambda doc: (
-                                                                       doc['task_name']))
+            actual_result = actual_result['results']
             full_list = self.generate_full_docs_list(self.gens_tasks, keys=keys_select)
             expected_result = [{"task_name" : doc['task_name']} for doc in full_list]
-            expected_result = sorted(expected_result, key=lambda doc: (doc['task_name']))
             self._verify_results(actual_result, expected_result)
 
             keys_select.extend(["wrong"])
             self.query = 'select task_name FROM %s USE KEYS %s' % (bucket.name, keys_select)
             actual_result = self.run_cbq_query()
-            actual_result = sorted(actual_result['results'])
+            actual_result = actual_result['results']
             self._verify_results(actual_result, expected_result)
 
             self.query = 'select task_name FROM %s USE KEYS ["wrong_one","wrong_second"]' % (bucket.name)
@@ -685,19 +668,17 @@ class JoinTests(QuerySanityTests, QueryTests):
             key_select, value_select = next(gen_select)
             self.query = 'SELECT * FROM %s USE KEYS ARRAY emp._id FOR emp IN [%s] END' % (bucket.name, value_select)
             actual_result = self.run_cbq_query()
-            actual_result = sorted(actual_result['results'])
+            actual_result = actual_result['results']
             expected_result = self.generate_full_docs_list(self.gens_tasks, keys=[key_select])
             expected_result = [{bucket.name : doc} for doc in expected_result]
-            expected_result = sorted(expected_result)
             self._verify_results(actual_result, expected_result)
 
             key2_select, value2_select = next(gen_select)
             self.query = 'SELECT * FROM %s USE KEYS ARRAY emp._id FOR emp IN [%s,%s] END' % (bucket.name, value_select, value2_select)
             actual_result = self.run_cbq_query()
-            actual_result = sorted(actual_result['results'])
+            actual_result = actual_result['results']
             expected_result = self.generate_full_docs_list(self.gens_tasks, keys=[key_select, key2_select])
             expected_result = [{bucket.name : doc} for doc in expected_result]
-            expected_result = sorted(expected_result)
             self._verify_results(actual_result, expected_result)
 
 ##############################################################################################
@@ -743,14 +724,12 @@ class JoinTests(QuerySanityTests, QueryTests):
                          "ON KEYS emp.tasks_ids"
             actual_result = self.run_cbq_query()
             actual_result = self.sort_nested_list(actual_result['results'], key='projects')
-            actual_result = sorted(actual_result)
             full_list = self._generate_full_nested_docs_list(join_type=self.type_join)
             expected_result = [{"name" : doc['item']['name'],
                                 "projects" : [nested_doc['project'] for nested_doc in doc['items_nested']]}
                                for doc in full_list if doc and 'items_nested' in doc]
             expected_result.extend([{} for doc in full_list if not 'items_nested' in doc])
             expected_result = self.sort_nested_list(expected_result, key='projects')
-            expected_result = sorted(expected_result)
             self._verify_results(actual_result, expected_result)
 
     def test_prepared_nest_keys_with_array(self):
@@ -826,7 +805,6 @@ class JoinTests(QuerySanityTests, QueryTests):
                          "ON KEYS emp.tasks_ids where emp.join_day <= 4 and emp.join_yr>=2010"
             actual_result = self.run_cbq_query()
             actual_result = self.sort_nested_list(actual_result['results'], key='projects')
-            actual_result = sorted(actual_result)
             full_list = self._generate_full_nested_docs_list(join_type=self.type_join)
             expected_result = [{"name" : doc['item']['name'], "join_day" : doc['item']['join_day'],
                                 'join_yr': doc['item']['join_yr'],
@@ -835,14 +813,11 @@ class JoinTests(QuerySanityTests, QueryTests):
                                if doc and 'join_day' in doc['item'] and\
                                doc['item']['join_day'] <=4 and doc['item']['join_yr']>=2010]
             expected_result = self.sort_nested_list(expected_result, key='projects')
-            expected_result = sorted(expected_result)
             self._verify_results(actual_result, expected_result)
 
     def test_dual(self):
         self.query = "select 1"
         actual_result = self.run_cbq_query()
-        actual_result = sorted(actual_result)
         self.query = "select 1 from system:dual"
         expected_result = self.run_cbq_query()
-        expected_result = sorted(expected_result)
         self._verify_results(actual_result, expected_result)
