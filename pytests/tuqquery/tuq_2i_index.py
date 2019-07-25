@@ -3233,7 +3233,9 @@ class QueriesIndexTests(QueryTests):
                     self.sleep(15, 'wait for index')
                     self.query = "select meta().id from %s use index(`#primary`) WHERE _id like '%s' " %(bucket.name, 'query-testemployee10%')
                     result = self.run_cbq_query()
-                    self.assertEqual(sorted(actual_result['results']), sorted(result['results']))
+                    diffs = DeepDiff(actual_result['results'], result['results'], ignore_order=True)
+                    if diffs:
+                        self.assertTrue(False, diffs)
                     self.query = "DROP PRIMARY INDEX ON %s" % bucket.name
                     self.run_cbq_query()
 
@@ -3312,7 +3314,10 @@ class QueriesIndexTests(QueryTests):
                 self.assertTrue(plan['~children'][0]['~children'][0]['scans'][0]['scan']['index']=='rec1-1_record_by_index_map')
                 self.query = 'SELECT r AS doc, meta(r).cas AS revision FROM %s AS r WHERE any i in object_pairs(indexMap) satisfies i = { "name":"key1", "val":"val1"} end AND any i in object_pairs(indexMap) satisfies i = { "name":"key2", "val":"val2"} end LIMIT 100'%(bucket.name)
                 actual_result = self.run_cbq_query()
-                self.assertTrue(sorted(actual_result['results'][0]['doc']) == (['data', 'indexMap', 'type']))
+                #self.assertTrue(sorted(actual_result['results'][0]['doc']) == (['data', 'indexMap', 'type']))
+                diffs = DeepDiff(actual_result['results'][0]['doc'], (['data', 'indexMap', 'type']), ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
                 self.query = 'explain SELECT r AS doc, meta(r).cas AS revision FROM %s AS r WHERE every i in object_pairs(indexMap) satisfies i = { "name":"key1", "val":"val1"} end AND any i in object_pairs(indexMap) satisfies i = { "name":"key2", "val":"val2"} end LIMIT 100'%(bucket.name)
                 actual_result = self.run_cbq_query()
                 plan = self.ExplainPlanHelper(actual_result)
@@ -3320,7 +3325,10 @@ class QueriesIndexTests(QueryTests):
                 self.assertTrue(plan['~children'][0]['~children'][0]['scan']['index']=='rec1-1_record_by_index_map')
                 self.query = 'SELECT r AS doc, meta(r).cas AS revision FROM %s AS r WHERE every i in object_pairs(indexMap) satisfies i = { "name":"key1", "val":"val1"} end or any i in object_pairs(indexMap) satisfies i = { "name":"key2", "val":"val2"} end LIMIT 100'%(bucket.name)
                 actual_result=self.run_cbq_query()
-                self.assertTrue(sorted(actual_result['results'][0]['doc']) == (['data', 'indexMap', 'type']))
+                #self.assertTrue(sorted(actual_result['results'][0]['doc']) == (['data', 'indexMap', 'type']))
+                diffs = DeepDiff(actual_result['results'][0]['doc'], (['data', 'indexMap', 'type']), ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
                 self.query = 'explain SELECT r AS doc, meta(r).cas AS revision FROM %s AS r WHERE any i in object_pairs(indexMap) satisfies i = { "name":"key1", "val":"val1"} end AND every i in object_pairs(indexMap) satisfies i = { "name":"key2", "val":"val2"} end LIMIT 100'%(bucket.name)
                 actual_result = self.run_cbq_query()
                 plan = self.ExplainPlanHelper(actual_result)
@@ -3328,7 +3336,10 @@ class QueriesIndexTests(QueryTests):
                 self.assertTrue(plan['~children'][0]['~children'][0]['scan']['index']=='rec1-1_record_by_index_map')
                 self.query = 'SELECT r AS doc, meta(r).cas AS revision FROM %s AS r WHERE any i in object_pairs(indexMap) satisfies i = { "name":"key1", "val":"val1"} end or every i in object_pairs(indexMap) satisfies i = { "name":"key2", "val":"val2"} end LIMIT 100'%(bucket.name)
                 actual_result = self.run_cbq_query()
-                self.assertTrue(sorted(actual_result['results'][0]['doc']) == (['data', 'indexMap', 'type']))
+                #self.assertTrue(sorted(actual_result['results'][0]['doc']) == (['data', 'indexMap', 'type']))
+                diffs = DeepDiff(actual_result['results'][0]['doc'], (['data', 'indexMap', 'type']), ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
                 self.query = 'explain SELECT r AS doc, meta(r).cas AS revision FROM %s AS r WHERE some and every i in object_pairs(indexMap) satisfies i = { "name":"key1", "val":"val1"} end AND some and every i in object_pairs(indexMap) satisfies i = { "name":"key2", "val":"val2"} end LIMIT 100'%(bucket.name)
                 actual_result = self.run_cbq_query()
                 plan = self.ExplainPlanHelper(actual_result)
@@ -3338,7 +3349,10 @@ class QueriesIndexTests(QueryTests):
                 self.run_cbq_query()
                 self.query = 'SELECT r AS doc, meta(r).cas AS revision FROM %s AS r WHERE SOME AND EVERY i in object_pairs(indexMap) satisfies i = { "name":"key1", "val":"val1"} end AND SOME AND EVERY i in object_pairs(data) satisfies i = { "name":"foo", "val":"bar"} end LIMIT 100'%(bucket.name)
                 actual_result = self.run_cbq_query()
-                self.assertTrue(sorted(actual_result['results'][0]['doc']) == (['data', 'indexMap', 'type']))
+                #self.assertTrue(sorted(actual_result['results'][0]['doc']) == (['data', 'indexMap', 'type']))
+                diffs = DeepDiff(actual_result['results'][0]['doc'], (['data', 'indexMap', 'type']), ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
                 self.query = 'explain SELECT r AS doc, meta(r).cas AS revision FROM %s AS r WHERE any i in object_pairs(indexMap) satisfies i = { "name":"key1", "val":"val1"} end AND any j in object_pairs(indexMap) satisfies j = { "name":"key2", "val":"val2"} end LIMIT 100'%(bucket.name)
                 actual_result = self.run_cbq_query()
                 plan = self.ExplainPlanHelper(actual_result)
@@ -3346,7 +3360,10 @@ class QueriesIndexTests(QueryTests):
                 self.assertTrue(plan['~children'][0]['~children'][0]['scans'][0]['scan']['index'] == 'rec1-1_record_by_index_map')
                 self.query = 'SELECT r AS doc, meta(r).cas AS revision FROM %s AS r WHERE any i in object_pairs(indexMap) satisfies i = { "name":"key1", "val":"val1"} end AND any j in object_pairs(indexMap) satisfies j = { "name":"key2", "val":"val2"} end LIMIT 100'%(bucket.name)
                 actual_result = self.run_cbq_query()
-                self.assertTrue(sorted(actual_result['results'][0]['doc']) == (['data', 'indexMap', 'type']))
+                #self.assertTrue(sorted(actual_result['results'][0]['doc']) == (['data', 'indexMap', 'type']))
+                diffs = DeepDiff(actual_result['results'][0]['doc'], (['data', 'indexMap', 'type']), ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
                 self.query = 'explain SELECT r AS doc, meta(r).cas AS revision FROM %s AS r WHERE some and every i in object_pairs(indexMap) satisfies i = { "name":"key1", "val":"val1"} end AND some and every j in object_pairs(indexMap) satisfies j = { "name":"key2", "val":"val2"} end LIMIT 100'%(bucket.name)
                 actual_result = self.run_cbq_query()
                 plan = self.ExplainPlanHelper(actual_result)
@@ -3593,8 +3610,9 @@ class QueriesIndexTests(QueryTests):
                 bucket.name, "'ub%'") + "order BY name limit 10"
                 actual_result = self.run_cbq_query()
                 expected_result = self.run_cbq_query()
-                expected_result = sorted(expected_result['results'])
-                self.assertTrue(expected_result==sorted(actual_result['results']))
+                diffs = DeepDiff(actual_result['results'], expected_result['results'], ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
             finally:
                 for idx in created_indexes:
                     self.query = "DROP INDEX %s.%s USING %s" % (bucket.name, idx, self.index_type)
@@ -3628,8 +3646,9 @@ class QueriesIndexTests(QueryTests):
                 self.query = "select VMs from %s use index(`#primary`)  WHERE ANY v IN VMs SATISFIES REGEXP_LIKE(v.os,%s) = 1  END  " % (
                 bucket.name, "'ub%'") + "limit 10"
                 expected_result = self.run_cbq_query()
-                expected_result = expected_result['results']
-                self.assertTrue(sorted(expected_result)==sorted(actual_result['results']))
+                diffs = DeepDiff(actual_result['results'], expected_result['results'], ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
             finally:
                 for idx in created_indexes:
                     self.query = "DROP INDEX %s.%s USING %s" % (bucket.name, idx, self.index_type)
