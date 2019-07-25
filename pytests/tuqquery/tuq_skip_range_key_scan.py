@@ -1,4 +1,5 @@
 from .tuq import QueryTests
+from deepdiff import DeepDiff
 
 
 class QuerySkipRangeScanTests(QueryTests):
@@ -60,7 +61,9 @@ class QuerySkipRangeScanTests(QueryTests):
         compare_results = self.run_cbq_query(query=compare_query)
         compare_docs = compare_results['results']
         self.assertEqual(len(results), len(compare_docs))
-        self.assertEqual(sorted(results), sorted(compare_docs))
+        diffs = DeepDiff(results, compare_docs, ignore_order=True)
+        if diffs:
+            self.assertTrue(False, diffs)
 
     def test_basic_skip_range_scan(self):
         queries = dict()
