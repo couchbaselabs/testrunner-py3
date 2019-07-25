@@ -5,6 +5,7 @@ import threading
 from .rqg_mysql_client import RQGMySQLClient
 from .rqg_postgres_client import RQGPostgresClient
 import traceback
+from deepdiff import DeepDiff
 
 class RQGTestsNew(BaseRQGTests):
 
@@ -195,12 +196,15 @@ class RQGTestsNew(BaseRQGTests):
         n1ql_result = new_n1ql_result
         actual_result = n1ql_result
 
-        actual_result = sorted(actual_result)
-        expected_result = sorted(sql_result)
+        expected_result = sql_result
 
-        if len(actual_result) != len(expected_result):
-            extra_msg = self._get_failure_message(expected_result, actual_result)
-            raise Exception("Results are incorrect. Actual num %s. Expected num: %s. :: %s \n" % (len(actual_result), len(expected_result), extra_msg))
+        #if len(actual_result) != len(expected_result):
+        #    extra_msg = self._get_failure_message(expected_result, actual_result)
+        #    raise Exception("Results are incorrect. Actual num %s. Expected num: %s. :: %s \n" % (len(actual_result), len(expected_result), extra_msg))
+
+        diffs = DeepDiff(actual_result, expected_result, ignore_order=True)
+        if diffs:
+            raise Exception("Results are incorrect. " + diffs)
 
         msg = "The number of rows match but the results mismatch, please check"
         sorted_actual = self._sort_data(actual_result)
