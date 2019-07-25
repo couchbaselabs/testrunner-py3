@@ -1,5 +1,5 @@
 from tuqquery.tuq import QueryTests
-
+from deepdiff import DeepDiff
 
 class OptionsTests(QueryTests):
     def setUp(self):
@@ -160,8 +160,9 @@ class OptionsRestTests(QueryTests):
 
             statement = 'SELECT * FROM %s use index(`#primary`)  where job_title = "Engineer" and name=$name&$name="employee-4"'% (bucket.name)
             expected_result = self.curl_helper(statement)
-
-            self.assertTrue(sorted(actual_result['results'])== sorted(expected_result['results']))
+            diffs = DeepDiff(actual_result['results'], expected_result['results'], ignore_order=True)
+            if diffs:
+                self.assertTrue(False, diffs)
 
             statement = 'EXPLAIN SELECT * FROM %s where job_title=$job_title and name=$name&$job_title="Engineer"&$name="employee-4"'% (bucket.name)
             output = self.curl_helper(statement)
@@ -171,7 +172,9 @@ class OptionsRestTests(QueryTests):
             actual_result = self.curl_helper(statement)
             statement = 'SELECT * FROM %s use index(`#primary`) where job_title=$job_title and name=$name&$job_title="Engineer"&$name="employee-4"'% (bucket.name)
             expected_result = self.curl_helper(statement)
-            self.assertTrue(sorted(actual_result['results'])== sorted(expected_result['results']))
+            diffs = DeepDiff(actual_result['results'], expected_result['results'], ignore_order=True)
+            if diffs:
+                self.assertTrue(False, diffs)
 
             statement = 'EXPLAIN SELECT * FROM %s where job_title=$1 and name=$2&args=["Engineer","id@mail.com"]'% (bucket.name)
             output = self.curl_helper(statement)
@@ -181,7 +184,9 @@ class OptionsRestTests(QueryTests):
             actual_result = self.curl_helper(statement)
             statement = 'SELECT * FROM %s use index(`#primary`) where job_title=$1 and name=$2&args=["Engineer","employee-4"]'% (bucket.name)
             expected_result = self.curl_helper(statement)
-            self.assertTrue(sorted(actual_result['results'])== sorted(expected_result['results']))
+            diffs = DeepDiff(actual_result['results'], expected_result['results'], ignore_order=True)
+            if diffs:
+                self.assertTrue(False, diffs)
 
             #in clause with incorrect datatype for first argument
             statement = 'EXPLAIN SELECT * FROM %s where job_title=$job_title and name IN $name&$job_title=3&$name= ["id@mail.com", "employee-4"]'% (bucket.name)
@@ -191,7 +196,9 @@ class OptionsRestTests(QueryTests):
             actual_result = self.curl_helper(statement)
             statement = 'SELECT * FROM %s use index(`#primary`) where job_title=$job_title and name IN $name&$job_title=3&$name= ["id@mail.com", "employee-4"]'% (bucket.name)
             expected_result = self.curl_helper(statement)
-            self.assertTrue(sorted(actual_result['results'])== sorted(expected_result['results']))
+            diffs = DeepDiff(actual_result['results'], expected_result['results'], ignore_order=True)
+            if diffs:
+                self.assertTrue(False, diffs)
 
             #in clause with correct datatype for first argument
             statement = 'EXPLAIN SELECT * FROM %s where job_title=$job_title and name IN $name&$job_title="Engineer"&$name= ["id@mail.com", "employee-4"]'% (bucket.name)
@@ -201,7 +208,9 @@ class OptionsRestTests(QueryTests):
             actual_result = self.curl_helper(statement)
             statement = 'SELECT * FROM %s use index(`#primary`) where job_title=$job_title and name IN $name&$job_title="Engineer"&$name= ["id@mail.com", "employee-4"]'% (bucket.name)
             expected_result = self.curl_helper(statement)
-            self.assertTrue(sorted(actual_result['results'])== sorted(expected_result['results']))
+            diffs = DeepDiff(actual_result['results'], expected_result['results'], ignore_order=True)
+            if diffs:
+                self.assertTrue(False, diffs)
 
             #in clause with missing first argument
             statement = 'EXPLAIN SELECT * FROM %s where job_title=$job_title and name IN $name&$job_title is missing&$name= ["id@mail.com", "employee-4"]'% (bucket.name)
@@ -223,7 +232,9 @@ class OptionsRestTests(QueryTests):
             actual_result = self.curl_helper(statement)
             statement = 'SELECT * FROM %s use index(`#primary`) where job_title=$job_title and name IN $name&$job_title=null&$name= ["id@mail.com", "employee-4"]'% (bucket.name)
             expected_result = self.curl_helper(statement)
-            self.assertTrue(sorted(actual_result['results'])== sorted(expected_result['results']))
+            diffs = DeepDiff(actual_result['results'], expected_result['results'], ignore_order=True)
+            if diffs:
+                self.assertTrue(False, diffs)
 
             statement = 'EXPLAIN SELECT * FROM %s where job_title=$1 and name IN $2&args=["Engineer", ["id@mail.com", "employee-4"]]'% (bucket.name)
             output = self.curl_helper(statement)
@@ -233,7 +244,9 @@ class OptionsRestTests(QueryTests):
             actual_result = self.curl_helper(statement)
             statement = 'SELECT * FROM %s use index(`#primary`) where job_title=$1 and name IN $2&args=["Engineer", ["id@mail.com", "employee-4"]]'% (bucket.name)
             expected_result = self.curl_helper(statement)
-            self.assertTrue(sorted(actual_result['results'])== sorted(expected_result['results']))
+            diffs = DeepDiff(actual_result['results'], expected_result['results'], ignore_order=True)
+            if diffs:
+                self.assertTrue(False, diffs)
             # args is empty
             statement = 'explain SELECT * FROM %s where job_title=$1 and name IN $2&args=["", ["id@mail.com", "employee-4"]]'% (bucket.name)
             output = self.curl_helper(statement)
@@ -313,7 +326,9 @@ class OptionsRestTests(QueryTests):
             actual_result = self.curl_helper(statement)
             statement = 'SELECT * FROM %s t1 use index(`#primary`) WHERE job_title = "Engineer" and name IN (SELECT name FROM %s where job_title=$type and name=$name)&$type="Support"&$name="employee-4"'% (bucket.name, bucket.name)
             expected_result = self.curl_helper(statement)
-            self.assertTrue(sorted(actual_result['results'])==sorted(expected_result['results']))
+            diffs = DeepDiff(actual_result['results'], expected_result['results'], ignore_order=True)
+            if diffs:
+                self.assertTrue(False, diffs)
 
             statement='EXPLAIN SELECT * FROM %s t1 WHERE job_title = "Engineer" and name in (SELECT name FROM %s where _type=$1 and name=$2)&args=["Support","employee-4"]'% (bucket.name, bucket.name)
             output = self.curl_helper(statement)
@@ -323,7 +338,9 @@ class OptionsRestTests(QueryTests):
             actual_result = self.curl_helper(statement)
             statement='SELECT * FROM %s t1 use index(`#primary`) WHERE job_title = "Engineer" and name in (SELECT name FROM %s where _type=$1 and name=$2)&args=["Support","employee-4"]'% (bucket.name, bucket.name)
             expected_result = self.curl_helper(statement)
-            self.assertTrue(sorted(actual_result['results'])==sorted(expected_result['results']))
+            diffs = DeepDiff(actual_result['results'], expected_result['results'], ignore_order=True)
+            if diffs:
+                self.assertTrue(False, diffs)
 
             statement = 'EXPLAIN SELECT * FROM (SELECT name FROM %s where job_title=$type and name=$name) as name&$type="Support"&$name="employee-4"'% (bucket.name)
             output = self.curl_helper(statement)
@@ -332,7 +349,9 @@ class OptionsRestTests(QueryTests):
             actual_result = self.curl_helper(statement)
             statement = 'SELECT * FROM (SELECT name FROM %s use index(`#primary`) where job_title=$type and name=$name) as name&$type="Support"&$name="employee-4"'% (bucket.name)
             expected_result = self.curl_helper(statement)
-            self.assertTrue(sorted(actual_result['results'])==sorted(expected_result['results']))
+            diffs = DeepDiff(actual_result['results'], expected_result['results'], ignore_order=True)
+            if diffs:
+                self.assertTrue(False, diffs)
 
             statement = 'EXPLAIN SELECT * FROM  (SELECT name FROM %s where job_title=$1 and name=$2) as name&args=["Support","employee-4"]'% (bucket.name)
             output = self.curl_helper(statement)

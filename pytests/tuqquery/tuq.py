@@ -3080,7 +3080,9 @@ class QueryTests(BaseTestCase):
         self.assertEqual(len(actual_result), len(expected_result), msg)
         msg = "Results are incorrect.\n Actual first and last 100:  %s.\n ... \n %s Expected first and last 100: %s." \
               "\n  ... \n %s" % (actual_result[:100], actual_result[-100:], expected_result[:100], expected_result[-100:])
-        self.assertTrue(sorted(actual_result) == sorted(expected_result), msg)
+        diffs = DeepDiff(actual_result, expected_result, ignore_order=True)
+        if diffs:
+            self.assertTrue(False, diffs)
 
 ##############################################################################################
 #
