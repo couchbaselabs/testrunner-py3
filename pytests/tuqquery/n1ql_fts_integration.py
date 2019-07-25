@@ -6,7 +6,7 @@ from remote.remote_util import RemoteMachineShellConnection
 import json
 from pytests.security.rbac_base import RbacBase
 from lib.remote.remote_util import RemoteMachineShellConnection
-
+from deepdiff import DeepDiff
 
 class N1qlFTSIntegrationTest(QueryTests):
     test_fts_query = "select primary_key from `test_bucket` where meta().id in " \
@@ -691,7 +691,9 @@ class N1qlFTSIntegrationTest(QueryTests):
             if 'n1ql' in node_services:
                 fts_result = self.run_cbq_query(query=fts_query, server=node, username=username, password=password)
                 n1ql_result = self.run_cbq_query(query=n1ql_query, server=node, username=username, password=password)
-                if sorted(fts_result['results'])!=sorted(n1ql_result['results']):
+                diffs = DeepDiff(fts_result['results'], n1ql_result['results'], ignore_order=True)
+                if diffs:
+                    self.log.info("Diffs: "+diffs)
                     return False
 
         return True
