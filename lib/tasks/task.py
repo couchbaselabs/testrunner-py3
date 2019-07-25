@@ -35,7 +35,7 @@ from testconstants import MIN_KV_QUOTA, INDEX_QUOTA, FTS_QUOTA, COUCHBASE_FROM_4
 from multiprocessing import Process, Manager, Semaphore
 import memcacheConstants
 from membase.api.exception import CBQError
-
+from deepdiff import DeepDiff
 
 try:
     CHECK_FLAG = False
@@ -3809,10 +3809,10 @@ class GenerateExpectedViewResultsTask(Task):
 
     @staticmethod
     def cmp_result_rows(x, y):
-        rc = cmp(x['key'], y['key'])
+        rc = len(DeepDiff(x['key'], y['key'], ignore_order=True))
         if rc == 0:
             # sort by id is tie breaker
-            rc = cmp(x['id'], y['id'])
+            rc = len(DeepDiff(x['id'], y['id'], ignore_order=True))
         return rc
 
 class ViewQueryVerificationTask(Task):
@@ -4288,7 +4288,7 @@ class CompactBucketTask(Task):
                     current_compaction_count[node.ip] += int(i.split(':')[2])
 
 
-        if cmp(current_compaction_count, self.compaction_count) == 1:
+        if len(DeepDiff(current_compaction_count, self.compaction_count)) == 1:
             # compaction count has increased
             self.set_result(True)
             self.state = FINISHED
