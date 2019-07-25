@@ -813,7 +813,7 @@ class QueryTests(BaseTestCase):
             if not end:
                 end = self.num_items
             generators = []
-            index = end/3
+            index = end//3
             template = '{{ "feature_name":"{0}", "coverage_tests" : {{"P0":{1}, "P1":{2}, "P2":{3}}},'
             template += '"story_point" : {4},"jira_tickets": {5}}}'
             names = [str(i) for i in range(0, index)]
