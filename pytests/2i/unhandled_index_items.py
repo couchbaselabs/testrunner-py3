@@ -10,6 +10,7 @@ from couchbase_helper.documentgenerator import  DocumentGenerator
 from couchbase_helper.query_definitions import QueryDefinition
 from membase.api.rest_client import RestConnection
 from remote.remote_util import RemoteMachineShellConnection
+from deepdiff import DeepDiff
 
 log = logging.getLogger(__name__)
 
@@ -88,9 +89,12 @@ class GSIUnhandledIndexItems(BaseSecondaryIndexingTests):
                         index_id, body={"stale": "false"})
                     expected_result = self._get_expected_results_for_scan(query_definition)
                     msg = "Results don't match for index {0}. Actual: {1}, Expected: {2}"
-                    self.assertEqual(sorted(actual_result), sorted(expected_result),
-                                     msg.format(query_definition.index_name,
-                                                actual_result, expected_result))
+                    #self.assertEqual(sorted(actual_result), sorted(expected_result),
+                    #                 msg.format(query_definition.index_name,
+                    #                            actual_result, expected_result))
+                    diffs = DeepDiff(actual_result, expected_result, ignore_order=True)
+                    if diffs:
+                        self.assertTrue(False, diffs)
 
     def test_increase_max_item_limits(self):
         self.set_allow_large_keys(self.allow_large_keys)
@@ -118,9 +122,12 @@ class GSIUnhandledIndexItems(BaseSecondaryIndexingTests):
                         index_id, body={"stale": "false"})
                     expected_result = self._get_expected_results_for_scan(query_definition)
                     msg = "Results don't match for index {0}. Actual: {1}, Expected: {2}"
-                    self.assertEqual(sorted(actual_result), sorted(expected_result),
-                                     msg.format(query_definition.index_name,
-                                                actual_result, expected_result))
+                    #self.assertEqual(sorted(actual_result), sorted(expected_result),
+                    #                 msg.format(query_definition.index_name,
+                    #                            actual_result, expected_result))
+                    diffs = DeepDiff(actual_result, expected_result, ignore_order=True)
+                    if diffs:
+                        self.assertTrue(False, diffs)
             if not self.repeat:
                 break
 
@@ -151,9 +158,12 @@ class GSIUnhandledIndexItems(BaseSecondaryIndexingTests):
                     expected_result = self._get_expected_results_for_scan(
                         query_definition)
                     msg = "Results don't match for index {0}. Actual: {1}, Expected: {2}"
-                    self.assertEqual(sorted(actual_result), sorted(expected_result),
-                                     msg.format(query_definition.index_name,
-                                                actual_result, expected_result))
+                    #self.assertEqual(sorted(actual_result), sorted(expected_result),
+                    #                 msg.format(query_definition.index_name,
+                    #                            actual_result, expected_result))
+                    diffs = DeepDiff(actual_result, expected_result, ignore_order=True)
+                    if diffs:
+                        self.assertTrue(False, diffs)
             if not self.repeat:
                 break
 
@@ -176,9 +186,12 @@ class GSIUnhandledIndexItems(BaseSecondaryIndexingTests):
                 expected_result = self._get_expected_results_for_scan(
                     query_definition)
                 msg = "Results don't match for index {0}. Actual: {1}, Expected: {2}"
-                self.assertEqual(sorted(actual_result), sorted(expected_result),
-                                 msg.format(query_definition.index_name,
-                                            actual_result, expected_result))
+                #self.assertEqual(sorted(actual_result), sorted(expected_result),
+                #                 msg.format(query_definition.index_name,
+                #                            actual_result, expected_result))
+                diffs = DeepDiff(actual_result, expected_result, ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
         self._upload_documents(num_items=self.num_docs, item_size=self.max_item_size,
                                             array_size=self.max_array_size, update_docs=True)
         self.sleep(10)
@@ -190,9 +203,12 @@ class GSIUnhandledIndexItems(BaseSecondaryIndexingTests):
                 expected_result = self._get_expected_results_for_scan(
                     query_definition)
                 msg = "Results don't match for index {0}. Actual: {1}, Expected: {2}"
-                self.assertEqual(sorted(actual_result), sorted(expected_result),
-                                 msg.format(query_definition.index_name,
-                                            actual_result, expected_result))
+                #self.assertEqual(sorted(actual_result), sorted(expected_result),
+                #                 msg.format(query_definition.index_name,
+                #                            actual_result, expected_result))
+                diffs = DeepDiff(actual_result, expected_result, ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
 
     def test_max_limits_decrease_item_size(self):
         self.set_allow_large_keys(self.allow_large_keys)
@@ -213,9 +229,12 @@ class GSIUnhandledIndexItems(BaseSecondaryIndexingTests):
                 expected_result = self._get_expected_results_for_scan(
                     query_definition)
                 msg = "Results don't match for index {0}. Actual: {1}, Expected: {2}"
-                self.assertEqual(sorted(actual_result), sorted(expected_result),
-                                 msg.format(query_definition.index_name,
-                                            actual_result, expected_result))
+                #self.assertEqual(sorted(actual_result), sorted(expected_result),
+                #                 msg.format(query_definition.index_name,
+                #                            actual_result, expected_result))
+                diffs = DeepDiff(actual_result, expected_result, ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
         self._upload_documents(num_items=self.num_docs, item_size=self.max_item_size//4,
                                             array_size=self.max_array_size, update_docs=True)
         self.sleep(10)
@@ -227,9 +246,12 @@ class GSIUnhandledIndexItems(BaseSecondaryIndexingTests):
                 expected_result = self._get_expected_results_for_scan(
                     query_definition)
                 msg = "Results don't match for index {0}. Actual: {1}, Expected: {2}"
-                self.assertEqual(sorted(actual_result), sorted(expected_result),
-                                 msg.format(query_definition.index_name,
-                                            actual_result, expected_result))
+                #self.assertEqual(sorted(actual_result), sorted(expected_result),
+                #                 msg.format(query_definition.index_name,
+                #                            actual_result, expected_result))
+                diffs = DeepDiff(actual_result, expected_result, ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
 
     def test_increase_max_array_limits(self):
         self.set_allow_large_keys(self.allow_large_keys)
@@ -258,9 +280,12 @@ class GSIUnhandledIndexItems(BaseSecondaryIndexingTests):
                     expected_result = self._get_expected_results_for_scan(
                         query_definition)
                     msg = "Results don't match for index {0}. Actual: {1}, Expected: {2}"
-                    self.assertEqual(sorted(actual_result), sorted(expected_result),
-                                 msg.format(query_definition.index_name,
-                                            actual_result, expected_result))
+                    #self.assertEqual(sorted(actual_result), sorted(expected_result),
+                    #             msg.format(query_definition.index_name,
+                    #                        actual_result, expected_result))
+                    diffs = DeepDiff(actual_result, expected_result, ignore_order=True)
+                    if diffs:
+                        self.assertTrue(False, diffs)
 
     def test_decrease_max_array_limits(self):
         self.set_allow_large_keys(self.allow_large_keys)
@@ -289,9 +314,12 @@ class GSIUnhandledIndexItems(BaseSecondaryIndexingTests):
                     expected_result = self._get_expected_results_for_scan(
                         query_definition)
                     msg = "Results don't match for index {0}. Actual: {1}, Expected: {2}"
-                    self.assertEqual(sorted(actual_result), sorted(expected_result),
-                                 msg.format(query_definition.index_name,
-                                            actual_result, expected_result))
+                    #self.assertEqual(sorted(actual_result), sorted(expected_result),
+                    #             msg.format(query_definition.index_name,
+                    #                        actual_result, expected_result))
+                    diffs = DeepDiff(actual_result, expected_result, ignore_order=True)
+                    if diffs:
+                        self.assertTrue(False, diffs)
             if not self.repeat:
                 break
 
@@ -314,9 +342,12 @@ class GSIUnhandledIndexItems(BaseSecondaryIndexingTests):
                 expected_result = self._get_expected_results_for_scan(
                     query_definition)
                 msg = "Results don't match for index {0}. Actual: {1}, Expected: {2}"
-                self.assertEqual(sorted(actual_result), sorted(expected_result),
-                                 msg.format(query_definition.index_name,
-                                            actual_result, expected_result))
+                #self.assertEqual(sorted(actual_result), sorted(expected_result),
+                #                 msg.format(query_definition.index_name,
+                #                            actual_result, expected_result))
+                diffs = DeepDiff(actual_result, expected_result, ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
         self._upload_documents(num_items=self.num_docs, item_size=self.max_item_size,
                                             array_size=self.max_array_size, update_docs=True)
         for bucket in self.buckets:
@@ -327,9 +358,12 @@ class GSIUnhandledIndexItems(BaseSecondaryIndexingTests):
                 expected_result = self._get_expected_results_for_scan(
                     query_definition)
                 msg = "Results don't match for index {0}. Actual: {1}, Expected: {2}"
-                self.assertEqual(sorted(actual_result), sorted(expected_result),
-                                 msg.format(query_definition.index_name,
-                                            actual_result, expected_result))
+                #self.assertEqual(sorted(actual_result), sorted(expected_result),
+                #                 msg.format(query_definition.index_name,
+                #                            actual_result, expected_result))
+                diffs = DeepDiff(actual_result, expected_result, ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
 
     def test_max_limits_decrease_array_size(self):
         self.set_allow_large_keys(self.allow_large_keys)
@@ -350,9 +384,12 @@ class GSIUnhandledIndexItems(BaseSecondaryIndexingTests):
                 expected_result = self._get_expected_results_for_scan(
                     query_definition)
                 msg = "Results don't match for index {0}. Actual: {1}, Expected: {2}"
-                self.assertEqual(sorted(actual_result), sorted(expected_result),
-                                 msg.format(query_definition.index_name,
-                                            actual_result, expected_result))
+                #self.assertEqual(sorted(actual_result), sorted(expected_result),
+                #                 msg.format(query_definition.index_name,
+                #                            actual_result, expected_result))
+                diffs = DeepDiff(actual_result, expected_result, ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
         self._upload_documents(num_items=self.num_docs, item_size=self.max_item_size,
                                             array_size=self.max_array_size//4, update_docs=True)
         for bucket in self.buckets:
@@ -363,9 +400,12 @@ class GSIUnhandledIndexItems(BaseSecondaryIndexingTests):
                 expected_result = self._get_expected_results_for_scan(
                     query_definition)
                 msg = "Results don't match for index {0}. Actual: {1}, Expected: {2}"
-                self.assertEqual(sorted(actual_result), sorted(expected_result),
-                                 msg.format(query_definition.index_name,
-                                            actual_result, expected_result))
+                #self.assertEqual(sorted(actual_result), sorted(expected_result),
+                #                 msg.format(query_definition.index_name,
+                #                            actual_result, expected_result))
+                diffs = DeepDiff(actual_result, expected_result, ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
 
     def test_change_allow_large_key(self):
         self.set_allow_large_keys(self.allow_large_keys)
@@ -400,9 +440,12 @@ class GSIUnhandledIndexItems(BaseSecondaryIndexingTests):
                     expected_result = self._get_expected_results_for_scan(
                         query_definition)
                     msg = "Results don't match for index {0}. Actual: {1}, Expected: {2}"
-                    self.assertEqual(sorted(actual_result), sorted(expected_result),
-                                 msg.format(query_definition.index_name,
-                                            actual_result, expected_result))
+                    #self.assertEqual(sorted(actual_result), sorted(expected_result),
+                    #             msg.format(query_definition.index_name,
+                    #                        actual_result, expected_result))
+                    diffs = DeepDiff(actual_result, expected_result, ignore_order=True)
+                    if diffs:
+                        self.assertTrue(False, diffs)
             if not self.repeat:
                 break
 
@@ -433,9 +476,12 @@ class GSIUnhandledIndexItems(BaseSecondaryIndexingTests):
                 expected_result = self._get_expected_results_for_scan(
                     query_definition)
                 msg = "Results don't match for index {0}. Actual: {1}, Expected: {2}"
-                self.assertEqual(sorted(actual_result), sorted(expected_result),
-                                 msg.format(query_definition.index_name,
-                                            actual_result, expected_result))
+                #self.assertEqual(sorted(actual_result), sorted(expected_result),
+                #                 msg.format(query_definition.index_name,
+                #                            actual_result, expected_result))
+                diffs = DeepDiff(actual_result, expected_result, ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
 
     def test_random_increase_decrease_size_limit(self):
         self.set_allow_large_keys(self.allow_large_keys)
@@ -475,9 +521,12 @@ class GSIUnhandledIndexItems(BaseSecondaryIndexingTests):
                     expected_result = self._get_expected_results_for_scan(
                         query_definition)
                     msg = "Results don't match for index {0}. Actual: {1}, Expected: {2}"
-                    self.assertEqual(sorted(actual_result), sorted(expected_result),
-                                 msg.format(query_definition.index_name,
-                                            actual_result, expected_result))
+                    #self.assertEqual(sorted(actual_result), sorted(expected_result),
+                    #             msg.format(query_definition.index_name,
+                    #                        actual_result, expected_result))
+                    diffs = DeepDiff(actual_result, expected_result, ignore_order=True)
+                    if diffs:
+                        self.assertTrue(False, diffs)
 
     def test_various_docid_keysize_combinations(self):
         self.set_allow_large_keys(self.allow_large_keys)
@@ -527,9 +576,12 @@ class GSIUnhandledIndexItems(BaseSecondaryIndexingTests):
                 expected_result = self._get_expected_results_for_scan(
                     query_definition)
                 msg = "Results don't match for index {0}. Actual: {1}, Expected: {2}"
-                self.assertEqual(sorted(actual_result), sorted(expected_result),
-                                 msg.format(query_definition.index_name,
-                                            actual_result, expected_result))
+                #self.assertEqual(sorted(actual_result), sorted(expected_result),
+                #                 msg.format(query_definition.index_name,
+                #                            actual_result, expected_result))
+                diffs = DeepDiff(actual_result, expected_result, ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
 
     def _create_indexes(self):
         query_definitions = []
