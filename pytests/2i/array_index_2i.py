@@ -11,6 +11,7 @@ from couchbase_helper.tuq_generators import TuqGenerators
 from membase.api.rest_client import RestConnection
 from membase.helper.bucket_helper import BucketOperationHelper
 from .base_2i import BaseSecondaryIndexingTests
+from deepdiff import DeepDiff
 
 DATATYPES = [str, "scalar", int, dict, "missing", "empty", "null"]
 
@@ -69,9 +70,12 @@ class SecondaryIndexArrayIndexTests(BaseSecondaryIndexingTests):
                 expected_result = self._get_expected_results_for_full_table_scan(
                         query_definition)
                 msg = "Results don't match for index {0}. Actual number: {1}, Expected number: {2}"
-                self.assertEqual(sorted(actual_result), sorted(expected_result),
-                             msg.format(query_definition.index_name,
-                                        actual_result, expected_result))
+                #self.assertEqual(sorted(actual_result), sorted(expected_result),
+                #             msg.format(query_definition.index_name,
+                #                        actual_result, expected_result))
+                diffs = DeepDiff(actual_result, expected_result, ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
                 self.full_docs_list = self.generate_full_docs_list(self.gens_load)
         self.multi_drop_index_using_rest(buckets=self.buckets,
                                          query_definitions=query_definitions)
@@ -111,9 +115,12 @@ class SecondaryIndexArrayIndexTests(BaseSecondaryIndexingTests):
                         expected_result = self._get_expected_results_for_full_table_scan(
                             query_definition)
                         msg = "Results don't match for index {0}. Actual number: {1}, Expected number: {2}"
-                        self.assertEqual(sorted(actual_result), sorted(expected_result),
-                                         msg.format(query_definition.index_name,
-                                                    actual_result, expected_result))
+                        #self.assertEqual(sorted(actual_result), sorted(expected_result),
+                        #                 msg.format(query_definition.index_name,
+                        #                            actual_result, expected_result))
+                        diffs = DeepDiff(actual_result, expected_result, ignore_order=True)
+                        if diffs:
+                            self.assertTrue(False, diffs)
                         self.full_docs_list = self.generate_full_docs_list(self.gens_load)
             self.multi_drop_index_using_rest(buckets=self.buckets, query_definitions=definitions_list)
 
@@ -142,9 +149,12 @@ class SecondaryIndexArrayIndexTests(BaseSecondaryIndexingTests):
                     expected_result = self._get_expected_results_for_full_table_scan(
                         query_definition)
                     msg = "Results don't match for index {0}. Actual number: {1}, Expected number: {2}"
-                    self.assertEqual(sorted(actual_result), sorted(expected_result),
-                                 msg.format(query_definition.index_name,
-                                            len(actual_result), len(expected_result)))
+                    #self.assertEqual(sorted(actual_result), sorted(expected_result),
+                    #             msg.format(query_definition.index_name,
+                    #                        len(actual_result), len(expected_result)))
+                    diffs = DeepDiff(actual_result, expected_result, ignore_order=True)
+                    if diffs:
+                        self.assertTrue(False, diffs)
             self.multi_drop_index_using_rest(buckets=self.buckets, query_definitions=definitions_list)
             self.full_docs_list = self.generate_full_docs_list(self.gens_load)
 
@@ -174,9 +184,12 @@ class SecondaryIndexArrayIndexTests(BaseSecondaryIndexingTests):
             expected_result = self._get_expected_results_for_full_table_scan(
                         query_definition)
             msg = "Results don't match for index {0}. Actual number: {1}, Expected number: {2}"
-            self.assertEqual(sorted(actual_result), sorted(expected_result),
-                             msg.format(query_definition.index_name,
-                                        actual_result, expected_result))
+            #self.assertEqual(sorted(actual_result), sorted(expected_result),
+            #                 msg.format(query_definition.index_name,
+            #                            actual_result, expected_result))
+            diffs = DeepDiff(actual_result, expected_result, ignore_order=True)
+            if diffs:
+                self.assertTrue(False, diffs)
         self.multi_drop_index_using_rest(buckets=self.buckets,
                                          query_definitions=[query_definition])
 
