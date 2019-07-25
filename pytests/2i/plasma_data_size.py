@@ -11,6 +11,7 @@ from couchbase_helper.tuq_generators import TuqGenerators
 from membase.api.rest_client import RestConnection
 from membase.helper.bucket_helper import BucketOperationHelper
 from .base_2i import BaseSecondaryIndexingTests
+from deepdiff import DeepDiff
 
 log = logging.getLogger(__name__)
 
@@ -168,9 +169,13 @@ class SecondaryIndexDatasizeTests(BaseSecondaryIndexingTests):
                     expected_result = self._get_expected_results_for_scan(
                     query_definition)
                     msg = "Results don't match for index {0}. Actual: {1}, Expected: {2}"
-                    self.assertEqual(sorted(actual_result), sorted(expected_result),
-                             msg.format(query_definition.index_name,
-                                        actual_result, expected_result))
+                    #self.assertEqual(sorted(actual_result), sorted(expected_result),
+                    #         msg.format(query_definition.index_name,
+                    #                    actual_result, expected_result))
+                    diffs = DeepDiff(actual_result, expected_result, ignore_order=True)
+                    if diffs:
+                        self.assertTrue(False, diffs)
+
             self.sleep(20)
             array_size = random.choice(list(range(1000, 5000)))
             item_size = random.choice(list(range(1000, 5000)))
@@ -184,9 +189,12 @@ class SecondaryIndexDatasizeTests(BaseSecondaryIndexingTests):
                     expected_result = self._get_expected_results_for_scan(
                     query_definition)
                     msg = "Results don't match for index {0}. Actual: {1}, Expected: {2}"
-                    self.assertEqual(sorted(actual_result), sorted(expected_result),
-                             msg.format(query_definition.index_name,
-                                        actual_result, expected_result))
+                    #self.assertEqual(sorted(actual_result), sorted(expected_result),
+                    #         msg.format(query_definition.index_name,
+                    #                    actual_result, expected_result))
+                    diffs = DeepDiff(actual_result, expected_result, ignore_order=True)
+                    if diffs:
+                        self.assertTrue(False, diffs)
 
     def test_change_key_size(self):
         self.iterations = self.input.param("num_iterations", 5)
