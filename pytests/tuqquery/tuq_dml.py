@@ -2,6 +2,7 @@ import copy
 import uuid
 import json
 from tuqquery.tuq import QueryTests
+from deepdiff import DeepDiff
 
 
 class DMLQueryTests(QueryTests):
@@ -119,8 +120,13 @@ class DMLQueryTests(QueryTests):
             self.query = 'insert into %s (key , value) VALUES %s RETURNING ELEMENT name' % (bucket.name, values[:-1])
             actual_result = self.run_cbq_query()
             self.assertEqual(actual_result['status'], 'success', 'Query was not run successfully')
-            self.assertEqual(sorted(actual_result['results']), sorted([v['name'] for v in expected_item_values]),
-                             'Results expected:%s, actual: %s' % (expected_item_values, actual_result['results']))
+            #self.assertEqual(sorted(actual_result['results']), sorted([v['name'] for v in expected_item_values]),
+            #                 'Results expected:%s, actual: %s' % (expected_item_values, actual_result['results']))
+            diffs = DeepDiff(actual_result['results'], [v['name'] for v in expected_item_values], ignore_order=True)
+            if diffs:
+                self.assertTrue(False, diffs)
+
+
 
     def test_insert_returning_raw(self):
         keys = ['%s%s' % (k, str(uuid.uuid4())[:5]) for k in range(10)]
@@ -138,8 +144,11 @@ class DMLQueryTests(QueryTests):
             self.query = 'insert into %s (key , value) VALUES %s RETURNING RAW name' % (bucket.name, values[:-1])
             actual_result = self.run_cbq_query()
             self.assertEqual(actual_result['status'], 'success', 'Query was not run successfully')
-            self.assertEqual(sorted(actual_result['results']), sorted([v['name'] for v in expected_item_values]),
-                'Results expected:%s, actual: %s' % (expected_item_values, actual_result['results']))
+            #self.assertEqual(sorted(actual_result['results']), sorted([v['name'] for v in expected_item_values]),
+            #    'Results expected:%s, actual: %s' % (expected_item_values, actual_result['results']))
+            diffs = DeepDiff(actual_result['results'], [v['name'] for v in expected_item_values], ignore_order=True)
+            if diffs:
+                self.assertTrue(False, diffs)
 
     def test_insert_returning_alias(self):
         keys = ['%s%s' % (k, str(uuid.uuid4())[:5]) for k in range(10)]
@@ -159,7 +168,9 @@ class DMLQueryTests(QueryTests):
             #modified to support the alias
             expected_item_values = [{'new_name': 'return_%s' % v} for v in range(10)]
             self.assertEqual(actual_result['status'], 'success', 'Query was not run successfully')
-            self.assertEqual(sorted(actual_result['results']), sorted(expected_item_values))
+            diffs = DeepDiff(actual_result['results'], expected_item_values, ignore_order=True)
+            if diffs:
+                self.assertTrue(False, diffs)
 
     def test_insert_values_returning_elements(self):
         keys = ['%s%s' % (k, str(uuid.uuid4())[:5]) for k in range(10)]
@@ -177,8 +188,11 @@ class DMLQueryTests(QueryTests):
             self.query = 'insert into %s (key , value) %s RETURNING ELEMENT name' % (bucket.name, values[:-1])
             actual_result = self.run_cbq_query()
             self.assertEqual(actual_result['status'], 'success', 'Query was not run successfully')
-            self.assertEqual(sorted(actual_result['results']), sorted([v['name'] for v in expected_item_values]),
-                             'Results expected:%s, actual: %s' % (expected_item_values, actual_result['results']))
+            #self.assertEqual(sorted(actual_result['results']), sorted([v['name'] for v in expected_item_values]),
+            #                 'Results expected:%s, actual: %s' % (expected_item_values, actual_result['results']))
+            diffs = DeepDiff(actual_result['results'], [v['name'] for v in expected_item_values], ignore_order=True)
+            if diffs:
+                self.assertTrue(False, diffs)
 
     def test_prepared_insert_values_returning_elements(self):
         keys = ['%s%s' % (k, str(uuid.uuid4())[:5]) for k in range(10)]
@@ -202,8 +216,11 @@ class DMLQueryTests(QueryTests):
             prepared = self.run_cbq_query(query=self.query)['results'][0]
             actual_result = self.run_cbq_query(query=prepared, is_prepared=True)
             self.assertEqual(actual_result['status'], 'success', 'Query was not run successfully')
-            self.assertEqual(sorted(actual_result['results']), sorted([v['name'] for v in expected_item_values]),
-                'Results expected:%s, actual: %s' % (expected_item_values, actual_result['results']))
+            #self.assertEqual(sorted(actual_result['results']), sorted([v['name'] for v in expected_item_values]),
+            #    'Results expected:%s, actual: %s' % (expected_item_values, actual_result['results']))
+            diffs = DeepDiff(actual_result['results'], [v['name'] for v in expected_item_values], ignore_order=True)
+            if diffs:
+                self.assertTrue(False, diffs)
 
     def test_insert_returning_elements_long(self):
         keys = ['%s%s' % (k, str(uuid.uuid4())[:2] *120) for k in range(10)]
@@ -221,8 +238,11 @@ class DMLQueryTests(QueryTests):
             self.query = 'insert into %s (key , value) VALUES %s RETURNING ELEMENT name' % (bucket.name, values[:-1])
             actual_result = self.run_cbq_query()
             self.assertEqual(actual_result['status'], 'success', 'Query was not run successfully')
-            self.assertEqual(sorted(actual_result['results']), sorted([v['name'] for v in expected_item_values]),
-                             'Results expected:%s, actual: %s' % (expected_item_values, actual_result['results']))
+            #self.assertEqual(sorted(actual_result['results']), sorted([v['name'] for v in expected_item_values]),
+            #                 'Results expected:%s, actual: %s' % (expected_item_values, actual_result['results']))
+            diffs = DeepDiff(actual_result['results'], [v['name'] for v in expected_item_values], ignore_order=True)
+            if diffs:
+                self.assertTrue(False, diffs)
 
     def test_insert_returning_raw_long(self):
         keys = ['%s%s' % (k, str(uuid.uuid4())[:2] *120) for k in range(10)]
@@ -240,8 +260,11 @@ class DMLQueryTests(QueryTests):
             self.query = 'insert into %s (key , value) VALUES %s RETURNING RAW name' % (bucket.name, values[:-1])
             actual_result = self.run_cbq_query()
             self.assertEqual(actual_result['status'], 'success', 'Query was not run successfully')
-            self.assertEqual(sorted(actual_result['results']), sorted([v['name'] for v in expected_item_values]),
-                'Results expected:%s, actual: %s' % (expected_item_values, actual_result['results']))
+            #self.assertEqual(sorted(actual_result['results']), sorted([v['name'] for v in expected_item_values]),
+            #    'Results expected:%s, actual: %s' % (expected_item_values, actual_result['results']))
+            diffs = DeepDiff(actual_result['results'], [v['name'] for v in expected_item_values], ignore_order=True)
+            if diffs:
+                self.assertTrue(False, diffs)
 
     def test_insert_values_returning_elements_long(self):
         keys = ['%s%s' % (k, str(uuid.uuid4())[:2] *120) for k in range(10)]
@@ -259,8 +282,11 @@ class DMLQueryTests(QueryTests):
             self.query = 'insert into %s (key , value) %s RETURNING ELEMENT name' % (bucket.name, values[:-1])
             actual_result = self.run_cbq_query()
             self.assertEqual(actual_result['status'], 'success', 'Query was not run successfully')
-            self.assertEqual(sorted(actual_result['results']), sorted([v['name'] for v in expected_item_values]),
-                             'Results expected:%s, actual: %s' % (expected_item_values, actual_result['results']))
+            #self.assertEqual(sorted(actual_result['results']), sorted([v['name'] for v in expected_item_values]),
+            #                 'Results expected:%s, actual: %s' % (expected_item_values, actual_result['results']))
+            diffs = DeepDiff(actual_result['results'], [v['name'] for v in expected_item_values], ignore_order=True)
+            if diffs:
+                self.assertTrue(False, diffs)
 
     def test_insert_returning_elements_long_value(self):
         keys = ['%s%s' % (k, str(uuid.uuid4())[:1]) for k in range(10)]
@@ -279,8 +305,11 @@ class DMLQueryTests(QueryTests):
             actual_result = self.run_cbq_query()
             self.assertEqual(actual_result['status'], 'success', 'Query was not run successfully')
             if (self.use_rest):
-                self.assertEqual(sorted(actual_result['results']), sorted([v['name'] for v in expected_item_values]),
-                             'Results expected:%s, actual: %s' % (expected_item_values, actual_result['results']))
+                #self.assertEqual(sorted(actual_result['results']), sorted([v['name'] for v in expected_item_values]),
+                #             'Results expected:%s, actual: %s' % (expected_item_values, actual_result['results']))
+                diffs = DeepDiff(actual_result['results'], [v['name'] for v in expected_item_values], ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
 
     def test_insert_values_returning_elements_long_value(self):
         keys = ['%s%s' % (k, str(uuid.uuid4())[:1]) for k in range(10)]
@@ -298,8 +327,11 @@ class DMLQueryTests(QueryTests):
             self.query = 'insert into %s (key , value) %s RETURNING ELEMENT name' % (bucket.name, values[:-1])
             actual_result = self.run_cbq_query()
             self.assertEqual(actual_result['status'], 'success', 'Query was not run successfully')
-            self.assertEqual(sorted(actual_result['results']), sorted([v['name'] for v in expected_item_values]),
-                             'Results expected:%s, actual: %s' % (expected_item_values, actual_result['results']))
+            #self.assertEqual(sorted(actual_result['results']), sorted([v['name'] for v in expected_item_values]),
+            #                 'Results expected:%s, actual: %s' % (expected_item_values, actual_result['results']))
+            diffs = DeepDiff(actual_result['results'], [v['name'] for v in expected_item_values], ignore_order=True)
+            if diffs:
+                self.assertTrue(False, diffs)
 
     def test_insert_values_prepare_returning_elements(self):
         keys = ['%s%s' % (k, str(uuid.uuid4())[:1]) for k in range(10)]
@@ -318,8 +350,11 @@ class DMLQueryTests(QueryTests):
             prepared = self.run_cbq_query(query='PREPARE %s' % query)['results'][0]
             actual_result = self.run_cbq_query(query=prepared, is_prepared=True)
             self.assertEqual(actual_result['status'], 'success', 'Query was not run successfully')
-            self.assertEqual(sorted(actual_result['results']), sorted([v['name'] for v in expected_item_values]),
-                             'Results expected:%s, actual: %s' % (expected_item_values, actual_result['results']))
+            #self.assertEqual(sorted(actual_result['results']), sorted([v['name'] for v in expected_item_values]),
+            #                 'Results expected:%s, actual: %s' % (expected_item_values, actual_result['results']))
+            diffs = DeepDiff(actual_result['results'], [v['name'] for v in expected_item_values], ignore_order=True)
+            if diffs:
+                self.assertTrue(False, diffs)
 
     def test_insert_returning_nulls(self):
         keys = ['%s%s' % (k, str(uuid.uuid4())[:5]) for k in range(10)]
@@ -364,11 +399,12 @@ class DMLQueryTests(QueryTests):
             self.query = 'select * from %s use keys %s'  % (bucket.name, keys)
             actual_result = self.run_cbq_query()
             expected_result = sorted([{bucket.name: doc} for doc in values[:num_docs]])
-            actual_result = sorted(actual_result['results'])
+            actual_result = actual_result['results']
             self._delete_ids(actual_result)
             self._delete_ids(expected_result)
-            self.assertEqual(actual_result, expected_result,
-                             'Item did not appear')
+            diffs = DeepDiff(actual_result, expected_result, ignore_order=True)
+            if diffs:
+                self.assertTrue(False, diffs)
 
     def test_prepared_insert_json(self):
         num_docs = self.input.param('num_docs', 10)
@@ -404,11 +440,12 @@ class DMLQueryTests(QueryTests):
             self.query = 'select * from %s use keys %s'  % (bucket.name, keys)
             actual_result = self.run_cbq_query()
             expected_result = sorted([{bucket.name: doc} for doc in values[:num_docs]])
-            actual_result = sorted(actual_result['results'])
+            actual_result = actual_result['results']
             self._delete_ids(actual_result)
             self._delete_ids(expected_result)
             self.assertEqual(actual_result, expected_result,
                              'Item did not appear')
+
 
     def test_prepared_insert_with_select(self):
         num_docs = self.input.param('num_docs', 10)
@@ -432,11 +469,13 @@ class DMLQueryTests(QueryTests):
         for bucket in self.buckets:
             self.query = 'select * from %s use keys [%s]'  % (bucket.name, ','.join(['"%s_%s"' % (prefix, i) for i in range(num_docs)]))
             actual_result = self.run_cbq_query()
-            expected_result = sorted([{bucket.name: {'name': doc['name']}} for doc in values[:num_docs]])
-            actual_result = sorted(actual_result['results'])
+            expected_result = [{bucket.name: {'name': doc['name']}} for doc in values[:num_docs]]
+            actual_result = actual_result['results']
             self._delete_ids(actual_result)
             self._delete_ids(expected_result)
-            self.assertEqual(actual_result, expected_result, 'Item did not appear')
+            diffs = DeepDiff(actual_result, expected_result, ignore_order=True)
+            if diffs:
+                self.assertTrue(False, diffs)
 
     def test_insert_with_select(self):
         num_docs = self.input.param('num_docs', 10)
@@ -572,12 +611,13 @@ class DMLQueryTests(QueryTests):
         for bucket in self.buckets:
             self.query = 'select * from %s use keys %s'  % (bucket.name, keys)
             actual_result = self.run_cbq_query()
-            expected_result = sorted([{bucket.name: doc} for doc in values[:num_docs]])
-            actual_result = sorted(actual_result['results'])
+            expected_result = [{bucket.name: doc} for doc in values[:num_docs]]
+            actual_result = actual_result['results']
             self._delete_ids(actual_result)
             self._delete_ids(expected_result)
-            self.assertEqual(actual_result, expected_result,
-                             'Item did not appear')
+            diffs = DeepDiff(actual_result, expected_result, ignore_order=True)
+            if diffs:
+                self.assertTrue(False, diffs)
 
     def test_prepared_upsert_with_select(self):
         num_docs = self.input.param('num_docs', 10)
@@ -608,12 +648,13 @@ class DMLQueryTests(QueryTests):
         for bucket in self.buckets:
             self.query = 'select * from %s use keys %s'  % (bucket.name, keys)
             actual_result = self.run_cbq_query()
-            expected_result = sorted([{bucket.name: doc} for doc in values[:num_docs]])
-            actual_result = sorted(actual_result['results'])
+            expected_result = [{bucket.name: doc} for doc in values[:num_docs]]
+            actual_result = actual_result['results']
             self._delete_ids(actual_result)
             self._delete_ids(expected_result)
-            self.assertEqual(actual_result, expected_result,
-                             'Item did not appear')
+            diffs = DeepDiff(actual_result, expected_result, ignore_order=True)
+            if diffs:
+                self.assertTrue(False, diffs)
 
     def test_upsert_returning_elements_long_value(self):
         keys = ['%s%s' % (k, str(uuid.uuid4())[:1]) for k in range(10)]
@@ -642,8 +683,9 @@ class DMLQueryTests(QueryTests):
                                                                                    for i in range(num_docs)]))
                 actual_result = self.run_cbq_query()
                 expected_result = vls
-                self.assertEqual(sorted(actual_result['results']), sorted(expected_result),
-                                 'Item did not appear')
+                diffs = DeepDiff(actual_result['results'], expected_result, ignore_order=True)
+                if diffs:
+                    self.assertTrue(False, diffs)
 ############################################################################################################################
 #
 # DELETE
