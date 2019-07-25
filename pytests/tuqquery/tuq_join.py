@@ -37,14 +37,13 @@ class JoinTests(QuerySanityTests, QueryTests):
             "ON KEYS employee.tasks_ids"
             time.sleep(30)
             actual_result = self.run_cbq_query()
-            actual_result = sorted(actual_result['results'])
+            actual_result = actual_result['results']
             full_list = self._generate_full_joined_docs_list(join_type=self.type_join)
             expected_result = [doc for doc in full_list if not doc]
             expected_result.extend([{"name" : doc['name'], "tasks_ids" : doc['tasks_ids'], "project" : doc['project']}
                                     for doc in full_list if doc and 'project' in doc])
             #expected_result.extend([{"name" : doc['name'], "tasks_ids" : doc['tasks_ids']}
                                     #for doc in full_list if doc and not 'project' in doc])
-            expected_result = sorted(expected_result)
             self._verify_results(actual_result, expected_result)
 
     def test_prepared_simple_join_keys(self):
@@ -60,14 +59,13 @@ class JoinTests(QuerySanityTests, QueryTests):
             "FROM %s as employee %s JOIN default as new_task " % (bucket.name, self.type_join) +\
             "ON KEYS employee.tasks_ids"
             actual_result = self.run_cbq_query()
-            actual_result = sorted(actual_result['results'])
+            actual_result = actual_result['results']
             full_list = self._generate_full_joined_docs_list(join_type=self.type_join)
             expected_result = [doc for doc in full_list if not doc]
             expected_result.extend([{"name" : doc['name'], "tasks_ids" : doc['tasks_ids'], "project" : doc['project'], "task_name" : doc['task_name']}
                                     for doc in full_list if doc and 'project' in doc])
             #expected_result.extend([{"name" : doc['name'], "tasks_ids" : doc['tasks_ids']}
             #                        for doc in full_list if doc and not 'project' in doc])
-            expected_result = sorted(expected_result)
             self._verify_results(actual_result, expected_result)
 
 
@@ -77,11 +75,10 @@ class JoinTests(QuerySanityTests, QueryTests):
             "FROM %s as employee %s JOIN default as new_project_full " % (bucket.name, self.type_join) +\
             "ON KEYS employee.tasks_ids WHERE new_project_full.project == 'IT'"
             actual_result = self.run_cbq_query()
-            actual_result = sorted(actual_result['results'])
+            actual_result = actual_result['results']
             expected_result = self._generate_full_joined_docs_list(join_type=self.type_join)
             expected_result = [{"name" : doc['name'], "tasks_ids" : doc['tasks_ids'], "new_project" : doc['project']}
                                for doc in expected_result if doc and 'project' in doc and doc['project'] == 'IT']
-            expected_result = sorted(expected_result)
             self._verify_results(actual_result, expected_result)
 
     def test_bidirectional_join(self):
@@ -246,20 +243,22 @@ class JoinTests(QuerySanityTests, QueryTests):
                          "FROM %s as employee %s JOIN default as new_project_full " % (bucket.name, self.type_join) +\
                          "ON KEYS employee.tasks_ids WHERE employee.name == 'employee-9' limit 10"
             actual_result = self.run_cbq_query()
-            actual_result = sorted(actual_result['results'])
+            actual_result = actual_result['results']
             expected_result = self._generate_full_joined_docs_list(join_type=self.type_join)
             expected_result = [{"name" : doc['name'], "tasks_ids" : doc['tasks_ids']
                                 }
             for doc in expected_result if doc and 'name' in doc and\
                                           doc['name'] == 'employee-9']
-            expected_result = sorted(expected_result)[0:10]
+            expected_result = expected_result[0:10]
             self.query = "create primary index on %s" %bucket.name
             self.run_cbq_query()
             self.query = "SELECT employee.name , employee.tasks_ids " +\
                          "FROM %s as employee %s JOIN default as new_project_full " % (bucket.name, self.type_join) +\
                          "ON KEYS employee.tasks_ids WHERE employee.name == 'employee-9' limit 10"
             result = self.run_cbq_query()
-            self.assertEqual(actual_result, sorted(result['results']))
+            diffs = DeepDiff(actual_result, result['results'], ignore_order=True)
+            if diffs:
+                self.assertTrue(False, diffs)
           finally:
             self.query = "drop primary index on %s" %bucket.name
             self.run_cbq_query()
@@ -588,9 +587,8 @@ class JoinTests(QuerySanityTests, QueryTests):
             all_docs_list = self.generate_full_docs_list(self.gens_load)
             tasks_ids = [doc["task_name"] for doc in self.generate_full_docs_list(self.gens_tasks)]
             actual_result = self.run_cbq_query()
-            actual_result = sorted(actual_result['results'])
+            actual_result = actual_result['results']
             expected_result = [{'name' : doc['name']} for doc in all_docs_list if doc['tasks_ids'][0] in tasks_ids]
-            expected_result = sorted(expected_result)
             self._verify_results(actual_result, expected_result)
 
     def test_subquery_exists_where(self):
