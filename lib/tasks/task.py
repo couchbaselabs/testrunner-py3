@@ -275,7 +275,7 @@ class BucketCreateTask(Task):
             return
         info = rest.get_nodes_self()
 
-        if int(self.size) <= 0:
+        if self.size is None or int(self.size) <= 0:
             self.size = info.memoryQuota * 2 // 3
 
         authType = 'none' if self.password is None else 'sasl'
