@@ -1902,7 +1902,7 @@ class QueryXattrTests(QueryTests):
     """
     def get_values_for_compare(self, field):
         query_response = self.run_cbq_query("SELECT " + field + " FROM default")
-        docs = sorted(query_response['results'], key=(lambda x: x[field]))
+        docs = query_response['results']
         return docs
 
     """
