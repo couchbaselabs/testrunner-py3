@@ -2836,7 +2836,10 @@ class QueryTests(BaseTestCase):
                     actual_indexes = [x.encode('UTF8') for x in actual_indexes]
                     self.log.info('actual indexes "{0}"'.format(actual_indexes))
                     self.log.info('compared against "{0}"'.format(indexes_names))
-                    self.assertTrue(set(actual_indexes) == set(indexes_names), "Indexes should be %s, but are: %s" % (indexes_names, actual_indexes))
+                    #self.assertTrue(set(actual_indexes) == set(indexes_names), "Indexes should be %s, but are: %s" % (indexes_names, actual_indexes))
+                    diffs = DeepDiff(set(actual_indexes), set(indexes_names), ignore_order=True, ignore_string_type_changes=True)
+                    if diffs:
+                        self.assertTrue(False, diffs)
             else:
                 result = ""
             self.log.info('-'*100)
