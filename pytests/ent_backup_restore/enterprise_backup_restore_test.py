@@ -51,10 +51,11 @@ INDEX_DEFINITION = {
     "planParams": {}
 }
 
-
-class EnterpriseBackupRestoreTest(EnterpriseBackupRestoreBase, NewUpgradeBaseTest, EventingBaseTest):
+# TBD: Check with Tony on the below change. Without this, Py3 is failing due to different super class flow.
+#class EnterpriseBackupRestoreTest(EnterpriseBackupRestoreBase, NewUpgradeBaseTest, EventingBaseTest):
+class EnterpriseBackupRestoreTest(EnterpriseBackupRestoreBase):
     def setUp(self):
-        super(EnterpriseBackupRestoreTest, self).setUp()
+        super().setUp()
         self.users_check_restore = \
               self.input.param("users-check-restore", '').replace("ALL", "*").split(";")
         if '' in self.users_check_restore:
