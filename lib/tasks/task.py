@@ -553,6 +553,7 @@ class RebalanceTask(Task):
         # not just 'running' and at 100%) before we declare ourselves done
         if progress != -1 and status != 'none':
             if self.retry_get_progress < retry_get_process_num:
+                self.log.info("-->progress!=-1 and status!=none, scheduling again...retry_get_progress={}<retry_get_process_num={}".format(self.retry_get_progress,retry_get_process_num))
                 task_manager.schedule(self, 10)
             else:
                 self.state = FINISHED

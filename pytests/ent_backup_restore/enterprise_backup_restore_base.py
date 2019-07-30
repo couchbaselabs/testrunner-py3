@@ -55,7 +55,7 @@ INDEX_DEFINITION = {
 
 class EnterpriseBackupRestoreBase(BaseTestCase):
     def setUp(self):
-        super(EnterpriseBackupRestoreBase, self).setUp()
+        super().setUp()
         """ from version 4.6.0 and later, --host flag is deprecated """
         self.cluster_flag = "--host"
         self.backupset = Backupset()
