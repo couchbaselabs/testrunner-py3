@@ -102,6 +102,10 @@ class RbacFTS(FTSBaseTest):
         response, content = httplib2.Http(timeout=120).request(api,
                                                                "PUT",
                                                                headers=None)
+        try:
+            content = content.decode()
+        except AttributeError:
+            pass
         self.log.info("Creating index returned : {0}".format(str(response)+ content))
         if response['status'] in ['200', '201', '202']:
             self.log.error(content)
@@ -122,6 +126,10 @@ class RbacFTS(FTSBaseTest):
         response, content = httplib2.Http(timeout=120).request(api,
                                                               "DELETE",
                                                               headers=None)
+        try:
+            content = content.decode()
+        except AttributeError:
+            pass
         self.log.info("Deleting index definition returned : {0}".format(str(response)+content))
         if response['status'] in ['200', '201', '202']:
             self.log.error(content)
@@ -142,6 +150,10 @@ class RbacFTS(FTSBaseTest):
         response, content = httplib2.Http(timeout=120).request(api,
                                                                "GET",
                                                                headers=None)
+        try:
+            content = content.decode()
+        except AttributeError:
+            pass
         self.log.info("Getting index definition returned : {0}".format(str(response)+content))
         if response['status'] in ['200', '201', '202']:
             self.log.error(content)
@@ -166,6 +178,10 @@ class RbacFTS(FTSBaseTest):
         response, content = httplib2.Http(timeout=120).request(api,
                                                                "POST",
                                                                headers=None)
+        try:
+            content = content.decode()
+        except AttributeError:
+            pass
         self.log.info("Querying returned : {0}".format(str(response) + content))
         if response['status'] in ['200', '201', '202']:
             self.log.error(content)
