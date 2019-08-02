@@ -213,7 +213,7 @@ class ElasticSearchBase(object):
                     api,
                     response['status'],
                     reason,
-                    content.rstrip('\n')))
+                    content.rstrip(b'\n')))
                 return False, content, response
         except socket.error as e:
             self.__log.error("socket error while connecting to {0} error {1} ".
