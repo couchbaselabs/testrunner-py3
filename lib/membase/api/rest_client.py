@@ -4110,7 +4110,8 @@ class RestConnection(object):
         if not status:
             raise Exception(content)
         # Following line is added since the content uses chunked encoding
-        chunkless_content = content.replace("][", ", \n")
+        chunkless_content = content.decode().replace("][", ", \n")
+
         return json.loads(chunkless_content)
 
     def range_scan_gsi_index_with_rest(self, id, body, username="Administrator", password="password"):
@@ -4130,9 +4131,9 @@ class RestConnection(object):
         if not status:
             raise Exception(content)
         #Below line is there because of MB-20758
-        content = content.split("[]")[0]
+        content = content.split(b'[]')[0].decode()
         # Following line is added since the content uses chunked encoding
-        chunkless_content = content.replace("][", ", \n")
+        chunkless_content = content.decode().replace("][", ", \n")
         return json.loads(chunkless_content)
 
     def multiscan_for_gsi_index_with_rest(self, id, body, username="Administrator", password="password"):
@@ -4144,14 +4145,14 @@ class RestConnection(object):
         params = json.loads("{0}".format(body).replace('\'', '"').replace(
             'True', 'true').replace('False', 'false').replace(
             "~[]{}UnboundedtruenilNA~", "~[]{}UnboundedTruenilNA~"))
-        params = json.dumps(params).encode("ascii", "ignore").replace("\\\\", "\\")
+        params = json.dumps(params).encode("ascii", "ignore").decode().replace("\\\\", "\\")
         log.info(json.dumps(params).encode("ascii", "ignore"))
         status, content, header = self._http_request(api, 'GET', headers=headers,
                                                      params=params)
         if not status:
             raise Exception(content)
         #Below line is there because of MB-20758
-        content = content.split("[]")[0]
+        content = content.split(b'[]')[0].decode()
         # Following line is added since the content uses chunked encoding
         chunkless_content = content.replace("][", ", \n")
         if chunkless_content:
@@ -4168,14 +4169,14 @@ class RestConnection(object):
         count_cmd_body = body.replace('\'', '"').replace('True', 'true').replace('False', 'false')
         count_cmd_body = count_cmd_body.replace("~[]{}UnboundedtruenilNA~", "~[]{}UnboundedTruenilNA~")
         params = json.loads(count_cmd_body)
-        params = json.dumps(params).encode("ascii", "ignore").replace("\\\\", "\\")
+        params = json.dumps(params).encode("ascii", "ignore").decode().replace("\\\\", "\\")
         log.info(json.dumps(params).encode("ascii", "ignore"))
         status, content, header = self._http_request(api, 'GET', headers=headers,
                                                      params=params)
         if not status:
             raise Exception(content)
         #Below line is there because of MB-20758
-        content = content.split("[]")[0]
+        content = content.split(b'[]')[0].decode()
         # Following line is added since the content uses chunked encoding
         chunkless_content = content.replace("][", ", \n")
         if chunkless_content:

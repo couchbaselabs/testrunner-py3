@@ -5,6 +5,7 @@ import logging
 from couchbase_helper.query_definitions import QueryDefinition
 from membase.api.rest_client import RestConnection
 from .base_2i import BaseSecondaryIndexingTests
+from deepdiff import DeepDiff
 
 DATATYPES = [str, "scalar", int, dict, "missing", "empty", "null"]
 RANGE_SCAN_TEMPLATE = "SELECT {0} FROM %s WHERE {1}"
@@ -968,7 +969,7 @@ class SecondaryIndexingMultiscanTests(BaseSecondaryIndexingTests):
         err_message = "There are more ranges than number"
         if isinstance(multiscan_result, dict):
             if err_message in list(multiscan_result.values()):
-                multiscan_result = ''
+                multiscan_result = []
         expected_results = []
         body = {"stale": "False"}
         for content in scan_content:
@@ -1026,7 +1027,12 @@ class SecondaryIndexingMultiscanTests(BaseSecondaryIndexingTests):
                 log.info("No. of items mismatch :- expected = {0} and actual = {1}".format(
                     len(expected_results), multiscan_count_result))
                 return False
-        if sorted(expected_results) != sorted(multiscan_result):
-            log.info("The number of rows match but the results mismatch, please check")
+
+        if multiscan_result == '':
+            multiscan_result = []
+        diffs = DeepDiff(expected_results, multiscan_result,  ignore_order = True, ignore_string_type_changes=True)
+        if diffs:
+            log.info("The number of rows match but the results mismatch, please check. Diffs: {}".format(diffs))
             return False
+
         return True
