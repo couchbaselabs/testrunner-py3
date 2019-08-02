@@ -3,7 +3,7 @@ import logging
 import random
 import pdb
 
-from string import lowercase
+from string import ascii_lowercase
 from .base_2i import BaseSecondaryIndexingTests
 from couchbase.bucket import Bucket
 from couchbase_helper.documentgenerator import  DocumentGenerator
@@ -543,24 +543,24 @@ class GSIUnhandledIndexItems(BaseSecondaryIndexingTests):
         max_item_length = self.max_item_size * 4
         max_array_element_size = (self.max_array_size * 4)// 10
         for i in range(self.num_docs):
-            index_id = "".join(random.choice(lowercase) for k in range(random.randint(1, 255)))
+            index_id = "".join(random.choice(ascii_lowercase) for k in range(random.randint(1, 255)))
             encoded_array = []
-            name = "".join(random.choice(lowercase) for k in range(random.randint(max_item_length)))
+            name = "".join(random.choice(ascii_lowercase) for k in range(random.randint(max_item_length)))
             age = random.choice(list(range(4, 59)))
             big_value_array = [name]
             for j in range(30):
-                element = "".join(random.choice(lowercase) for k in range(random.randint(max_array_element_size)))
+                element = "".join(random.choice(ascii_lowercase) for k in range(random.randint(max_array_element_size)))
                 encoded_array.append(element)
             generators.append(DocumentGenerator(
                 index_id, template, [name], [age], [encoded_array],
                 [big_value_array], start=0, end=1))
-        index_id = "".join(random.choice(lowercase) for k in range(250))
-        name = "".join(random.choice(lowercase) for k in range(random.randint(max_item_length)))
+        index_id = "".join(random.choice(ascii_lowercase) for k in range(250))
+        name = "".join(random.choice(ascii_lowercase) for k in range(random.randint(max_item_length)))
         age = random.choice(list(range(4, 59)))
         big_value_array = [name]
         encoded_array = []
         for j in range(30):
-            element = "".join(random.choice(lowercase) for k in range(random.randint(max_array_element_size)))
+            element = "".join(random.choice(ascii_lowercase) for k in range(random.randint(max_array_element_size)))
             encoded_array.append(element)
         generators.append(DocumentGenerator(
             index_id, template, [name], [age], [encoded_array],
@@ -622,11 +622,11 @@ class GSIUnhandledIndexItems(BaseSecondaryIndexingTests):
             else:
                 index_id = "unhandled_items_" + str(random.random()*100000)
             encoded_array = []
-            name = "".join(random.choice(lowercase) for k in range(item_length))
+            name = "".join(random.choice(ascii_lowercase) for k in range(item_length))
             age = random.choice(list(range(4, 59)))
             big_value_array = [name]
             for j in range(array_elements):
-                element = "".join(random.choice(lowercase) for k in range(array_element_size))
+                element = "".join(random.choice(ascii_lowercase) for k in range(array_element_size))
                 encoded_array.append(element)
             generators.append(DocumentGenerator(
                 index_id, template, [name], [age], [encoded_array],

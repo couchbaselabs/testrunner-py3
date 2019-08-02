@@ -2,7 +2,7 @@ import copy
 import logging
 import random
 
-from string import lowercase
+from string import ascii_lowercase
 from couchbase.bucket import Bucket
 from couchbase_helper.documentgenerator import  DocumentGenerator
 from couchbase_helper.data import FIRST_NAMES, COUNTRIES
@@ -239,7 +239,7 @@ class SecondaryIndexArrayIndexTests(BaseSecondaryIndexingTests):
             arrLen = random.choice(list(range(10, 15)))
             indiSize = (4096 * 4)
             for j in range(arrLen):
-                longStr = "".join(random.choice(lowercase) for k in range(indiSize))
+                longStr = "".join(random.choice(ascii_lowercase) for k in range(indiSize))
                 bigValues.append(longStr)
             generators.append(DocumentGenerator(id, template, [name], [age], [bigValues],
                                                 start=0, end=1))

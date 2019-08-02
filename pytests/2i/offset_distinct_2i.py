@@ -3,7 +3,6 @@ import logging
 import random
 from threading import Thread
 
-from string import lowercase
 from couchbase.bucket import Bucket
 from couchbase_helper.data import FIRST_NAMES, COUNTRIES
 from couchbase_helper.query_definitions import QueryDefinition

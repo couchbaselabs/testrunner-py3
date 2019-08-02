@@ -2,7 +2,7 @@ import copy
 import logging
 import random
 
-from string import lowercase
+from string import ascii_lowercase
 from couchbase.bucket import Bucket
 from couchbase_helper.documentgenerator import  DocumentGenerator
 from couchbase_helper.data import FIRST_NAMES, COUNTRIES
@@ -214,10 +214,10 @@ class SecondaryIndexDatasizeTests(BaseSecondaryIndexingTests):
             for i in range(10):
                 name = FIRST_NAMES[random.choice(list(range(len(FIRST_NAMES))))]
                 id_size = random.choice(list(range(5, 10)))
-                short_str = "".join(random.choice(lowercase) for k in range(id_size))
+                short_str = "".join(random.choice(ascii_lowercase) for k in range(id_size))
                 id = "{0}-{1}".format(name, short_str)
                 age = random.choice(list(range(4, 19)))
-                bigValues = "".join(random.choice(lowercase) for k in range(5))
+                bigValues = "".join(random.choice(ascii_lowercase) for k in range(5))
                 generators.append(DocumentGenerator(
                     id, template, [name], [age], [bigValues], start=0, end=10))
             self.load(generators, flag=self.item_flag, verify_data=False,
@@ -229,10 +229,10 @@ class SecondaryIndexDatasizeTests(BaseSecondaryIndexingTests):
             for i in range(10):
                 name = FIRST_NAMES[random.choice(list(range(len(FIRST_NAMES))))]
                 id_size = random.choice(list(range(100, 200)))
-                long_str = "".join(random.choice(lowercase) for k in range(id_size))
+                long_str = "".join(random.choice(ascii_lowercase) for k in range(id_size))
                 id = "{0}-{1}".format(name, long_str)
                 age = random.choice(list(range(4, 19)))
-                bigValues = "".join(random.choice(lowercase) for k in range(5))
+                bigValues = "".join(random.choice(ascii_lowercase) for k in range(5))
                 generators.append(DocumentGenerator(
                     id, template, [name], [age], [bigValues], start=0, end=10))
             self.load(generators, flag=self.item_flag, verify_data=False,
@@ -263,11 +263,11 @@ class SecondaryIndexDatasizeTests(BaseSecondaryIndexingTests):
             for i in range(10):
                 name = FIRST_NAMES[random.choice(list(range(len(FIRST_NAMES))))]
                 id_size = random.choice(list(range(5, 200)))
-                short_str = "".join(random.choice(lowercase) for k in range(id_size))
+                short_str = "".join(random.choice(ascii_lowercase) for k in range(id_size))
                 id = "{0}-{1}".format(name, short_str)
                 age = random.choice(list(range(4, 19)))
                 bigValue_size = random.choice(list(range(10, 5000)))
-                bigValues = "".join(random.choice(lowercase) for k in range(bigValue_size))
+                bigValues = "".join(random.choice(ascii_lowercase) for k in range(bigValue_size))
                 generators.append(DocumentGenerator(
                     id, template, [name], [age], [bigValues], start=0, end=10))
             self.load(generators, flag=self.item_flag, verify_data=False,
@@ -415,11 +415,11 @@ class SecondaryIndexDatasizeTests(BaseSecondaryIndexingTests):
             else:
                 index_id = "unhandled_items_" + str(random.random()*100000)
             encoded_array = []
-            name = "".join(random.choice(lowercase) for k in range(item_length))
+            name = "".join(random.choice(ascii_lowercase) for k in range(item_length))
             age = random.choice(list(range(4, 59)))
             big_value_array = [name]
             for j in range(array_elements):
-                element = "".join(random.choice(lowercase) for k in range(array_element_size))
+                element = "".join(random.choice(ascii_lowercase) for k in range(array_element_size))
                 encoded_array.append(element)
             generators.append(DocumentGenerator(
                 index_id, template, [name], [age], [encoded_array],
