@@ -1326,7 +1326,7 @@ class ESBulkLoadGeneratorTask(Task):
             if batched == self.batch_size or not self.generator.has_next():
                 es_file = open(es_filename, "wb")
                 for line in es_bulk_docs:
-                    es_file.write("%s\n" %line)
+                    es_file.write("{}\n".format(line).encode())
                 es_file.close()
                 self.es_instance.load_bulk_data(es_filename)
                 loaded += batched
