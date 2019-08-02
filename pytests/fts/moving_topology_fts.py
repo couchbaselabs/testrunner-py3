@@ -16,6 +16,12 @@ class MovingTopFTS(FTSBaseTest):
     def tearDown(self):
         super(MovingTopFTS, self).tearDown()
 
+    def suite_setUp(self):
+        self.log.info("*** MovingTopFTS: suite_setUp() ***")
+
+    def suite_tearDown(self):
+        self.log.info("*** MovingTopFTS: suite_tearDown() ***")
+
     """ Topology change during indexing"""
 
     def rebalance_in_during_index_building(self):
