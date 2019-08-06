@@ -342,6 +342,13 @@ def main():
         sd = SchedDelays(TestInputSingleton.input.servers)
         sd.start_measure_sched_delays()
 
+    if TestInputSingleton.input.param("hanging_threads", False):
+       print("--> hanging_threads: start monitoring...")
+       from hanging_threads import start_monitoring
+       hanging_threads_frozen_time = int(TestInputSingleton.input.param("hanging_threads", 120))
+       hanging_threads_test_interval = int(TestInputSingleton.input.param("test_interval", 1000))
+       monitoring_thread = start_monitoring(seconds_frozen=hanging_threads_frozen_time, test_interval=hanging_threads_test_interval) 
+
     for name in names:
         start_time = time.time()
         argument_split = [a.strip() for a in re.split("[,]?([^,=]+)=", name)[1:]]
