@@ -885,6 +885,7 @@ class QueryTests(BaseTestCase):
 
     def with_retry(self, func, eval=None, delay=5, tries=10, func_params=None):
         attempts = 0
+        res = None
         while attempts < tries:
             attempts = attempts + 1
             try:
