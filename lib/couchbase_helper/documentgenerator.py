@@ -12,11 +12,37 @@ from .data import FIRST_NAMES, LAST_NAMES, DEPT, LANGUAGES
 class KVGenerator(object):
     def __init__(self, name, start, end):
         self.name = name
-        self.start = int(start)
-        self.end = int(end)
-        self.itr = int(start)
+        try:
+            self.start = int(start)
+        except ValueError:
+            self.start = 0
+            pass
+
+        try:
+            self.end = int(end)
+        except ValueError:
+            self.end = 0
+            pass
+
+        try:
+            self.itr = int(start)
+        except ValueError:
+            self.itr = 0
+            pass
+
     def has_next(self):
-        return int(self.itr) < int(self.end)
+        try:
+            self.itr = int(self.itr)
+        except ValueError:
+            self.itr = 0
+            pass
+        try:
+            self.end = int(self.end)
+        except ValueError:
+            self.end = 0
+            pass
+
+        return self.itr < self.end
 
     def __next__(self):
         raise NotImplementedError

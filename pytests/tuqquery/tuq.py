@@ -124,6 +124,11 @@ class QueryTests(BaseTestCase):
             self.full_list = self.generate_full_docs_list(self.gens_load)
         if self.input.param("gomaxprocs", None):
             self.configure_gomaxprocs()
+        try:
+            self.docs_per_day = int(self.docs_per_day)
+        except ValueError:
+            self.docs_per_day = 0
+            pass
         if self.docs_per_day > 0:
             self.log.info("--> docs_per_day>0..generating TuqGenerators...")
             self.gen_results = TuqGenerators(self.log, self.generate_full_docs_list(self.gens_load))

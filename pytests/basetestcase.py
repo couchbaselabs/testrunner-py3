@@ -2519,6 +2519,17 @@ class BaseTestCase(unittest.TestCase):
         items = 0
         for bucket in buckets:
             for gen_load in gens_load[bucket]:
+                try:
+                    gen_load.end = int(gen_load.end)
+                except ValueError:
+                    gen_load.end = 0
+                    pass
+                try:
+                    gen_load.start = int(gen_load.start)
+                except ValueError:
+                    gen_load.start = 0
+                    pass
+
                 items += (gen_load.end - gen_load.start)
         for bucket in buckets:
             self.log.info("%s %s to %s documents..." % (op_type, items, bucket.name))
