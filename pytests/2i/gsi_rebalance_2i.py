@@ -14,12 +14,15 @@ from pytests.ent_backup_restore.enterprise_backup_restore_base import Enterprise
 from pytests.fts.fts_base import NodeHelper
 from pytests.query_tests_helper import QueryHelperTests
 from pytests.tuqquery.tuq import QueryTests
+from basetestcase import BaseTestCase
 
-
-class SecondaryIndexingRebalanceTests(BaseSecondaryIndexingTests, QueryHelperTests, NodeHelper,
-                                      EnterpriseBackupRestoreBase):
+#class SecondaryIndexingRebalanceTests(BaseSecondaryIndexingTests, QueryHelperTests,  NodeHelper,
+#                                      EnterpriseBackupRestoreBase):
+class SecondaryIndexingRebalanceTests(BaseSecondaryIndexingTests, QueryHelperTests,  NodeHelper):
+#class SecondaryIndexingRebalanceTests(BaseSecondaryIndexingTests):
     def setUp(self):
-        super(SecondaryIndexingRebalanceTests, self).setUp()
+        #super(SecondaryIndexingRebalanceTests, self).setUp()
+        super().setUp()
         self.rest = RestConnection(self.servers[0])
         self.n1ql_server = self.get_nodes_from_services_map(service_type="n1ql", get_all_nodes=False)
         self.create_primary_index = False
