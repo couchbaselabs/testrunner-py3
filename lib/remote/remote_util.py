@@ -3275,7 +3275,7 @@ class RemoteMachineShellConnection:
             channel.exec_command(command)
             data = channel.recv(1024)
             while data:
-                temp += str(data)
+                temp += data.decode()
                 data = channel.recv(1024)
             channel.close()
             stdin.close()
@@ -3302,10 +3302,6 @@ class RemoteMachineShellConnection:
                 error.append(line)
             if temp:
                 line = temp.splitlines()
-                try:
-                   line = line.decode()
-                except AttributeError:
-                   pass
                 output.extend(line)
             stdout.close()
             stderro.close()
