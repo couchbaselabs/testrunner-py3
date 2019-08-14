@@ -565,7 +565,9 @@ class RebalanceTask(Task):
             success_cleaned = []
             for removed in self.to_remove:
                 try:
+                    self.log.info("-->Start: Calling RestConnection({})".format(removed))
                     rest = RestConnection(removed)
+                    self.log.info("-->End: Calling RestConnection({})".format(removed))
                 except ServerUnavailableException as e:
                     self.log.error(e)
                     continue
