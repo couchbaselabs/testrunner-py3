@@ -57,10 +57,10 @@ class SaslTest(BaseTestCase):
         client = MemcachedClient(self.master.ip, node.memcached)
         mechs = list(client.sasl_mechanisms())
         self.log.info("Start check mech types")
-        assert "SCRAM-SHA1" in mechs
-        assert "SCRAM-SHA256" in mechs
-        assert "SCRAM-SHA512" in mechs
-        assert "PLAIN" in mechs
+        assert b"SCRAM-SHA1" in mechs
+        assert b"SCRAM-SHA256" in mechs
+        assert b"SCRAM-SHA512" in mechs
+        assert b"PLAIN" in mechs
         assert len(list(mechs)) == 4
 
     """Tests basic sasl authentication on buckets that exist"""
