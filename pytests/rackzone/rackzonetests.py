@@ -180,10 +180,10 @@ class RackzoneTests(RackzoneBaseTest):
             k = 1
             for i in range(0, self.zone):
                 if "Group 1" in zones[i]:
-                    total_node_per_zone = int(len(self.servers))/int(self.zone) - 1
+                    total_node_per_zone = int(len(self.servers))//int(self.zone) - 1
                 else:
                     nodes_in_zone[zones[i]] = []
-                    total_node_per_zone = int(len(self.servers))/int(self.zone)
+                    total_node_per_zone = int(len(self.servers))//int(self.zone)
                 for n in range(0, total_node_per_zone):
                     nodes_in_zone[zones[i]].append(self.servers[k].ip)
                     rest.add_node(user=self.user, password=self.password, \
