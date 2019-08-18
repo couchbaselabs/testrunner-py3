@@ -1126,7 +1126,7 @@ class XDCRReplicationBaseTest(XDCRBaseTest):
         elif self._cluster_topology_str == XDCRConstants.CLUSTER_TOPOLOGY_TYPE_RING:
             self._set_topology_ring()
         else:
-            raise "Not supported cluster topology : %s", self._cluster_topology_str
+            raise Exception("Not supported cluster topology : %s", self._cluster_topology_str)
 
     def _load_data(self):
         if not self._seed_data:
@@ -1136,7 +1136,7 @@ class XDCRReplicationBaseTest(XDCRBaseTest):
         elif self._cluster_topology_str == XDCRConstants.CLUSTER_TOPOLOGY_TYPE_STAR:
             self._load_data_star()
         else:
-            raise "Seed data not supported cluster topology : %s", self._cluster_topology_str
+            raise Exception("Seed data not supported cluster topology : %s", self._cluster_topology_str)
 
     def _setup_topology_chain(self):
         ord_keys = self._clusters_keys_olst
