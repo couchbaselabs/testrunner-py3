@@ -856,11 +856,12 @@ class RestConnection(object):
         count = 1
         while True:
             try:
-                log.info("--->Start calling httplib2.Http({}).request({},{},{},{})".format(timeout,api,headers,method,params))
+                if TestInputSingleton.input.param("debug.api.calls", False):
+                    log.info("--->Start calling httplib2.Http({}).request({},{},{},{})".format(timeout,api,headers,method,params))
                 response, content = httplib2.Http(timeout=timeout).request(api, method,
                                                                            params, headers)
-                log.info("--->End calling httplib2.Http({}).request({},{},{},{})".format(timeout, api, headers, method,
-                                                                                      params))
+                if TestInputSingleton.input.param("debug.api.calls", False):
+                    log.info("--->End calling httplib2.Http({}).request({},{},{},{})".format(timeout, api, headers, method, params))
                 if response['status'] in ['200', '201', '202']:
                     return True, content, response
                 else:
