@@ -215,6 +215,12 @@ class cbrecovery(CBRbaseclass, XDCRReplicationBaseTest):
             self.sleep(20)
         super(cbrecovery, self).tearDown()
 
+    def suite_setUp(self):
+        self.log.info("*** cbrecovery: suite_setUp() ***")
+
+    def suite_tearDown(self):
+        self.log.info("*** cbrecovery: suite_tearDown() ***")
+
     def common_preSetup(self):
         self._load_all_buckets(self.src_master, self.gen_create, "create", 0, flag=self.flag_val)
         tasks = []
