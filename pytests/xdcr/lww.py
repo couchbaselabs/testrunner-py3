@@ -41,6 +41,12 @@ class Lww(XDCRNewBaseTest):
         if not self.skip_ntp:
             self._disable_ntp()
 
+    def suite_setUp(self):
+        self.log.info("*** Lww: suite_setUp() ***")
+
+    def suite_tearDown(self):
+        self.log.info("*** Lww: suite_tearDown() ***")
+
     def _enable_ntp_and_sync(self, nodes=[], ntp_server="0.north-america.pool.ntp.org"):
         if not nodes:
             nodes = self._input.servers
@@ -137,7 +143,7 @@ class Lww(XDCRNewBaseTest):
             RbacBase().remove_user_role(role_del, RestConnection(cluster.get_master_node()))
         except Exception as ex:
             self.log.info(str(ex))
-            self.assertTrue(str(ex) == '"User was not found."', str(ex))
+            self.assertTrue(str(ex) == str(b'"User was not found."'), str(ex))
 
         testuser = [{'id': bucket, 'name': bucket, 'password': 'password'}]
         RbacBase().create_user_source(testuser, 'builtin', cluster.get_master_node())
