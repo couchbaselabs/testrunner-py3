@@ -856,12 +856,21 @@ class RestConnection(object):
         count = 1
         while True:
             try:
-                if TestInputSingleton.input.param("debug.api.calls", False):
-                    log.info("--->Start calling httplib2.Http({}).request({},{},{},{})".format(timeout,api,headers,method,params))
+                try:
+                    if TestInputSingleton.input.param("debug.api.calls", False):
+                        log.info("--->Start calling httplib2.Http({}).request({},{},{},{})".format(timeout,api,headers,method,params))
+                except AttributeError:
+                    pass
                 response, content = httplib2.Http(timeout=timeout).request(api, method,
                                                                            params, headers)
-                if TestInputSingleton.input.param("debug.api.calls", False):
-                    log.info("--->End calling httplib2.Http({}).request({},{},{},{})".format(timeout, api, headers, method, params))
+                try:
+                    if TestInputSingleton.input.param("debug.api.calls", False):
+                        log.info(
+                            "--->End calling httplib2.Http({}).request({},{},{},{})".format(timeout, api, headers,
+                                                                                              method, params))
+                except AttributeError:
+                    pass
+
                 if response['status'] in ['200', '201', '202']:
                     return True, content, response
                 else:
