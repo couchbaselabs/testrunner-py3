@@ -966,6 +966,10 @@ the same interface as FileCache."""
                             old_response['content-location'] = absolute_uri
                         redirect_method = ((response.status == 303) and (
                         method not in ["GET", "HEAD"])) and "GET" or method
+                        #TBD: Location is getting relative and having issue and for now location is having the absolute uri
+                        if 'location' in response:
+                            location = response['location']
+                        print("-->redirection location: {} and response:{} ".format(location,response))
                         (response, content) = self.request(location, redirect_method, body=body, headers=headers,
                                                            redirections=redirections - 1)
                         response.previous = old_response
@@ -1017,7 +1021,12 @@ a string that contains the response entity body.
                 headers['user-agent'] = "Python-httplib2/%s" % __version__
             
             #print("-->uri:{}".format(uri))
+            if (not uri.startswith("http")):
+                print("-->before iri2uri uri doesn't start with http! {}".format(uri))
             uri = iri2uri(uri)
+
+            if (not uri.startswith("http")):
+                print("-->after iri2uri uri doesn't start with http! {}".format(uri))
 
             (scheme, authority, request_uri, defrag_uri) = urlnorm(uri)
 
