@@ -1194,6 +1194,7 @@ class FTSIndex:
         doc_ids = []
         time_taken = 0
         status = {}
+        facets = []
         try:
             hits, matches, time_taken, status, facets = \
                 self.__cluster.run_fts_query_with_facets(self.name, query_dict)
