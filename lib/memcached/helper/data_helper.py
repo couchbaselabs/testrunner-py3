@@ -1433,7 +1433,7 @@ class KVStoreAwareSmartClient(VBucketAwareMemcached):
                 self.memcached(key).set(key, 0, 0, value, collection=collection)
 
             if self.store_enabled:
-                self.kv_store.write(key, hashlib.md5(value).digest(), ttl)
+                self.kv_store.write(key, hashlib.md5(value.encode()).digest(), ttl)
 
         except MemcachedError as e:
             self._rlock.release()
