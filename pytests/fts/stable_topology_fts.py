@@ -628,6 +628,7 @@ class StableTopFTS(FTSBaseTest):
         Index and query index, update map, query again, uses RQG
         """
         fail = False
+        error = None
         index = self.create_index(
             bucket=self._cb_cluster.get_bucket_by_name('default'),
             index_name="custom_index")
@@ -640,6 +641,7 @@ class StableTopFTS(FTSBaseTest):
         except AssertionError as err:
             self.log.error(err)
             fail = True
+            error = err
         self.log.info("Editing custom index with new map...")
         index.generate_new_custom_map(seed=index.cm_id+10)
         index.index_definition['uuid'] = index.get_uuid()
@@ -651,7 +653,7 @@ class StableTopFTS(FTSBaseTest):
         self.wait_for_indexing_complete()
         self.run_query_and_compare(index)
         if fail:
-            raise err
+            raise error
 
     def index_query_in_parallel(self):
         """
