@@ -311,7 +311,7 @@ class JsonDocGenerator(KVGenerator):
                 size *= len(arg)
 
         KVGenerator.__init__(self, name, 0, size)
-        random.seed(0)
+        random.seed(0,1)
 
         if 'start' in kwargs:
             self.start = int(kwargs['start'])
@@ -353,7 +353,7 @@ class JsonDocGenerator(KVGenerator):
                    regenerate in a doc during update. If this is 'None', by
                    default for this dataset, 'salary' field is regenerated.
         """
-        random.seed(1)
+        random.seed(1,1)
         for count in range(self.start, self.end):
             doc_dict = self.gen_docs[count]
             if fields_to_update is None:
@@ -482,7 +482,7 @@ class WikiJSONGenerator(KVGenerator):
                 size *= len(arg)
 
         KVGenerator.__init__(self, name, 0, size)
-        random.seed(0)
+        random.seed(0,1)
 
         if 'start' in kwargs:
             self.start = int(kwargs['start'])
@@ -589,7 +589,7 @@ class GeoSpatialDataLoader(KVGenerator):
                 size *= len(arg)
 
         KVGenerator.__init__(self, name, 0, size)
-        random.seed(0)
+        random.seed(0,1)
 
         if 'start' in kwargs:
             self.start = int(kwargs['start'])
