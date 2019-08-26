@@ -379,7 +379,7 @@ class NewUpgradeBaseTest(BaseTestCase):
                 self.rest.init_cluster(self.rest_settings.rest_username, self.rest_settings.rest_password)
             self.sleep(self.sleep_time)
             remote.disconnect()
-            self.sleep(10)
+            self.sleep(30)
             return o, e
         except Exception as e:
             print(traceback.extract_stack())

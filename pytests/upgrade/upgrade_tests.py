@@ -14,7 +14,8 @@ from couchbase_helper.documentgenerator import BlobGenerator
 from membase.helper.bucket_helper import BucketOperationHelper
 
 
-class UpgradeTests(NewUpgradeBaseTest, EventingBaseTest):
+
+class UpgradeTests(NewUpgradeBaseTest):
 
     def setUp(self):
         super(UpgradeTests, self).setUp()
@@ -1223,3 +1224,7 @@ class UpgradeTests(NewUpgradeBaseTest, EventingBaseTest):
                 if server.ip == node.ip:
                     server_set.append(server)
         return server_set
+
+
+class UpgradeEventTests(UpgradeTests, EventingBaseTest):
+    pass
