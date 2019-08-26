@@ -370,6 +370,8 @@ class NewUpgradeBaseTest(BaseTestCase):
             if 5.0 > float(self.initial_version[:3]) and self.is_centos7:
                 remote.execute_command("systemctl daemon-reload")
                 remote.start_server()
+            # TBD: For now adding sleep as the server is not fully up and tests failing during py3
+            self.sleep(30)
             self.rest = RestConnection(server)
             if self.is_linux:
                 self.wait_node_restarted(server, wait_time=testconstants.NS_SERVER_TIMEOUT * 4, wait_if_warmup=True)
