@@ -1367,10 +1367,10 @@ class RestConnection(object):
                 wanted_node.print_UI_logs()
             except Exception as ex:
                 self.log(ex)
-            if content.find('Prepare join failed. Node is already part of cluster') >= 0:
+            if content.find(b'Prepare join failed. Node is already part of cluster') >= 0:
                 raise ServerAlreadyJoinedException(nodeIp=self.ip,
                                                    remoteIp=remoteIp)
-            elif content.find('Prepare join failed. Joining node to itself is not allowed') >= 0:
+            elif content.find(b'Prepare join failed. Joining node to itself is not allowed') >= 0:
                 raise ServerSelfJoinException(nodeIp=self.ip,
                                           remoteIp=remoteIp)
             else:
