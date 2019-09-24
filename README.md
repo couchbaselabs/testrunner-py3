@@ -12,22 +12,34 @@ See the setup steps in the Py2 to Py3 porting guide: https://docs.google.com/doc
 Dependencies
 ------------
 
-General:
 Use pip3 or pip3.6 or pip3.7 based on the platform.
+General:
 
-pip3 install couchbase
-pip3 install sgmllib3k
-pip3 install paramiko
-pip3 install httplib2
-pip3 install pyyaml
-pip3 install Geohash
-pip3 install python-geohash
-pip3 install deepdiff
-pip3 install pyes
+	pip3 install couchbase
 
-Other
+	pip3 install sgmllib3k
+
+	pip3 install paramiko
+
+	pip3 install httplib2
+
+	pip3 install pyyaml
+
+	pip3 install Geohash
+
+	pip3 install python-geohash
+
+	pip3 install deepdiff
+
+	pip3 install pyes
+
+Other:
+
     pip3 install boto
+    
     pip3 install boto3
+	
+	pip3 install botocore
 
 Performance tests:
 
