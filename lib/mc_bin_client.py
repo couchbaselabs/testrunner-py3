@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 Binary memcached test client.
 
@@ -19,40 +19,88 @@ import time
 import zlib
 
 from memcacheConstants import REQ_MAGIC_BYTE, RES_MAGIC_BYTE, ALT_REQ_MAGIC_BYTE, ALT_RES_MAGIC_BYTE, ALT_RES_PKT_FMT
-from memcacheConstants import REQ_PKT_FMT, RES_PKT_FMT, MIN_RECV_PACKET, REQ_PKT_SD_EXTRAS, SUBDOC_FLAGS_MKDIR_P
+from memcacheConstants import REQ_PKT_FMT, RES_PKT_FMT, MIN_RECV_PACKET, REQ_PKT_SD_EXTRAS, SUBDOC_FLAGS_MKDIR_P, MIN_RECV_PACKET
 from memcacheConstants import SET_PKT_FMT, DEL_PKT_FMT, INCRDECR_RES_FMT, INCRDECR_RES_WITH_UUID_AND_SEQNO_FMT, META_CMD_FMT
 from memcacheConstants import TOUCH_PKT_FMT, GAT_PKT_FMT, GETL_PKT_FMT, REQ_PKT_SD_EXTRAS_EXPIRY
 from memcacheConstants import COMPACT_DB_PKT_FMT
 import memcacheConstants
 import logger
 def decodeCollectionID(key):
-    # A leb128 varint encodes the CID
-    data = array.array('B', key)
-    cid = data[0] & 0x7f
-    end = 1
-    if (data[0] & 0x80) == 0x80:
-        shift =7
-        for end in range(1, len(data)):
-            cid |= ((data[end] & 0x7f) << shift)
-            if (data[end] & 0x80) == 0:
-                break
-            shift = shift + 7
+    # Sane defaults
+    family = socket.AF_UNSPEC
+    port = 11210
+    # Is this IPv6?
+    if addr.startswith('['):
+        matches = re.match(r'^\[([^\]]+)\](:(\d+))?$', addr)
+        family = socket.AF_INET6
+    else:
+        matches = re.match(r'^([^:]+)(:(\d+))?$', addr)
+    if matches:
+        # The host is the first group
+        host = matches.group(1)
+        # Optional port is the 3rd group
+        if matches.group(3):
+            port = int(matches.group(3))
+    else:
+        raise Exception("Invalid format for host string: '{}'".format(addr))
 
-        end = end + 1
-        if end == len(data):
-            #  We should of stopped for a stop byte, not the end of the buffer
-            raise exceptions.ValueError("encoded key did not contain a stop byte")
-    return cid, key[end:]
+    return host, port, family
 
-class MemcachedError(exceptions.Exception):
+
+def to_bytes(bytes_or_str):
+    if isinstance(bytes_or_str, str):
+        value = bytes_or_str.encode()  # uses 'utf-8' for encoding
+    else:
+        value = bytes_or_str
+    return value  # Instance of bytes
+
+
+class TimeoutError(Exception):
+    def __init__(self, time):
+        Exception.__init__(self, "Operation timed out")
+        self.time = time
+
+    def __str__(self):
+        return self.__repr__()
+
+    def __repr__(self):
+        str = 'Error: Operation timed out (%d seconds)\n' % self.time
+        str += 'Please check list of arguments (e.g., IP address, port number) '
+        str += 'passed or the connectivity to a server to be connected'
+        return str
+
+
+# This metaclass causes any instantiation of MemcachedError to transparently
+# construct the appropriate subclass if the error code is known.
+class MemcachedErrorMetaclass(type):
+    _dispatch = {}
+    def __new__(meta, name, bases, dct):
+        cls = (super(MemcachedErrorMetaclass, meta)
+               .__new__(meta, name, bases, dct))
+        if 'ERRCODE' in dct:
+            meta._dispatch[dct['ERRCODE']] = cls
+        return cls
+
+    def __call__(cls, *args, **kwargs):
+        err = None
+        if 'status' in kwargs:
+            err = kwargs['status']
+        elif len(args):
+            err = args[0]
+
+        if err in cls._dispatch:
+            cls = cls._dispatch[err]
+
+        return (super(MemcachedErrorMetaclass, cls)
+                .__call__(*args, **kwargs))
+
+class MemcachedError(Exception, metaclass=MemcachedErrorMetaclass):
     """Error raised when a command fails."""
 
-    def __init__(self, status, msg=None):
-        error_msg = error_to_str(status)
-        supermsg = 'Memcached error #' + repr(status) + ' ' + repr(error_msg)
-        msg = str(msg)
+    def __init__(self, status, msg):
+        supermsg='Memcached error #' + repr(status)
         if msg: supermsg += ":  " + msg
-        exceptions.Exception.__init__(self, supermsg)
+        Exception.__init__(self, supermsg)
 
         self.status = status
         self.msg = msg
@@ -98,135 +146,105 @@ class MemcachedClient(object):
         return self._createConn()
 
     def close(self):
-        self.s.close()
+        if hasattr(self, 's'):
+            self.s.close()
 
     def __del__(self):
         self.close()
 
-
-    def _sendCmd(self, cmd, key, val, opaque, extraHeader='', cas=0, collection=None, extended_meta_data='',extraHeaderLength=None):
+    def _sendCmd(self, cmd, key, val, opaque, extraHeader=b'', cas=0, collection=None):
         self._sendMsg(cmd, key, val, opaque, extraHeader=extraHeader, cas=cas,
-                      vbucketId=self.vbucketId, collection=collection, extended_meta_data=extended_meta_data, extraHeaderLength=extraHeaderLength)
+                      vbucketId=self.vbucketId, collection=collection)
 
-    def _sendMsg(self, cmd, key, val, opaque, extraHeader='', cas=0,
+    def _sendAltCmd(self, cmd, flex, key, val, opaque, extras=b'', cas=0,
+                    dtype=0, collection=None):
+        """Send a request in the alternative format supporing flex framing extras"""
+        if collection:
+            key = self._encodeCollectionId(key, collection)
+
+        msg = struct.pack(ALT_REQ_PKT_FMT, ALT_REQ_MAGIC_BYTE, cmd, len(flex),
+                          len(key), len(extras), dtype, self.vbucketId,
+                          len(flex) + len(key) + len(extras) + len(val),
+                          opaque, cas)
+        self.s.sendall(msg + flex + extras + to_bytes(key) + to_bytes(val))
+
+    def _sendMsg(self, cmd, key, val, opaque, extraHeader=b'', cas=0,
                  dtype=0, vbucketId=0,
                  fmt=REQ_PKT_FMT, magic=REQ_MAGIC_BYTE, collection=None, extended_meta_data='', extraHeaderLength=None):
         if collection:
             key = self._encodeCollectionId(key, collection)
-        # a little bit unfortunate but the delWithMeta command expects the extra data length to be the
-        # overall packet length (28 in that case) so we need a facility to support that
-        if extraHeaderLength is None:
-            extraHeaderLength = len(extraHeader)
 
-        msg = struct.pack(fmt, magic,
-            cmd, len(key), extraHeaderLength, dtype, vbucketId,
-                len(key) + len(extraHeader) + len(val) + len(extended_meta_data), opaque, cas)
-        #self.log.info("--->unpack msg:magic,cmd,keylen,extralen/valelen/extlen,opaque,cas={}".format(struct.unpack(fmt,msg)))
-        _, w, _ = select.select([], [self.s], [], self.timeout)
-        if w:
-            #self.log.info("--->_send:{},{},{},{},{}".format(type(msg),type(extraHeader),type(key),type(val),type(extended_meta_data)))
-            #self.log.info("--->_send:{},{},{},{},{}".format(msg,extraHeader,key,val,extended_meta_data))
-            try:
-              key = key.encode()
-            except AttributeError:
-              pass
+        msg=struct.pack(fmt, magic,
+            cmd, len(key), len(extraHeader), dtype, vbucketId,
+                len(key) + len(extraHeader) + len(val), opaque, cas)
+        self.s.sendall(msg + extraHeader + to_bytes(key) + to_bytes(val))
 
-            try:
-              extraHeader = extraHeader.encode()
-            except AttributeError:
-              pass
-
-            try:
-              val = val.encode()
-            except AttributeError:
-              pass
-
-            try:
-              extended_meta_data = extended_meta_data.encode()
-            except AttributeError:
-              pass
-
-            #self.log.info("--->sending..{}".format(msg+extraHeader+key+val+extended_meta_data))
-            self.s.send(msg+extraHeader+key+val+extended_meta_data)
-        else:
-            raise exceptions.EOFError("Timeout waiting for socket send. from {0}".format(self.host))
+    def _socketRecv(self, amount):
+        ready = select.select([self.s], [], [], 30)
+        if ready[0]:
+            return self.s.recv(amount)
+        raise TimeoutError(30)
 
 
 
 
     def _recvMsg(self):
-        response = b""
+        response = b''
         while len(response) < MIN_RECV_PACKET:
-            r, _, _ = select.select([self.s], [], [], self.timeout)
-            if r:
-                data = self.s.recv(MIN_RECV_PACKET - len(response))
-                if data == '':
-                    raise exceptions.EOFError("Got empty data (remote died?). from {0}".format(self.host))
-                response += data
-            else:
-                raise exceptions.EOFError("Timeout waiting for socket recv. from {0}".format(self.host))
-
-        #self.log.info("-->_recvMsg response={}".format(response))
-        #self.log.info("-->_recvMsg response={},{},MIN_RECV_PACKET={}".format(str(response),len(response),MIN_RECV_PACKET))
+            data = self._socketRecv(MIN_RECV_PACKET - len(response))
+            if data == b'':
+                raise EOFError("Got empty data (remote died?).")
+            response += data
         assert len(response) == MIN_RECV_PACKET
 
         # Peek at the magic so we can support alternative-framing
-        magic = struct.unpack(b">B", response[0:1])[0]
-        assert (magic in (RES_MAGIC_BYTE, REQ_MAGIC_BYTE, ALT_RES_MAGIC_BYTE, ALT_REQ_MAGIC_BYTE)), "Got magic: 0x%x" % magic
+        (magic, ) = struct.unpack(">B", response[0:1])
+        assert (magic in (RES_MAGIC_BYTE, REQ_MAGIC_BYTE, ALT_RES_MAGIC_BYTE, ALT_REQ_MAGIC_BYTE)), "Got magic: {:#x}".format(magic)
 
-        cmd = 0
-        frameextralen = 0
-        keylen = 0
-        extralen = 0
-        dtype = 0
-        errcode = 0
-        remaining = 0
-        opaque = 0
-        cas = 0
-        if magic == ALT_RES_MAGIC_BYTE or magic == ALT_REQ_MAGIC_BYTE:
-            magic, cmd, frameextralen, keylen, extralen, dtype, errcode, remaining, opaque, cas = \
-                struct.unpack(ALT_RES_PKT_FMT, response)
-        else:
-            magic, cmd, keylen, extralen, dtype, errcode, remaining, opaque, cas = \
-                struct.unpack(RES_PKT_FMT, response[0:MIN_RECV_PACKET])
+        if magic == RES_MAGIC_BYTE:
+            (_, cmd, keylen, extralen, dtype, errcode, remaining, opaque,
+             cas) = struct.unpack(RES_PKT_FMT, response)
+            framing_extras_len = 0
+        elif magic == ALT_RES_MAGIC_BYTE:
+            (_, cmd, framing_extras_len, keylen, extralen, dtype, errcode,
+             remaining, opaque, cas) = struct.unpack(ALT_RES_PKT_FMT, response)
 
-        rv = b""
+        rv = b''
         while remaining > 0:
-            r, _, _ = select.select([self.s], [], [], self.timeout)
-            if r:
-                data = self.s.recv(remaining)
-                if data == '':
-                    raise exceptions.EOFError("Got empty data (remote died?). from {0}".format(self.host))
-                rv += data
-                remaining -= len(data)
-            else:
-                raise exceptions.EOFError("Timeout waiting for socket recv. from {0}".format(self.host))
+            data = self._socketRecv(remaining)
+            if data == b'':
+                raise EOFError("Got empty data (remote died?).")
+            rv += data
+            remaining -= len(data)
 
-        return cmd, errcode, opaque, cas, keylen, extralen, dtype, rv, frameextralen
+        # TODO: Skip flex framing extras in response for now
+        rv = rv[framing_extras_len:]
+
+        return cmd, errcode, opaque, cas, keylen, extralen, rv
 
     def _handleKeyedResponse(self, myopaque):
-        cmd, errcode, opaque, cas, keylen, extralen, dtype, rv, frameextralen = self._recvMsg()
+        cmd, errcode, opaque, cas, keylen, extralen, rv = self._recvMsg()
         assert myopaque is None or opaque == myopaque, \
             "expected opaque %x, got %x" % (myopaque, opaque)
         if errcode != 0:
+            err_context = rv.decode(errors="backslashreplace")
             if self.error_map is None:
-                msg = rv
+                msg = err_context
             else:
-                err = self.error_map['errors'].get(errcode, rv)
-                msg = "{name} : {desc} : {rv}".format(rv=rv, **err)
+                err = self.error_map['errors'].get(errcode)
+                msg = "{name} : {desc} : {rv}".format(rv=err_context, **err)
 
             raise MemcachedError(errcode,  msg)
-        return cmd, opaque, cas, keylen, extralen, rv, frameextralen
+        return cmd, opaque, cas, keylen, extralen, rv
 
     def _handleSingleResponse(self, myopaque):
-        cmd, opaque, cas, keylen, extralen, data, frameextralen = self._handleKeyedResponse(myopaque)
+        cmd, opaque, cas, keylen, extralen, data = self._handleKeyedResponse(myopaque)
         return opaque, cas, data
 
-    def _doCmd(self, cmd, key, val, extraHeader='', cas=0, collection=None,extended_meta_data='',extraHeaderLength=None):
+    def _doCmd(self, cmd, key, val, extraHeader=b'', cas=0, collection=None):
         """Send a command and await its response."""
         opaque = self.r.randint(0, 2 ** 32)
-        self._sendCmd(cmd, key, val, opaque, extraHeader, cas, collection, extended_meta_data=extended_meta_data,
-                      extraHeaderLength=extraHeaderLength)
+        self._sendCmd(cmd, key, val, opaque, extraHeader, cas, collection)
         return self._handleSingleResponse(opaque)
 
     def _doSdCmd(self, cmd, key, path, val=None, expiry=0, opaque=0, cas=0, create=False, collection=None):
@@ -289,8 +307,13 @@ class MemcachedClient(object):
         return self._doCmd(cmd, key, val, struct.pack(SET_PKT_FMT, flags, exp),
             cas, collection)
 
+    def _mutateDurable(self, cmd, key, exp, flags, cas, val, level, timeout, collection):
+        flex = self._encodeDurabilityFlex(level, timeout)
+        return self._doAltCmd(cmd, flex, key, val, struct.pack(SET_PKT_FMT, flags, exp),
+                           cas, collection)
+
     def _cat(self, cmd, key, cas, val, collection):
-        return self._doCmd(cmd, key, val, '', cas, collection)
+        return self._doCmd(cmd, key, val, b'', cas, collection)
 
     def append(self, key, value, cas=0, vbucket= -1, collection=None):
         collection = self.collection_name(collection)
@@ -327,7 +350,11 @@ class MemcachedClient(object):
         self._set_vbucket(key, vbucket, collection=collection)
         return self.__incrdecr(memcacheConstants.CMD_DECR, key, amt, init, exp, collection)
 
-    def set(self, key, exp, flags, val, vbucket= -1, collection=None):
+    def _doMetaCmd(self, cmd, key, value, cas, exp, flags, seqno, remote_cas, collection):
+        extra = struct.pack('>IIQQ', flags, exp, seqno, remote_cas)
+        return self._doCmd(cmd, key, value, extra, cas, collection)
+
+    def set(self, key, exp, flags, val, collection=None):
         """Set a value in the memcached server."""
         collection = self.collection_name(collection)
         self._set_vbucket(key, vbucket, collection=collection)
@@ -456,20 +483,31 @@ class MemcachedClient(object):
 
 
 
-    def hello(self, feature_flag): #, key, exp, flags, val, vbucket= -1):
-        resp = self._doCmd(memcacheConstants.CMD_HELLO, '', struct.pack(">H", feature_flag))
-        result = struct.unpack('>H', resp[2])
-        if result[0] != feature_flag:
-            self.log.info("collections not supported")
-        else:
-            self.collections_supported = True
+    # def hello(self, feature_flag): #, key, exp, flags, val, vbucket= -1):
+    #     resp = self._doCmd(memcacheConstants.CMD_HELLO, '', struct.pack(">H", feature_flag))
+    #     result = struct.unpack('>H', resp[2])
+    #     self.collections_supported = True
+    #     supported = resp[2]
+    #     for i in range(0, len(supported), struct.calcsize(">H")):
+    #         self.features.update(
+    #             struct.unpack_from(">H", supported, i))
+    #
+    #     if self.is_xerror_supported():
+    #         self.error_map = self.get_error_map()
+
+    def hello(self, feature_flag):
+        resp = self._doCmd(memcacheConstants.CMD_HELLO, '',
+                           struct.pack('>' + 'H', feature_flag))
         supported = resp[2]
+        self.collections_supported = True
         for i in range(0, len(supported), struct.calcsize(">H")):
             self.features.update(
                 struct.unpack_from(">H", supported, i))
 
         if self.is_xerror_supported():
             self.error_map = self.get_error_map()
+
+        return resp
 
     def send_set(self, key, exp, flags, val, vbucket= -1, collection=None):
         """Set a value in the memcached server without handling the response"""
@@ -484,14 +522,34 @@ class MemcachedClient(object):
         self._set_vbucket(key, vbucket, collection=collection)
         return self._mutate(memcacheConstants.CMD_ADD, key, exp, flags, 0, val, collection)
 
-    def replace(self, key, exp, flags, val, vbucket= -1, collection=None):
+    def addDurable(self, key, exp, flags, val,
+                   level=memcacheConstants.DURABILITY_LEVEL_MAJORITY,
+                   timeout=None,
+                   collection=None):
+        """Add a value with the given durability requirements if it doesn't already exist."""
+        return self._mutateDurable(memcacheConstants.CMD_ADD, key, exp, flags,
+                                   0, val, level, timeout, collection)
+
+    def addWithMeta(self, key, value, exp, flags, seqno, remote_cas, collection=None):
+        return self._doMetaCmd(memcacheConstants.CMD_ADD_WITH_META,
+                               key, value, 0, exp, flags, seqno, remote_cas, collection)
+
+    def replace(self, key, exp, flags, val, collection=None):
         """Replace a value in the memcached server iff it already exists."""
         collection = self.collection_name(collection)
         self._set_vbucket(key, vbucket, collection=collection)
         return self._mutate(memcacheConstants.CMD_REPLACE, key, exp, flags, 0,
             val, collection)
 
-    def observe(self, key, vbucket= -1, collection=None):
+    def replaceDurable(self, key, exp, flags, val,
+                   level=memcacheConstants.DURABILITY_LEVEL_MAJORITY,
+                   timeout=None,
+                   collection=None):
+        """Replace a value with the given durability requirements iff it already exists."""
+        return self._mutateDurable(memcacheConstants.CMD_REPLACE, key, exp, flags,
+                                   0, val, level, timeout, collection)
+
+    def observe(self, key, vbucket, collection=None):
         """Observe a key for persistence and replication."""
         collection = self.collection_name(collection)
         self._set_vbucket(key, vbucket, collection=collection)
@@ -657,7 +715,7 @@ class MemcachedClient(object):
         except MemcachedError as e:
             if e.status != memcacheConstants.ERR_AUTH_CONTINUE:
                 raise
-            challenge = e.msg.split(' ')[0]
+            challenge = e.msg
 
         dig = hmac.HMAC(password, challenge).hexdigest()
         return self._doCmd(memcacheConstants.CMD_SASL_STEP, 'CRAM-MD5',
@@ -800,9 +858,12 @@ class MemcachedClient(object):
         done = False
         rv = {}
         while not done:
-            cmd, opaque, cas, klen, extralen, data, frameextralen = self._handleKeyedResponse(None)
+            cmd, opaque, cas, klen, extralen, data = self._handleKeyedResponse(None)
             if klen:
-                rv[data[0:klen].decode()] = data[klen:].decode()
+                kv = data.decode()
+                key = kv[0:klen]
+                value = kv[klen:]
+                rv[key] = value
             else:
                 done = True
         return rv
@@ -817,7 +878,13 @@ class MemcachedClient(object):
         collection = self.collection_name(collection)
 
         self._set_vbucket(key, vbucket, collection=collection)
-        return self._doCmd(memcacheConstants.CMD_DELETE, key, '', '', cas, collection=collection)
+        return self._doCmd(memcacheConstants.CMD_DELETE, key, '', b'', cas, collection=collection)
+
+    def deleteDurable(self, key, cas=0, level=memcacheConstants.DURABILITY_LEVEL_MAJORITY, timeout=None, collection=None):
+        """Delete the value for a given key with the given durability requirements"""
+        flex = self._encodeDurabilityFlex(level, timeout)
+        return self._doAltCmd(memcacheConstants.CMD_DELETE, flex, key,
+                              '', b'', cas, collection=collection)
 
     def flush(self, timebomb=0):
         """Flush all storage in a memcached instance."""
@@ -1027,8 +1094,11 @@ class MemcachedClient(object):
     def list_buckets(self):
         """Get the name of all buckets."""
         opaque, cas, data = self._doCmd(
-            memcacheConstants.CMD_LIST_BUCKETS, '', '', '', 0)
-        return data.strip().split(' ')
+            memcacheConstants.CMD_LIST_BUCKETS, '', '', b'', 0)
+        stripped = data.decode().strip()
+        if not stripped:
+            return []
+        return stripped.split(' ')
 
     def get_error_map(self):
         _, _, errmap = self._doCmd(memcacheConstants.CMD_GET_ERROR_MAP, '',
@@ -1053,13 +1123,30 @@ class MemcachedClient(object):
         self._update_collection_map(manifest)
 
     def get_collections(self, update_map=False):
-        if self.collections_supported:
-            rv = self._doCmd(memcacheConstants.CMD_COLLECTIONS_GET_MANIFEST,
-                             '',
-                             '')
-            if update_map:
-                self._update_collection_map(rv[2])
-            return rv
+        rv = self._doCmd(memcacheConstants.CMD_COLLECTIONS_GET_MANIFEST,
+                         '',
+                         '')
+        if update_map:
+            self._update_collection_map(rv[2])
+        return rv
+
+    def get_collection_id(self, path):
+        tmpVbucketId=self.vbucketId
+        self.vbucketId = 0
+        rv = self._doCmd(memcacheConstants.CMD_COLLECTIONS_GET_ID,
+                         path,
+                         '')
+        self.vbucketId=tmpVbucketId
+        return rv
+
+    def get_scope_id(self, path):
+        tmpVbucketId=self.vbucketId
+        self.vbucketId = 0
+        rv = self._doCmd(memcacheConstants.CMD_COLLECTIONS_GET_SCOPE_ID,
+                         path,
+                         '')
+        self.vbucketId=tmpVbucketId
+        return rv
 
     def enable_xerror(self):
         self.feature_flag.add(memcacheConstants.FEATURE_XERROR)
@@ -1067,20 +1154,25 @@ class MemcachedClient(object):
     def enable_collections(self):
         self.feature_flag.add(memcacheConstants.FEATURE_COLLECTIONS)
 
+    def enable_mutation_seqno(self):
+        self.feature_flag.add(memcacheConstants.FEATURE_MUTATION_SEQNO)
+
+    def enable_tracing(self):
+        self.feature_flag.add(memcacheConstants.FEATURE_TRACING)
 
     def is_xerror_supported(self):
-        return memcacheConstants.FEATURE_XERROR in self.features
+        return memcacheConstants.FEATURE_XERROR in self.feature_flag
 
     def is_collections_supported(self):
-        return memcacheConstants.FEATURE_COLLECTIONS in self.features
+        return memcacheConstants.FEATURE_COLLECTIONS in self.feature_flag
 
     # Collections on the wire uses a varint encoding for the collection-ID
     # A simple unsigned_leb128 encoded is used:
     #    https://en.wikipedia.org/wiki/LEB128
     # @return a string with the binary encoding
     def _encodeCollectionId(self, key, collection):
-        if not self.is_collections_supported():
-                raise exceptions.RuntimeError("Collections are not enabled")
+        if not self.collections_supported:
+            raise exceptions.RuntimeError("Collections are not enabled")
 
         if isinstance(collection, str):
             # expect scope.collection for name API
@@ -1103,7 +1195,7 @@ class MemcachedClient(object):
                 output.append(0)
             else:
                 output[-1] = byte
-        return output.tostring() + key
+        return output.tostring().decode() + key
 
     def _update_collection_map(self, manifest):
         self.collection_map = {}
