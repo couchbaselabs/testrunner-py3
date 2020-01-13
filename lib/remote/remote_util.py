@@ -209,7 +209,7 @@ class RemoteMachineShellConnection:
             log.info("Can't establish SSH session with {0}".format(self.ip))
             exit(1)
 
-    def __init__(self, serverInfo):
+    def __init__(self, serverInfo, exit_on_failure=True):
         # let's create a connection
         self.username = serverInfo.ssh_username
         self.password = serverInfo.ssh_password
@@ -262,7 +262,11 @@ class RemoteMachineShellConnection:
                 else:
                     log.error("Can't establish SSH session to node {1} :\
                                                    {0}".format(e, self.ip))
-                    exit(1)
+                    if exit_on_failure:
+                        exit(1)
+                    else:
+                        break
+
         log.info("Connected to {0}".format(serverInfo.ip))
         """ self.info.distribution_type.lower() == "ubuntu" """
         self.cmd_ext = ""
@@ -812,20 +816,22 @@ class RemoteMachineShellConnection:
             self.log_command_output(o, r)
         else:
             raise Exception("stopping standalone moxi is not supported on windows")
-    def is_url_live(self, url):
+
+    def is_url_live(self, url, exit_if_not_live=True):
         live_url = False
-        #log.info("Check if url {0} is ok".format(url))
+        # log.info("Check if url {0} is ok".format(url))
         status = urllib.request.urlopen(url).getcode()
         if status == 200:
             log.info("This url {0} is live".format(url))
             live_url = True
         else:
-            mesg = "\n===============\n"\
-                   "        This url {0} \n"\
-                   "        is failed to connect.\n"\
-                   "        Check version in params to make sure it correct pattern or build number.\n"\
+            mesg = "\n===============\n" \
+                   "        This url {0} \n" \
+                   "        is failed to connect.\n" \
+                   "        Check version in params to make sure it correct pattern or build number.\n" \
                    "===============\n".format(url)
-            self.stop_current_python_running(mesg)
+            if exit_if_not_live:
+                self.stop_current_python_running(mesg)
         return live_url
 
     def is_ntp_installed(self):

@@ -885,6 +885,9 @@ the same interface as FileCache."""
         self.authorizations = []
 
     def _conn_request(self, conn, request_uri, method, body, headers):
+        content = None
+        response = None
+
         for i in range(2):
             try:
                 conn.request(method, request_uri, body, headers)
@@ -892,7 +895,7 @@ the same interface as FileCache."""
             except socket.gaierror:
                 conn.close()
                 raise ServerNotFoundError("Unable to find the server at %s" % conn.host)
-            except http.client.HTTPException as e:
+            except http.client.HTTPException:
                 if not i:
                     conn.close()
                     conn.connect()
@@ -906,7 +909,7 @@ the same interface as FileCache."""
                     content = _decompressContent(response, content)
 
             break
-        return (response, content)
+        return response, content
 
 
     def _request(self, conn, host, absolute_uri, request_uri, method, body, headers, redirections, cachekey):
