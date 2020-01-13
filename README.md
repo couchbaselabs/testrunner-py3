@@ -1,4 +1,4 @@
-*** Test Runner: Readme ***
+*** Test Runner Python3: Readme ***
 
 Prerequisites
 -------------
