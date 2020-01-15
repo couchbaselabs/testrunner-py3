@@ -34,7 +34,7 @@ from testconstants import MAX_COMPACTION_THRESHOLD
 from testconstants import LINUX_DIST_CONFIG
 from membase.helper.cluster_helper import ClusterOperationHelper
 from security.rbac_base import RbacBase
-
+from collection.collections_rest import Collections_Rest
 
 from couchbase_cli import CouchbaseCLI
 import testconstants
@@ -2771,67 +2771,20 @@ class BaseTestCase(unittest.TestCase):
         version = rest.get_nodes_self().version
         return float(version[:3])
 
-    def create_scope(self, bucket = "default", scope = "scope0", result = True):
-        status = RestConnection(self.master).create_scope(bucket, scope)
-        if result:
-            self.assertEqual(True, status)
-            self.log.info("Scope creation passed, name={}".format(scope))
-        else:
-            self.assertEqual(False, status)
-            self.log.info("Scope creation failed, name={}".format(scope))
+    def create_scope(self, bucket="default", scope="scope0"):
+        Collections_Rest.create_scope(self.master, bucket, scope)
 
+    def create_collection(self, bucket="default", scope="scope0", collection="mycollection0"):
+        Collections_Rest.create_collection(self.master, bucket, scope, collection)
 
-    def create_collection(self, bucket = "default", scope = "scope0", collection = "mycollection0", result = True):
-        status = RestConnection(self.master).create_collection(bucket, scope, collection)
-        if result:
-            self.assertEqual(True, status)
-            self.log.info("Collection creation passed, name={}".format(collection))
-        else:
-            self.assertEqual(False, status)
-            self.log.info("Collection creation failed, name={}".format(collection))
+    def delete_collection(self, bucket="default", scope='_default', collection='_default'):
+        Collections_Rest.delete_collection(self.master, bucket, scope, collection)
 
-    def delete_collection(self, bucket = "default", scope = '_default', collection = '_default' ):
-        status = RestConnection(self.master).delete_collection(bucket, scope, collection)
-        self.assertEqual(True, status)
-        self.log.info("{} collections deleted".format(collection))
-        try:
-            if "_default._default" in self.collection_name[bucket]:
-                self.collection_name[bucket].remove("_default._default")
-        except KeyError:
-            pass
+    def delete_scope(self, scope, bucket="default"):  # scope should be passed as default scope can not be deleted
+        Collections_Rest.delete_scope(self.master, scope, bucket)
 
-    def delete_scope(self, scope, bucket = "default"): # scope should be passed as default scope can not be deleted
-        status = RestConnection(self.master).delete_collection(bucket, scope)
-        self.assertEqual(True, status)
-        self.log.info("{} scope deleted".format(scope))
-        rex= re.compile(scope)
-        try:
-            # remove all the collections with the deleted scope
-            self.collection_name[bucket]=[x for x in self.collection_name[bucket] if not rex.match(self.collection_name[bucket])]
-        except KeyError:
-            pass
-
-    def create_scope_collection(self, scope_num, collection_num, bucket = "default"):
-        self.collection_name[bucket]= ["_default._default"]
-        for i in range(scope_num):
-            if i == 0:
-                scope_name = "_default"
-            else:
-                scope_name = bucket + str(i)
-                self.create_scope(bucket, scope=scope_name)
-            try:
-                if i == 0:
-                    num=int(collection_num[i] -1)
-                else:
-                    num=int(collection_num[i])
-            except:
-                num=2
-            for n in range(num):
-                collection = 'collection' + str(n)
-                self.create_collection(bucket=bucket, scope=scope_name, collection=collection)
-                self.collection_name[bucket].append(scope_name + '.' +collection)
-
-        self.log.info("created collections for the bucket {} are {}".format(bucket, self.collection_name[bucket]))
+    def create_scope_collection(self, scope_num, collection_num, bucket="default"):
+        Collections_Rest.create_scope_collection(self.master, self.collection_name, scope_num, collection_num, bucket)
 
     def _record_vbuckets(self, master, servers):
         map = dict()

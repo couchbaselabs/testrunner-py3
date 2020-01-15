@@ -6,12 +6,15 @@ import random
 import sys
 import traceback
 
-from couchbase.cluster import Cluster
-from couchbase.cluster import PasswordAuthenticator
+
+
+from couchbase.cluster import Cluster, ClusterOptions
+from couchbase_core.cluster import PasswordAuthenticator
 import couchbase.subdocument as SD
 from couchbase.exceptions import CouchbaseTransientError
 
-from . import constants
+sys.path.append(os.path.join(os.path.dirname(__file__), os.path.pardir))
+from .constants import Constants as constants
 from .ValueGenerator import ValueGenerator
 
 
@@ -45,10 +48,13 @@ class JSONDoc(object):
         # connect to cb cluster
         try:
             connection = "couchbase://" + self.server
-            cluster = Cluster(connection)
-            authenticator = PasswordAuthenticator(self.username, self.password)
-            cluster.authenticate(authenticator)
-            cb = cluster.open_bucket(self.bucket)
+            if "ip6" in self.server or self.server.startswith("["):
+                connection = connection + "?ipv6=allow"
+            cluster = Cluster(connection, ClusterOptions(PasswordAuthenticator(self.username, self.password)))
+            # authenticator = PasswordAuthenticator(self.username, self.password)
+            # cluster.authenticate(authenticator)
+            cb = cluster.bucket(self.bucket)
+            cb_coll = cb.default_collection()
             cb.timeout = 100
         except Exception as e:
             logging.error("Connection error\n" + traceback.format_exc())
@@ -76,7 +82,7 @@ class JSONDoc(object):
         while batches:
             batch = batches[-1]
             try:
-                cb.upsert_multi(batch)
+                cb_coll.upsert_multi(batch)
                 num_completed += len(batch)
                 batches.pop()
             except CouchbaseTransientError as e:
@@ -84,7 +90,7 @@ class JSONDoc(object):
                 ok, fail = e.split_results()
                 new_batch = {}
                 for key in fail:
-                    new_batch[key] = all_data[key]
+                    new_batch[key] = list(json_docs.items())[key]
                 batches.pop()
                 batches.append(new_batch)
                 num_completed += len(ok)
@@ -115,7 +121,7 @@ class JSONDoc(object):
                 dockey = self.keyprefix + str(i) + ".json"
                 output = os.path.join(current_dir, "output/", dockey)
                 with open(output, 'w') as f:
-                    f.write(json.dumps(self.json_objs_dict, indent=3).encode(self.encoding, "ignore"))
+                    f.write(json.dumps(self.json_objs_dict, indent=3).encode(self.encoding, "ignore").decode())
                 logging.info("print: " + dockey)
             except Exception as e:
                 logging.error("Print error\n" + traceback.format_exc())

@@ -6,7 +6,7 @@ import requests
 from datetime import datetime
 import pytz
 import collections
-from . import constants
+from .constants import Constants as constants
 
 
 class ValueGenerator(object):
