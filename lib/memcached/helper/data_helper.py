@@ -854,7 +854,7 @@ class VBucketAwareMemcached(object):
                             memcacheds[server_str] = \
                                 MemcachedClientHelper.direct_client(server, bucket, admin_user=admin_user,
                                                                     admin_pass=admin_pass)
-                            #self.enable_collection(memcacheds[server_str])
+                            self.enable_collection(memcacheds[server_str])
                         break
             except Exception as ex:
                 msg = "unable to establish connection to {0}. cleanup open connections"
@@ -1106,7 +1106,6 @@ class VBucketAwareMemcached(object):
             else:
 
                 mc = self.memcacheds[server_str]
-
                 errors = self._setMulti_rec(mc, exp, flags, keyval, pause_sec,
                                             timeout_sec, self._setMulti_seq, collection=collection)
                 if errors:
