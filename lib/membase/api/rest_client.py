@@ -837,7 +837,7 @@ class RestConnection(object):
               try:
                 #log.info("-->val: {}:{}".format(type(val),val))
                 val = val.encode()
-                return str("auth: " + base64.decodestring(val[6:]).decode())
+                return str("auth: " + base64.decodebytes(val[6:]).decode())
               except Exception as e:
                 print(e)
         return ""
@@ -2361,6 +2361,13 @@ class RestConnection(object):
             log.warn("Bucket deletion timed out waiting for all nodes")
 
         return status
+
+    def delete_all_buckets(self):
+        buckets = self.get_buckets()
+        for bucket in buckets:
+            if isinstance(bucket, Bucket):
+                api = '%s%s%s' % (self.baseUrl, 'pools/default/buckets/', bucket.name)
+                self._http_request(api, 'DELETE')
 
     '''Load any of the three sample buckets'''
     def load_sample(self, sample_name):

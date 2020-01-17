@@ -203,6 +203,10 @@ class BaseTestCase(unittest.TestCase):
             # end of bucket parameters spot (this is ongoing)
             self.disable_diag_eval_on_non_local_host = self.input.param("disable_diag_eval_non_local", False)
 
+            if self.collection:
+                cli = CouchbaseCLI(self.master, self.master.rest_username, self.master.rest_password)
+                cli.enable_dp()
+
             if self.skip_setup_cleanup:
                 self.buckets = RestConnection(self.master).get_buckets()
                 return

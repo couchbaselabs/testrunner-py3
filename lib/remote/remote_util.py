@@ -4385,7 +4385,7 @@ class RemoteMachineShellConnection:
         return output, error
 
     def execute_couchbase_cli(self, cli_command, cluster_host='localhost', options='',
-                              cluster_port=None, user='Administrator', password='password'):
+                              cluster_port=None, user='Administrator', password='password', additional_input=None):
         cb_client = "%scouchbase-cli" % (LINUX_COUCHBASE_BIN_PATH)
         if self.nonroot:
             cb_client = "/home/%s%scouchbase-cli" % (self.username,
@@ -4410,7 +4410,10 @@ class RemoteMachineShellConnection:
             passwd_param = (" --cluster-password {0}".format(password), "")[password is None]
         # now we can run command in format where all parameters are optional
         # {PATH}/couchbase-cli [COMMAND] [CLUSTER:[PORT]] [USER] [PASWORD] [OPTIONS]
-        command = cb_client + " " + cli_command + cluster_param + user_param + passwd_param + " " + options
+        if additional_input:
+            command = additional_input + " | " + cb_client + " " + cli_command + cluster_param + user_param + passwd_param + " " + options
+        else:
+            command = cb_client + " " + cli_command + cluster_param + user_param + passwd_param + " " + options
         log.info("command to run: {0}".format(command))
         output, error = self.execute_command(command, debug=False, use_channel=True)
         return output, error
