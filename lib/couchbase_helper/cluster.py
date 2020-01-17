@@ -24,7 +24,8 @@ class Cluster(object):
             bucket_params - a dictionary containing bucket creation parameters. (Dict)
         Returns:
             BucketCreateTask - A task future that is a handle to the scheduled task."""
-        bucket_params['bucket_name'] = 'default'
+        if 'bucket_name' not in bucket_params.keys():
+            bucket_params['bucket_name'] = 'default'
         _task = BucketCreateTask(bucket_params)
         self.task_manager.schedule(_task)
         return _task

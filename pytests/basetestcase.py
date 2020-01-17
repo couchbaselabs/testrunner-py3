@@ -34,7 +34,7 @@ from testconstants import MAX_COMPACTION_THRESHOLD
 from testconstants import LINUX_DIST_CONFIG
 from membase.helper.cluster_helper import ClusterOperationHelper
 from security.rbac_base import RbacBase
-from collection.collections_rest import Collections_Rest
+from collection.collections_rest_client import Collections_Rest
 
 from couchbase_cli import CouchbaseCLI
 import testconstants
@@ -127,7 +127,7 @@ class BaseTestCase(unittest.TestCase):
             self.default_bucket = self.input.param("default_bucket", True)
             self.parallelism = self.input.param("parallelism", False)
             if self.default_bucket:
-                self.default_bucket_name = "default"
+                self.default_bucket_name = self.input.param("default_bucket_name", "default")
             self.skip_standard_buckets = self.input.param("skip_standard_buckets", False)
             self.standard_buckets = self.input.param("standard_buckets", 0)
             # list of list [[2,1,1],[3,1,2,1],[4,1,1,2,3]]
@@ -591,7 +591,7 @@ class BaseTestCase(unittest.TestCase):
                 remote_client.disconnect()
         return quota
 
-    def _create_bucket_params(self, server, replicas=1, size=0, port=11211, password=None,
+    def _create_bucket_params(self, server, bucket_name='default', replicas=1, size=0, port=11211, password=None,
                               bucket_type='membase', enable_replica_index=1, eviction_policy='valueOnly',
                               bucket_priority=None, flush_enabled=1, lww=False, maxttl=None,
                               compression_mode='passive'):
@@ -616,6 +616,7 @@ class BaseTestCase(unittest.TestCase):
 
         bucket_params = dict()
         bucket_params['server'] = server
+        bucket_params['bucket_name'] = bucket_name
         bucket_params['replicas'] = replicas
         bucket_params['size'] = size
         bucket_params['port'] = port
@@ -633,7 +634,7 @@ class BaseTestCase(unittest.TestCase):
     def _bucket_creation(self):
         if self.default_bucket:
             default_params=self._create_bucket_params(
-                server=self.master, size=self.bucket_size,
+                server=self.master, bucket_name=self.default_bucket_name, size=self.bucket_size,
                 replicas=self.num_replicas, bucket_type=self.bucket_type,
                 enable_replica_index=self.enable_replica_index,
                 eviction_policy=self.eviction_policy, lww=self.lww,
@@ -2772,19 +2773,19 @@ class BaseTestCase(unittest.TestCase):
         return float(version[:3])
 
     def create_scope(self, bucket="default", scope="scope0"):
-        Collections_Rest.create_scope(self.master, bucket, scope)
+        Collections_Rest(self.master).create_scope(bucket, scope)
 
     def create_collection(self, bucket="default", scope="scope0", collection="mycollection0"):
-        Collections_Rest.create_collection(self.master, bucket, scope, collection)
+        Collections_Rest(self.master).create_collection(bucket, scope, collection)
 
     def delete_collection(self, bucket="default", scope='_default', collection='_default'):
-        Collections_Rest.delete_collection(self.master, bucket, scope, collection)
+        Collections_Rest(self.master).delete_collection(bucket, scope, collection)
 
     def delete_scope(self, scope, bucket="default"):  # scope should be passed as default scope can not be deleted
-        Collections_Rest.delete_scope(self.master, scope, bucket)
+        Collections_Rest(self.master).delete_scope(scope, bucket)
 
     def create_scope_collection(self, scope_num, collection_num, bucket="default"):
-        Collections_Rest.create_scope_collection(self.master, self.collection_name, scope_num, collection_num, bucket)
+        Collections_Rest(self.master).create_scope_collection(self.collection_name, scope_num, collection_num, bucket)
 
     def _record_vbuckets(self, master, servers):
         map = dict()
