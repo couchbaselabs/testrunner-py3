@@ -1,6 +1,8 @@
 from tasks.future import Future
 from tasks.taskmanager import TaskManager
 from tasks.task import *
+from sdk_client import SDKSmartClient as VBucketAwareMemcached
+from membase.api.rest_client import RestConnection
 import types
 
 

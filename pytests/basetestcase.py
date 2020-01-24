@@ -34,7 +34,7 @@ from testconstants import MAX_COMPACTION_THRESHOLD
 from testconstants import LINUX_DIST_CONFIG
 from membase.helper.cluster_helper import ClusterOperationHelper
 from security.rbac_base import RbacBase
-
+from collection.collections_rest_client import Collections_Rest
 from couchbase_cli import CouchbaseCLI
 import testconstants
 
@@ -201,6 +201,10 @@ class BaseTestCase(unittest.TestCase):
             self.standard_bucket_priority = self.input.param("standard_bucket_priority", None)
             # end of bucket parameters spot (this is ongoing)
             self.disable_diag_eval_on_non_local_host = self.input.param("disable_diag_eval_non_local", False)
+
+            if self.collection:
+                cli = CouchbaseCLI(self.master, self.master.rest_username, self.master.rest_password)
+                cli.enable_dp()
 
             if self.skip_setup_cleanup:
                 self.buckets = RestConnection(self.master).get_buckets()
@@ -650,6 +654,10 @@ class BaseTestCase(unittest.TestCase):
             if self.enable_time_sync:
                 self._set_time_sync_on_buckets([self.default_bucket_name])
 
+            if self.collection:
+                self.collection_name["default"] = self.create_scope_collection(scope_num=self.scope_num, collection_num=self.collection_num)
+
+
         self._create_sasl_buckets(self.master, self.sasl_buckets)
         self._create_standard_buckets(self.master, self.standard_buckets)
         self._create_memcached_buckets(self.master, self.memcached_buckets)
@@ -745,6 +753,8 @@ class BaseTestCase(unittest.TestCase):
         if self.enable_time_sync:
             self._set_time_sync_on_buckets(['bucket' + str(i) \
                                              for i in range(num_buckets)])
+        for i in range(num_buckets):
+            name = self.sasl_bucket_name + str(i)
 
     def _create_standard_buckets(self, server, num_buckets, server_id=None, bucket_size=None):
         if not num_buckets:
@@ -786,6 +796,18 @@ class BaseTestCase(unittest.TestCase):
 
         if self.enable_time_sync:
             self._set_time_sync_on_buckets(['standard_bucket' + str(i) for i in range(num_buckets)])
+
+        for i in range(num_buckets):
+            name = 'standard_bucket' + str(i)
+            if self.collection:
+                if self.standard_buckets_scope[i] is not list:
+                    scope_num=self.standard_buckets_scope[i]
+                    collection_num = [2] * self.standard_buckets_scope[i]
+                else:
+                    scope_num=self.standard_buckets_scope[i].remove
+                    collection_num = self.standard_buckets_scope[i]
+                self.collection_name[name] = self.create_scope_collection(scope_num=scope_num,
+                                                                          collection_num=collection_num, bucket=name)
 
     def _create_buckets(self, server, bucket_list, server_id=None, bucket_size=None):
         if server_id is None:
@@ -940,13 +962,18 @@ class BaseTestCase(unittest.TestCase):
                                 only_store_hash=True, batch_size=1, pause_secs=1, timeout_secs=30,
                                 proxy_client=None, collection=None):
         tasks = []
-
         for bucket in self.buckets:
-            gen = copy.deepcopy(kv_gen)
-            try :
+            if self.collection == True:
+                self.collection_name[bucket.name]=Collections_Rest(self.master).get_collection(bucket.name)
+            try:
                 len(self.collection_name[bucket.name])
             except KeyError:
-                self.collection_name[bucket.name] =[]
+                self.collection_name[bucket.name] = []
+
+            gen = copy.deepcopy(kv_gen)
+            self.log.info("collection name is {}".format(self.collection_name))
+            self.log.info("sleeping for 10 seconds")
+            self.sleep(10)
             if not collection and (len(self.collection_name[bucket.name]) > 0):
                 for collections in self.collection_name[bucket.name]:
                     gen = copy.deepcopy(kv_gen)
@@ -956,6 +983,7 @@ class BaseTestCase(unittest.TestCase):
                                                                       op_type, exp, flag, only_store_hash,
                                                                       batch_size, pause_secs, timeout_secs,
                                                                       proxy_client, compression=self.sdk_compression, collection=collections))
+
                     else:
                         self._load_memcached_bucket(server, gen, bucket.name, collections)
 
@@ -1161,13 +1189,14 @@ class BaseTestCase(unittest.TestCase):
         if len(self.buckets) > 1:
             batch_size = 1
         for bucket in self.buckets:
-            try :
+            if self.collection == True:
+                self.collection_name[bucket.name]=Collections_Rest(self.master).get_collection(bucket.name)
+            try:
                 len(self.collection_name[bucket.name])
             except KeyError:
-                self.collection_name[bucket.name] =[]
-            if bucket.type == 'memcached':
-                continue
-            #self.collection_bucket=self.collection_name[bucket]
+                self.collection_name[bucket.name] = []
+            self.log.info("sleeping for 10 seconds")
+            self.sleep(10)
             if not collection_name and (len(self.collection_name[bucket.name]) > 0):
                 for collections in self.collection_name[bucket.name]:
                     tasks.append(self.cluster.async_verify_data(server, bucket, bucket.kvs[kv_store], max_verify,
@@ -2768,6 +2797,21 @@ class BaseTestCase(unittest.TestCase):
         rest = RestConnection(self.master)
         version = rest.get_nodes_self().version
         return float(version[:3])
+
+    def create_scope(self, bucket="default", scope="scope0"):
+        Collections_Rest(self.master).create_scope(bucket, scope)
+
+    def create_collection(self, bucket="default", scope="scope0", collection="mycollection0"):
+        Collections_Rest(self.master).create_collection(bucket, scope, collection)
+
+    def delete_collection(self, bucket="default", scope='_default', collection='_default'):
+        Collections_Rest(self.master).delete_collection(bucket, scope, collection)
+
+    def delete_scope(self, scope, bucket="default"):  # scope should be passed as default scope can not be deleted
+        Collections_Rest(self.master).delete_scope(scope, bucket)
+
+    def create_scope_collection(self, scope_num, collection_num, bucket="default"):
+        self.collection_name[bucket] = Collections_Rest(self.master).create_scope_collection(scope_num, collection_num, bucket)
 
     def _record_vbuckets(self, master, servers):
         map = dict()

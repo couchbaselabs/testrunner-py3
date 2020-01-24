@@ -1084,7 +1084,6 @@ class GenericLoadingTask(Thread, Task):
             self._process_values_for_create(key_val)
             client = shared_client or self.client
 
-
             client.setMulti(self.exp, self.flag, key_val, self.pause, self.timeout, parallel=False, collection=self.collection)
         except (MemcachedError, ServerUnavailableException, socket.error, EOFError, AttributeError, RuntimeError) as error:
             self.state = FINISHED

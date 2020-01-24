@@ -609,6 +609,12 @@ class RestConnection(object):
             raise Exception("unable to get random document/key for bucket %s" % (bucket))
         return json_parsed
 
+    def get_collection(self, bucket):
+        api = self.baseUrl + 'pools/default/buckets/%s/collections' % (bucket)
+        headers = self._create_headers()
+        status, content, header = self._http_request(api, 'GET', headers=headers)
+        return status, content
+
     def run_view(self, bucket, view, name):
         api = self.capiBaseUrl + '/%s/_design/%s/_view/%s' % (bucket, view, name)
         status, content, header = self._http_request(api, headers=self._create_capi_headers())

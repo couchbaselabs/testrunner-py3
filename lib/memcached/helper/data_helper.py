@@ -23,6 +23,7 @@ import sys
 from perf_engines import mcsoda
 import memcacheConstants
 
+
 from queue import Queue
 from threading import Thread
 
@@ -854,7 +855,7 @@ class VBucketAwareMemcached(object):
                             memcacheds[server_str] = \
                                 MemcachedClientHelper.direct_client(server, bucket, admin_user=admin_user,
                                                                     admin_pass=admin_pass)
-                            #self.enable_collection(memcacheds[server_str])
+                            # self.enable_collection(memcacheds[server_str])
                         break
             except Exception as ex:
                 msg = "unable to establish connection to {0}. cleanup open connections"
@@ -1106,7 +1107,6 @@ class VBucketAwareMemcached(object):
             else:
 
                 mc = self.memcacheds[server_str]
-
                 errors = self._setMulti_rec(mc, exp, flags, keyval, pause_sec,
                                             timeout_sec, self._setMulti_seq, collection=collection)
                 if errors:
@@ -1139,10 +1139,13 @@ class VBucketAwareMemcached(object):
         memcached_client.bucket_select(bucket)
         memcached_client.enable_collections()
         memcached_client.hello(memcacheConstants.FEATURE_COLLECTIONS)
-        memcached_client.get_collections(True)
+        rv = memcached_client.get_collections(True)
 
     def _setMulti_rec(self, memcached_client, exp, flags, keyval, pause, timeout, rec_caller_fn, collection=None):
         try:
+            if collection:
+                print("collection is {}".format(collection))
+                self.enable_collection(memcached_client)
             errors = memcached_client.setMulti(exp, flags, keyval, collection=collection)
 
             if not errors:
@@ -1248,6 +1251,9 @@ class VBucketAwareMemcached(object):
 
     def _getMulti_from_mc(self, memcached_client, keys, pause, timeout, rec_caller_fn, collection=None):
         try:
+            if collection:
+                print("collection is {}".format(collection))
+                self.enable_collection(memcached_client)
             return memcached_client.getMulti(keys, collection=collection)
 
         except (EOFError, socket.error) as error:
