@@ -34,7 +34,6 @@ from testconstants import MAX_COMPACTION_THRESHOLD
 from testconstants import LINUX_DIST_CONFIG
 from membase.helper.cluster_helper import ClusterOperationHelper
 from security.rbac_base import RbacBase
-from collection.collections_rest_client import Collections_Rest
 
 from couchbase_cli import CouchbaseCLI
 import testconstants
@@ -202,10 +201,6 @@ class BaseTestCase(unittest.TestCase):
             self.standard_bucket_priority = self.input.param("standard_bucket_priority", None)
             # end of bucket parameters spot (this is ongoing)
             self.disable_diag_eval_on_non_local_host = self.input.param("disable_diag_eval_non_local", False)
-
-            if self.collection:
-                cli = CouchbaseCLI(self.master, self.master.rest_username, self.master.rest_password)
-                cli.enable_dp()
 
             if self.skip_setup_cleanup:
                 self.buckets = RestConnection(self.master).get_buckets()
@@ -619,7 +614,7 @@ class BaseTestCase(unittest.TestCase):
             bucket_params - A dictionary containing the parameters needed to create a bucket."""
 
         bucket_params = dict()
-        bucket_params['server'] = server
+        bucket_params['server'] = server or self.master
         bucket_params['bucket_name'] = bucket_name
         bucket_params['replicas'] = replicas
         bucket_params['size'] = size
@@ -637,14 +632,14 @@ class BaseTestCase(unittest.TestCase):
 
     def _bucket_creation(self):
         if self.default_bucket:
-            default_params=self._create_bucket_params(
+            default_params = self._create_bucket_params(
                 server=self.master, bucket_name=self.default_bucket_name, size=self.bucket_size,
                 replicas=self.num_replicas, bucket_type=self.bucket_type,
                 enable_replica_index=self.enable_replica_index,
                 eviction_policy=self.eviction_policy, lww=self.lww,
                 maxttl=self.maxttl, compression_mode=self.compression_mode)
             self.cluster.create_default_bucket(default_params)
-            self.buckets.append(Bucket(name="default",
+            self.buckets.append(Bucket(name=self.default_bucket_name,
                                        authType="sasl",
                                        saslPassword="",
                                        num_replicas=self.num_replicas,
@@ -653,19 +648,34 @@ class BaseTestCase(unittest.TestCase):
                                        lww=self.lww,
                                        type=self.bucket_type))
             if self.enable_time_sync:
-                self._set_time_sync_on_buckets(['default'])
-
-            self.collection_name["default"]=[]
-
-            if self.collection:
-                self.create_scope_collection(scope_num=self.scope_num, collection_num=self.collection_num)
-
-
+                self._set_time_sync_on_buckets([self.default_bucket_name])
 
         self._create_sasl_buckets(self.master, self.sasl_buckets)
         self._create_standard_buckets(self.master, self.standard_buckets)
         self._create_memcached_buckets(self.master, self.memcached_buckets)
 
+        if len(self.master.collections_map):
+            self._create_scope_collection()
+
+    def _create_scope_collection(self):
+        collection_tasks = []
+        # Supported collection level param in 7.0
+        supported_collection_params = ["maxTTL"]
+
+        for spec in self.master.collections_map.items():
+            collection_name = spec[0]
+            collection_params = {}
+            for bucket in self.buckets:
+                map_bucket_name = spec[1]["bucket"]
+                if map_bucket_name == bucket.name:
+                    scope_name = spec[1]["scope"]
+                    for param in supported_collection_params:
+                        if param in spec[1].keys():
+                            collection_params[param] = spec[1][param]
+                    collection_tasks.append(
+                        self.cluster.create_scope_collection(self.master, map_bucket_name, scope_name, collection_name, collection_params))
+        for task in collection_tasks:
+            task.result(self.wait_timeout)
 
     def _get_bucket_size(self, mem_quota, num_buckets):
         # min size is 100MB now
@@ -735,9 +745,6 @@ class BaseTestCase(unittest.TestCase):
         if self.enable_time_sync:
             self._set_time_sync_on_buckets(['bucket' + str(i) \
                                              for i in range(num_buckets)])
-        for i in range(num_buckets):
-            name = self.sasl_bucket_name + str(i)
-            self.collection_name[name]=[]
 
     def _create_standard_buckets(self, server, num_buckets, server_id=None, bucket_size=None):
         if not num_buckets:
@@ -780,18 +787,6 @@ class BaseTestCase(unittest.TestCase):
         if self.enable_time_sync:
             self._set_time_sync_on_buckets(['standard_bucket' + str(i) for i in range(num_buckets)])
 
-        for i in range(num_buckets):
-            name = 'standard_bucket' + str(i)
-            self.collection_name[name]=[]
-            if self.collection:
-                if self.standard_buckets_scope[i] is not list:
-                    scope_num=self.standard_buckets_scope[i]
-                    collection_num = [2] * self.standard_buckets_scope[i]
-                else:
-                    scope_num=self.standard_buckets_scope[i].remove
-                    collection_num = self.standard_buckets_scope[i]
-                self.create_scope_collection(scope_num=scope_num, collection_num=collection_num, bucket=name)
-
     def _create_buckets(self, server, bucket_list, server_id=None, bucket_size=None):
         if server_id is None:
             server_id = RestConnection(server).get_nodes_self().id
@@ -829,8 +824,6 @@ class BaseTestCase(unittest.TestCase):
         if self.enable_time_sync:
             self._set_time_sync_on_bucket( bucket_list )
 
-        for bucket_name in bucket_list:
-            self.collection_name[bucket_name]=[]
 
     def _create_memcached_buckets(self, server, num_buckets, server_id=None, bucket_size=None):
         if not num_buckets:
@@ -2775,21 +2768,6 @@ class BaseTestCase(unittest.TestCase):
         rest = RestConnection(self.master)
         version = rest.get_nodes_self().version
         return float(version[:3])
-
-    def create_scope(self, bucket="default", scope="scope0"):
-        Collections_Rest(self.master).create_scope(bucket, scope)
-
-    def create_collection(self, bucket="default", scope="scope0", collection="mycollection0"):
-        Collections_Rest(self.master).create_collection(bucket, scope, collection)
-
-    def delete_collection(self, bucket="default", scope='_default', collection='_default'):
-        Collections_Rest(self.master).delete_collection(bucket, scope, collection)
-
-    def delete_scope(self, scope, bucket="default"):  # scope should be passed as default scope can not be deleted
-        Collections_Rest(self.master).delete_scope(scope, bucket)
-
-    def create_scope_collection(self, scope_num, collection_num, bucket="default"):
-        Collections_Rest(self.master).create_scope_collection(self.collection_name, scope_num, collection_num, bucket)
 
     def _record_vbuckets(self, master, servers):
         map = dict()

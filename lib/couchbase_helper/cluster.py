@@ -57,6 +57,36 @@ class Cluster(object):
         self.task_manager.schedule(_task)
         return _task
 
+    def async_create_scope(self, server, bucket_name, scope_name):
+        _task = ScopeCreateTask(server, bucket_name, scope_name)
+        self.task_manager.schedule(_task)
+        return _task
+
+    def async_create_collection(self, server, bucket_name, scope_name, collection_name, collection_params):
+        _task = CollectionCreateTask(server, bucket_name, scope_name, collection_name, collection_params)
+        self.task_manager.schedule(_task)
+        return _task
+
+    def async_create_scope_collection(self, server, bucket_name, scope_name, collection_name, collection_params):
+        _task = ScopeCollectionCreateTask(server, bucket_name, scope_name, collection_name, collection_params)
+        self.task_manager.schedule(_task)
+        return _task
+
+    def async_delete_scope(self, server, bucket_name, scope_name):
+        _task = ScopeDeleteTask(server, bucket_name, scope_name)
+        self.task_manager.schedule(_task)
+        return _task
+
+    def async_delete_collection(self, server, bucket_name, scope_name, collection_name):
+        _task = CollectionDeleteTask(server, bucket_name, scope_name, collection_name)
+        self.task_manager.schedule(_task)
+        return _task
+
+    def async_delete_scope_collection(self, server, bucket_name, scope_name, collection_name):
+        _task = ScopeCollectionDeleteTask(server, bucket_name, scope_name, collection_name)
+        self.task_manager.schedule(_task)
+        return _task
+
     def async_create_memcached_bucket(self, name, port, bucket_params):
         """Asynchronously creates a standard bucket
 
@@ -137,12 +167,15 @@ class Cluster(object):
     def async_load_gen_docs(self, server, bucket, generator, kv_store, op_type, exp=0, flag=0, only_store_hash=True,
                             batch_size=1, pause_secs=1, timeout_secs=5, proxy_client=None, compression=True, collection=None):
 
+        # if collection:
+        #     _task = SDKClientTask(server, bucket, collection, op_type)
+        # else:
         if isinstance(generator, list):
-                _task = LoadDocumentsGeneratorsTask(server, bucket, generator, kv_store, op_type, exp, flag,
-                                                    only_store_hash, batch_size, compression=compression, collection=collection)
+            _task = LoadDocumentsGeneratorsTask(server, bucket, generator, kv_store, op_type, exp, flag,
+                                                only_store_hash, batch_size, compression=compression, collection=collection)
         else:
-                _task = LoadDocumentsGeneratorsTask(server, bucket, [generator], kv_store, op_type, exp, flag,
-                                                    only_store_hash, batch_size, compression=compression, collection=collection)
+            _task = LoadDocumentsGeneratorsTask(server, bucket, [generator], kv_store, op_type, exp, flag,
+                                                only_store_hash, batch_size, compression=compression, collection=collection)
 
         self.task_manager.schedule(_task)
         return _task
@@ -156,12 +189,15 @@ class Cluster(object):
 
     def async_verify_data(self, server, bucket, kv_store, max_verify=None,
                           only_store_hash=True, batch_size=1, replica_to_read=None, timeout_sec=5, compression=True, collection=None):
-        if batch_size > 1:
-            _task = BatchedValidateDataTask(server, bucket, kv_store, max_verify, only_store_hash, batch_size,
-                                            timeout_sec, compression=compression, collection=collection)
+        if collection:
+            _task = SDKClientTask(server, bucket, collection, "verify")
         else:
-            _task = ValidateDataTask(server, bucket, kv_store, max_verify, only_store_hash, replica_to_read,
-                                     compression=compression, collection=collection)
+            if batch_size > 1:
+                _task = BatchedValidateDataTask(server, bucket, kv_store, max_verify, only_store_hash, batch_size,
+                                                timeout_sec, compression=compression, collection=collection)
+            else:
+                _task = ValidateDataTask(server, bucket, kv_store, max_verify, only_store_hash, replica_to_read,
+                                         compression=compression, collection=collection)
         self.task_manager.schedule(_task)
         return _task
 
@@ -294,6 +330,30 @@ class Cluster(object):
             boolean - Whether or not the bucket was created."""
         _task = self.async_create_standard_bucket(name, port, bucket_params)
         return _task.result(timeout)
+
+    def create_scope(self, server, bucket_name, scope_name):
+        _task = self.async_create_scope(server, bucket_name, scope_name)
+        return _task
+
+    def create_collection(self, server, bucket_name, scope_name, collection_name, collection_params):
+        _task = self.async_create_collection(server, bucket_name, scope_name, collection_name, collection_params)
+        return _task
+
+    def create_scope_collection(self, server, bucket_name, scope_name, collection_name, collection_params):
+        _task = self.async_create_scope_collection(server, bucket_name, scope_name, collection_name, collection_params)
+        return _task
+
+    def delete_scope(self, server, bucket_name, scope_name):
+        _task = self.async_delete_scope(server, bucket_name, scope_name)
+        return _task
+
+    def delete_collection(self, server, bucket_name, scope_name, collection_name):
+        _task = self.async_delete_collection(server, bucket_name, scope_name, collection_name)
+        return _task
+
+    def delete_scope_collection(self, server, bucket_name, scope_name, collection_name):
+        _task = self.async_delete_scope_collection(server, bucket_name, scope_name, collection_name)
+        return _task
 
     def bucket_delete(self, server, bucket='default', timeout=None):
         """Synchronously deletes a bucket
